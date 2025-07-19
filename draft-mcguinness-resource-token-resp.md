@@ -83,27 +83,26 @@ This document introduces a new parameter, `resource`, to be returned in the toke
 
 ## Syntax
 
-Authorization servers that support this specification MAY include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}.
+Authorization servers that support this specification SHOULD include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}} for a valid resource request.
 
 The value of the `resource` parameter MUST be an absolute URI (as defined in {{RFC3986}}) that identifies the resource server for which the token is valid.
 
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: no-store
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Cache-Control: no-store
 
-{
-  "access_token": "2YotnFZFEjr1zCsicMWpAA",
-  "token_type": "Bearer",
-  "expires_in": 3600,
-  "resource": "https://api.example.com/"
-}
-```
+    {
+      "access_token": "2YotnFZFEjr1zCsicMWpAA",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "resource": "https://api.example.com/"
+    }
 
 ## Semantics
 
 - If the client included one or more `resource` parameters in the request per {{RFC8707}}, the `resource` value in the response MUST reflect the accepted or selected resource.
 - If the authorization server selected a default resource, it SHOULD return that selected resource in the `resource` parameter.
+- If the requested `resource` is not valid for the client, user, or authorization server, then the authorization server SHOULD return an `invalid_target` OAuth error response code according to {{RFC6749}}
 - If the token is not bound to a specific resource or the concept does not apply, the `resource` parameter SHOULD be omitted.
 
 # Client Processing
@@ -113,6 +112,133 @@ Clients that support this extension:
 - SHOULD compare the returned `resource` URI against the originally requested `resource` URI(s), if applicable.
 - MUST treat mismatches as errors, unless the client is explicitly designed to handle token audience negotiation.
 - MUST NOT use the token with a resource other than the one identified in the response.
+
+## Examples
+
+### Single Protected Resource
+
+#### Authorization Request
+
+Client makes an authorization request for a protected resource using the URL as the resource indicator
+
+    GET /authorize?response_type=code
+      &client_id=client123
+      &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
+      &scope=resource%3Aread
+      &state=abc123
+      &resource=https%3A%2F%2Fresource.example.com%2F
+      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+      &code_challenge_method=S256
+    HTTP/1.1
+    Host: authorization-server.example.com
+
+#### Redirect
+
+User successfully authenticates and delegates access to the client for the requested resource and scopes
+
+    HTTP/1.1 302 Found
+    Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+
+#### Token Request
+
+    POST /token HTTP/1.1
+    Host: authorization-server.example.com
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=authorization_code&
+    code=SplxlOBeZQQYbYS6WxSbIA&
+    redirect_uri=https%3A%2F%2Fclient.example%2Fcallback&
+    client_id=client123&
+    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+#### Token Response
+
+Resource is confirmed and unambiguous.
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Cache-Control: no-store
+
+    {
+      "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "resource:read",
+      "resource": "https://resource.example.com/"
+    }
+
+### Default Resource
+
+#### Authorization Request
+
+Client makes an authorization request  without a `resource` indicator
+
+    GET /authorize?response_type=code
+      &client_id=client123
+      &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
+      &scope=resource%3Aread
+      &state=abc123
+      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+      &code_challenge_method=S256
+    HTTP/1.1
+    Host: authorization-server.example.com
+
+#### Redirect
+
+User successfully authenticates and delegates access to the client for the requested scopes
+
+    HTTP/1.1 302 Found
+    Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+
+#### Token Request
+
+    POST /token HTTP/1.1
+    Host: authorization-server.example.com
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=authorization_code&
+    code=SplxlOBeZQQYbYS6WxSbIA&
+    redirect_uri=https%3A%2F%2Fclient.example%2Fcallback&
+    client_id=client123&
+    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+#### Token Response
+
+Default resource is confirmed and unambiguous.
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Cache-Control: no-store
+
+    {
+      "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "resource:read",
+      "resource": "https://resource.example.com/"
+    }
+
+### Invalid Resource
+
+#### Authorization Request
+
+    GET /authorize?response_type=code
+      &client_id=client123
+      &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
+      &scope=resource%3Aread
+      &state=invalid123
+      &resource=https%3A%2F%2Fevil.example.net%2F
+      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+      &code_challenge_method=S256
+    HTTP/1.1
+    Host: authorization-server.example.com
+
+#### Error Redirect
+
+The server rejected the requested resource value (e.g authorization or policy violation, resource is not valid, etc).
+
+      HTTP/1.1 302 Found
+      Location: https://client.example/callback?error=invalid_target&error_description=Resource%20not%20allowed&state=invalid123
 
 # Security Considerations
 
@@ -146,6 +272,44 @@ This document registers the following value in the OAuth Parameters registry est
 
 
 --- back
+
+# Additional Examples
+
+## Requesting a token for a dynamically discovered protected resource
+
+GET /.well-known/oauth-protected-resource
+Host: resource.example.com
+
+{
+  "issuer": "https://authorization-server.example.com/",
+  "authorization_server": "https://authorization-server.example.com/",
+  "resource_indicator_supported": true,
+  "scopes_supported": ["resource:read", "resource:write"]
+}
+
+GET /authorize?response_type=code
+  &client_id=client123
+  &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
+  &scope=resource%3Aread
+  &state=meta123
+  &resource=https%3A%2F%2Fresource.example.com%2F
+  &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+  &code_challenge_method=S256
+
+
+The client verified the correct issuer, confirmed resource_indicator_supported, and requested a token explicitly bound to the discovered resource.
+
+
+HTTP/1.1
+Host: authorization-server.example.com
+
+{
+  "access_token": "eyMeta...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "resource:read",
+  "resource": "https://resource.example.com/"
+}
 
 # Acknowledgments
 {:numbered="false"}
