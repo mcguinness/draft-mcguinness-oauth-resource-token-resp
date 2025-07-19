@@ -398,29 +398,120 @@ Appendix A.  Additional Examples
 
 A.1.  Requesting a token for a dynamically discovered protected resource
 
-   GET /.well-known/oauth-protected-resource Host: resource.example.com
+   The following example details the need for the resource parameter
+   when a client dynamically discovers an authorization server and
+   obtains an access token using [RFC9728] and [RFC8414]
 
-   { "issuer": "https://authorization-server.example.com/",
-   "authorization_server": "https://authorization-server.example.com/",
-   "resource_indicator_supported": true, "scopes_supported":
-   ["resource:read", "resource:write"] }
+   Client attempts to access a protected a resource without a valid
+   access token
 
-   GET /authorize?response_type=code &client_id=client123
-   &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
-   &scope=resource%3Aread &state=meta123
-   &resource=https%3A%2F%2Fresource.example.com%2F
-   &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
-   &code_challenge_method=S256
+   GET /resource
+   Host: api.example.com
+   Accept: application/json
 
-   The client verified the correct issuer, confirmed
-   resource_indicator_supported, and requested a token explicitly bound
-   to the discovered resource.
+   Client is challenged for authentication
 
-   HTTP/1.1 Host: authorization-server.example.com
+   HTTP/1.1 401 Unauthorized
+   WWW-Authenticate: Bearer resource_metadata=
+     "https://api.example.com/.well-known/oauth-protected-resource"
 
-   { "access_token": "eyMeta...", "token_type": "Bearer", "expires_in":
-   3600, "scope": "resource:read", "resource":
-   "https://resource.example.com/" }
+   Client fetches the resource's OAuth 2.0 Protected Resource Metadata
+   per [RFC9728] to dynamically discover an authorization server that
+   can issue an access token for the resource.
+
+   GET /.well-known/oauth-protected-resource
+   Host: api.example.com
+   Accept: application/json
+
+   HTTP/1.1 200 Ok
+   Content-Type: application/json
+
+   {
+      "resource":
+        "https://api.example.com/resource",
+      "authorization_servers":
+        [ "https://authorization-server.example.com/" ],
+      "bearer_methods_supported":
+        ["header", "body"],
+      "scopes_supported":
+        ["resource.read", "resource.write"],
+      "resource_documentation":
+        "https://api.example.com/resource_documentation.html"
+    }
+
+   Client discovers the Authorization Server configuration per [RFC8414]
+
+GET /.well-known/oauth-authorization-server
+Host: authorization-server.example.com
+Accept: application/json
+
+HTTP/1.1 200 Ok
+Content-Type: application/json
+
+{
+  "issuer": "https://authorization-server.example.com/",
+  "authorization_endpoint": "https://authorization-server.example.com/oauth2/authorize",
+  "token_endpoint": "https://authorization-server.saas.com/oauth2/token",
+  "jwks_uri": "https://authorization-server.example.com/oauth2/keys",
+  "scopes_supported": [
+    "resource.read", "resource.write"
+  ],
+  "response_types_supported": [
+    "code"
+  ],
+  "grant_types_supported": [
+    "authorization_code", "refresh_token"
+  ],
+  ...
+}
+
+   Client makes an authorization request for the resource
+
+   GET /oauth2/authorize?response_type=code
+     &client_id=client123
+     &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
+     &scope=resource%3Aread
+     &state=abc123
+     &resource=https%3A%2F%api.example.com%2Fresource
+     &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+     &code_challenge_method=S256
+   HTTP/1.1
+   Host: authorization-server.example.com
+
+   User successfully authenticates and delegates access to the client
+   for the requested resource and scopes
+
+HTTP/1.1 302 Found
+Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+
+   Client exchanges the authorization code for an access token
+
+   POST /oauth2/token HTTP/1.1
+   Host: authorization-server.example.com
+   Content-Type: application/x-www-form-urlencoded
+
+   grant_type=authorization_code&
+   code=SplxlOBeZQQYbYS6WxSbIA&
+   redirect_uri=https%3A%2F%2Fclient.example%2Fcallback&
+   client_id=client123&
+   code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+   Client obtains an access token for the resource
+
+   HTTP/1.1 200 OK
+   Content-Type: application/json
+   Cache-Control: no-store
+
+   {
+     "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+     "token_type": "Bearer",
+     "expires_in": 3600,
+     "scope": "resource:read",
+     "resource": "https://api.example.com/resource"
+   }
+
+   Client verifies the requested a token explicitly bound to the
+   discovered resource.
 
 Acknowledgments
 
