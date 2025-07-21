@@ -79,13 +79,22 @@ This document introduces a new parameter, `resource`, to be returned in the toke
 
 {::boilerplate bcp14-tagged}
 
+## Terminology
+
+    StringOrURI
+      A JSON string value, with the additional requirement that while
+      arbitrary string values MAY be used, any value containing a ":"
+      character MUST be a URI {{RFC3986}}.  StringOrURI values are
+      compared as case-sensitive strings with no transformations or
+      canonicalizations applied.
+
 # Resource Parameter in Token Response
 
 ## Syntax
 
 Authorization servers that support this specification SHOULD include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}} for a valid resource request.
 
-The value of the `resource` parameter MUST be an absolute URI (as defined in {{RFC3986}}) that identifies the resource server for which the token is valid.
+The value of the `resource` parameter MUST be an array of case-sensitive strings, each containing a StringOrURI value that identifies the resource server for which the token is valid.  In the special case when the token is targted to a single resource, the `resource` value MAY be a single case-sensitive string containing a StringOrURI value.
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -100,7 +109,7 @@ The value of the `resource` parameter MUST be an absolute URI (as defined in {{R
 
 ## Semantics
 
-- If the client included one or more `resource` parameters in the request per {{RFC8707}}, the `resource` value in the response MUST reflect the accepted or selected resource.
+- If the client included one or more `resource` parameters in the request per {{RFC8707}}, the `resource` value in the response MUST reflect the accepted or selected resource(s).
 - If the authorization server selected a default resource, it SHOULD return that selected resource in the `resource` parameter.
 - If the requested `resource` is not valid for the client, user, or authorization server, then the authorization server SHOULD return an `invalid_target` OAuth error response code according to {{RFC6749}}
 - If the token is not bound to a specific resource or the concept does not apply, the `resource` parameter SHOULD be omitted.
@@ -109,11 +118,67 @@ The value of the `resource` parameter MUST be an absolute URI (as defined in {{R
 
 Clients that support this extension:
 
-- SHOULD compare the returned `resource` URI against the originally requested `resource` URI(s), if applicable.
+- SHOULD compare the returned `resource` URIs against the originally requested `resource` URI(s), if applicable.
 - MUST treat mismatches as errors, unless the client is explicitly designed to handle token audience negotiation.
 - MUST NOT use the token with a resource other than the one identified in the response.
 
 ## Examples
+
+### Multiple Protected Resources
+
+#### Authorization Request
+
+Client makes an authorization request for a protected resource using the URL as the resource indicator
+
+    GET /authorize?response_type=code
+      &client_id=client123
+      &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
+      &scope=resource%3Aread
+      &state=abc123
+      &resource=https%3A%2F%2FresourceA.example.com%2F
+      &resource=https%3A%2F%2FresourceB.example.com%2F
+      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+      &code_challenge_method=S256
+    HTTP/1.1
+    Host: authorization-server.example.com
+
+#### Redirect
+
+User successfully authenticates and delegates access to the client for the requested resource and scopes
+
+    HTTP/1.1 302 Found
+    Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+
+#### Token Request
+
+    POST /token HTTP/1.1
+    Host: authorization-server.example.com
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=authorization_code&
+    code=SplxlOBeZQQYbYS6WxSbIA&
+    redirect_uri=https%3A%2F%2Fclient.example%2Fcallback&
+    client_id=client123&
+    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+#### Token Response
+
+Both resources are confirmed and unambiguous.
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Cache-Control: no-store
+
+    {
+      "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "resource:read",
+      "resource": [
+        "https://resourceA.example.com/",
+        "https://resourceB.example.com/"
+      ]
+    }
 
 ### Single Protected Resource
 
