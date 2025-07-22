@@ -104,7 +104,7 @@ Table of Contents
    deployments where multiple resources (or APIs) are involved, the
    Resource Indicators for OAuth 2.0 [RFC8707] specification introduced
    a resource request parameter that allows clients to indicate the
-   resource server for which the token is intended.
+   protected resource for which the token is intended.
 
    However, [RFC8707] does not require the authorization server to
    return any confirmation of the resource to which the access token
