@@ -1,24 +1,4 @@
 ---
-###
-# Internet-Draft Markdown Template
-#
-# Rename this file from draft-todo-yourname-protocol.md to get started.
-# Draft name format is "draft-<yourname>-<workgroup>-<name>.md".
-#
-# For initial setup, you only need to edit the first block of fields.
-# Only "title" needs to be changed; delete "abbrev" if your title is short.
-# Any other content can be edited, but be careful not to introduce errors.
-# Some fields will be set automatically during setup if they are unchanged.
-#
-# Don't include "-00" or "-latest" in the filename.
-# Labels in the form draft-<yourname>-<workgroup>-<name>-latest are used by
-# the tools to refer to the current version; see "docname" for example.
-#
-# This template uses kramdown-rfc: https://github.com/cabo/kramdown-rfc
-# You can replace the entire file if you prefer a different format.
-# Change the file extension to match the format (.xml for XML, etc...)
-#
-###
 title: "OAuth 2.0 Resource Parameter in Access Token Response"
 abbrev: "Resource Token Response Parameter"
 docName: "draft-mcguinness-resource-token-resp-latest"
@@ -111,7 +91,7 @@ The value of the `resource` parameter MUST be an array of case-sensitive strings
 
 - If the client included one or more `resource` parameters in the request per {{RFC8707}}, the `resource` value in the response MUST reflect the accepted or selected resource(s).
 - If the authorization server selected a default resource, it SHOULD return that selected resource in the `resource` parameter.
-- If the requested `resource` is not valid for the client, user, or authorization server, then the authorization server SHOULD return an `invalid_target` OAuth error response code according to {{RFC6749}}
+- If the requested `resource` is not valid for the client, user, or authorization server, then the authorization server SHOULD return an `invalid_target` OAuth error response code according to {{RFC8707}}
 - If the token is not bound to a specific resource or the concept does not apply, the `resource` parameter SHOULD be omitted.
 
 # Client Processing
