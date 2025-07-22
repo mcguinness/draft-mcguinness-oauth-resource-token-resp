@@ -1,6 +1,6 @@
 <!-- regenerate: on (set to off if you edit this file) -->
 
-# OAuth 2.0 Resource Indicator in Token Response
+# OAuth 2.0 Resource Parameter in Access Token Response
 
 This is the working area for the individual Internet-Draft, "OAuth 2.0 Resource Indicator in Token Response".
 
