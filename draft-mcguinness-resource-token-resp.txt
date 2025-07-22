@@ -108,10 +108,10 @@ Table of Contents
 
    However, Resource Indicators for OAuth 2.0 [RFC8707] does not require
    the authorization server to return any confirmation of the resource
-   to which the access token applies (audience restricted).  When an
-   authorization request includes one or more resource parameters, the
-   authorization server can exhibit a range of behaviors depending on
-   its capabilities and policy configuration.
+   to which the access token applies (audience).  When an authorization
+   request includes one or more resource parameters, the authorization
+   server can exhibit a range of behaviors depending on its capabilities
+   and policy configuration.
 
    An authorization server MAY:
 
@@ -128,7 +128,7 @@ Table of Contents
 
    *  Override the requested resource values and issue a token audience-
       restricted to an authorization-server-defined set of resources,
-      based on local policy or client registration.
+      based on policy or client registration.
 
    *  Reject one or more requested resource values and return an OAuth
       2.0 error response with the error code invalid_target as defined
