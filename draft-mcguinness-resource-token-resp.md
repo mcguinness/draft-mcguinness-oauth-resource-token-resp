@@ -44,15 +44,15 @@ informative:
 
 --- abstract
 
-This specification defines a new parameter, `resource`, to be returned in OAuth 2.0 access token responses. It enables clients to confirm the intended protected resource (resource server) for the issued token. This mitigates ambiguity and certain classes of security vulnerabilities such as resource mix-up attacks, particularly in systems that use the Resource Indicators for OAuth 2.0 specification ({{RFC8707}}).
+This specification defines a new parameter, `resource`, to be returned in OAuth 2.0 access token responses. It enables clients to confirm the intended protected resource (resource server) for the issued token. This mitigates ambiguity and certain classes of security vulnerabilities such as resource mix-up attacks, particularly in systems that use the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
 
 --- middle
 
 # Introduction
 
-OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple resources (or APIs) are involved, the {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the resource server for which the token is intended.
+OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple resources (or APIs) are involved, the Resource Indicators for OAuth 2.0 {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the resource server for which the token is intended.
 
-However, Resource Indicators for OAuth 2.0 {{RFC8707}} does not require the authorization server to return any confirmation of the resource to which the access token applies (audience).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
+However, {{RFC8707}} does not require the authorization server to return any confirmation of the resource to which the access token applies (audience).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
 
 An authorization server MAY:
 
@@ -89,7 +89,7 @@ The term "StringOrURI" is defined by the JWT specification {{RFC7519}}.
 
 Authorization servers that support this specification SHOULD include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}} for a valid token request.
 
-The value of the `resource` parameter MUST be an array of case-sensitive strings, each containing a StringOrURI value that identifies the resource server for which the token is valid.  In the special case when the token is targeted to a single resource, the `resource` value MAY be a single case-sensitive string containing a StringOrURI value.
+The value of the `resource` parameter MUST be an array of case-sensitive strings, each containing a StringOrURI value that identifies the protected resource for which the token is valid.  In the special case when the token is targeted to a single resource, the `resource` value MAY be a single case-sensitive string containing a StringOrURI value.
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -306,7 +306,8 @@ The server rejected the requested resource value (e.g authorization or policy vi
 
 The lack of confirmation about the audience of an access token introduces a security risk in OAuth deployments, particularly when:
 
-- A client uses multiple authorization servers and resource servers;
+- A client uses multiple authorization servers and resource servers
+- A client dynamically discovers an authorization server and attempts to obtain an access token at runtime via a HTTP authorization challenge with OAuth 2.0 Protected Resource Metadata {{RFC9728}}
 - An attacker attempts a **mix-up attack** where a token intended for one resource is used at another;
 - The authorization server ignores or overrides the requested resource without informing the client.
 
