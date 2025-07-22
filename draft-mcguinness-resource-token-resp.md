@@ -39,6 +39,7 @@ normative:
   RFC9207:
   RFC3986:
   RFC7519:
+  RFC9700:
 
 informative:
 
@@ -452,7 +453,7 @@ Client verifies the requested a token explicitly bound to the discovered resourc
 # Acknowledgments
 {:numbered="false"}
 
-This proposal builds on prior work in OAuth 2.0 extensibility and security analysis, particularly {{RFC8707}} and {{RFC9207}}.
+This proposal builds on prior work in OAuth 2.0 extensibility and security analysis, particularly {{RFC8707}}, {{RFC9700}}, and {{RFC9207}}.
 
 # Document History
 {:numbered="false"}
