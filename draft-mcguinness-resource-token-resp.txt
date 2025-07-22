@@ -163,12 +163,15 @@ Table of Contents
 
 2.1.  Terminology
 
-   StringOrURI
-     A JSON string value, with the additional requirement that while
-     arbitrary string values MAY be used, any value containing a ":"
-     character MUST be a URI {{RFC3986}}.  StringOrURI values are
-     compared as case-sensitive strings with no transformations or
-     canonicalizations applied.
+   The terms "client", "authorization server", "resource server',
+   "access token", "protected resource", "authorization request",
+   "access token request", "access token response" is defined by the
+   OAuth 2.0 Authorization Framework specification [RFC6749].
+
+   The term "resource" is defined by the Resource Indicators for OAuth
+   2.0 specification [RFC8707].
+
+   The term "StringOrURI" is defined by the JWT specification [RFC7519].
 
 3.  Resource Parameter in Token Response
 
@@ -495,6 +498,10 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
               Resource Identifier (URI): Generic Syntax", STD 66,
               RFC 3986, DOI 10.17487/RFC3986, January 2005,
               <https://www.rfc-editor.org/info/rfc3986>.
+
+   [RFC7519]  Jones, M., Bradley, J., and N. Sakimura, "JSON Web Token
+              (JWT)", RFC 7519, DOI 10.17487/RFC7519, May 2015,
+              <https://www.rfc-editor.org/info/rfc7519>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,

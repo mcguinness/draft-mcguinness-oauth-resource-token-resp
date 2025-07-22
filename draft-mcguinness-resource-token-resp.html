@@ -1293,16 +1293,9 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <h3 id="name-terminology">
 <a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
         </h3>
-<div class="alignLeft art-text artwork" id="section-2.1-1">
-<pre>
-StringOrURI
-  A JSON string value, with the additional requirement that while
-  arbitrary string values MAY be used, any value containing a ":"
-  character MUST be a URI {{RFC3986}}.  StringOrURI values are
-  compared as case-sensitive strings with no transformations or
-  canonicalizations applied.
-</pre><a href="#section-2.1-1" class="pilcrow">¶</a>
-</div>
+<p id="section-2.1-1">The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" is defined by the OAuth 2.0 Authorization Framework specification <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.1-2">The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">The term "StringOrURI" is defined by the JWT specification <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1789,6 +1782,10 @@ Host: authorization-server.example.com
 <dt id="RFC3986">[RFC3986]</dt>
       <dd>
 <span class="refAuthor">Berners-Lee, T.</span>, <span class="refAuthor">Fielding, R.</span>, and <span class="refAuthor">L. Masinter</span>, <span class="refTitle">"Uniform Resource Identifier (URI): Generic Syntax"</span>, <span class="seriesInfo">STD 66</span>, <span class="seriesInfo">RFC 3986</span>, <span class="seriesInfo">DOI 10.17487/RFC3986</span>, <time datetime="2005-01" class="refDate">January 2005</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3986">https://www.rfc-editor.org/info/rfc3986</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7519">[RFC7519]</dt>
+      <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Token (JWT)"</span>, <span class="seriesInfo">RFC 7519</span>, <span class="seriesInfo">DOI 10.17487/RFC7519</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7519">https://www.rfc-editor.org/info/rfc7519</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
       <dd>
