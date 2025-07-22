@@ -2,7 +2,7 @@
 
 # OAuth 2.0 Resource Parameter in Access Token Response
 
-This is the working area for the individual Internet-Draft, "OAuth 2.0 Resource Indicator in Token Response".
+This is the working area for the individual Internet-Draft, "OAuth 2.0 Resource Parameter in Access Token Response".
 
 * [Editor's Copy](https://mcguinness.github.io/draft-mcguinness-resource-token-resp/#go.draft-mcguinness-resource-token-resp.html)
 * [Datatracker Page](https://datatracker.ietf.org/doc/draft-mcguinness-resource-token-resp)
