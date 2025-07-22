@@ -5,8 +5,8 @@
 Web Authorization Protocol                                 K. McGuinness
 Internet-Draft                                               Independent
 Intended status: Standards Track                               J. Hanson
-Expires: 22 January 2026                                    Keycard Labs
-                                                            21 July 2025
+Expires: 23 January 2026                                    Keycard Labs
+                                                            22 July 2025
 
 
          OAuth 2.0 Resource Parameter in Access Token Response
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 January 2026.
+   This Internet-Draft will expire on 23 January 2026.
 
 Copyright Notice
 
@@ -81,8 +81,8 @@ Table of Contents
      3.2.  Semantics
    4.  Client Processing
      4.1.  Examples
-       4.1.1.  Multiple Protected Resources
-       4.1.2.  Single Protected Resource
+       4.1.1.  Single Protected Resource
+       4.1.2.  Multiple Protected Resources
        4.1.3.  Default Resource
        4.1.4.  Invalid Resource
    5.  Security Considerations
@@ -139,12 +139,12 @@ Table of Contents
 
    Authorization servers that support this specification SHOULD include
    the resource parameter in successful access token responses, as
-   defined in Section 5.1 of [RFC6749] for a valid resource request.
+   defined in Section 5.1 of [RFC6749] for a valid token request.
 
    The value of the resource parameter MUST be an array of case-
    sensitive strings, each containing a StringOrURI value that
    identifies the resource server for which the token is valid.  In the
-   special case when the token is targted to a single resource, the
+   special case when the token is targeted to a single resource, the
    resource value MAY be a single case-sensitive string containing a
    StringOrURI value.
 
@@ -190,7 +190,7 @@ Table of Contents
 
 4.1.  Examples
 
-4.1.1.  Multiple Protected Resources
+4.1.1.  Single Protected Resource
 
 4.1.1.1.  Authorization Request
 
@@ -202,8 +202,7 @@ Table of Contents
      &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
      &scope=resource%3Aread
      &state=abc123
-     &resource=https%3A%2F%2FresourceA.example.com%2F
-     &resource=https%3A%2F%2FresourceB.example.com%2F
+     &resource=https%3A%2F%2Fresource.example.com%2F
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
      &code_challenge_method=S256
    HTTP/1.1
@@ -231,7 +230,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
 
 4.1.1.4.  Token Response
 
-   Both resources are confirmed and unambiguous.
+   Resource is confirmed and unambiguous.
 
    HTTP/1.1 200 OK
    Content-Type: application/json
@@ -242,25 +241,23 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
      "token_type": "Bearer",
      "expires_in": 3600,
      "scope": "resource:read",
-     "resource": [
-       "https://resourceA.example.com/",
-       "https://resourceB.example.com/"
-     ]
+     "resource": "https://resource.example.com/"
    }
 
-4.1.2.  Single Protected Resource
+4.1.2.  Multiple Protected Resources
 
 4.1.2.1.  Authorization Request
 
-   Client makes an authorization request for a protected resource using
-   the URL as the resource indicator
+   Client makes an authorization request for multiple protected
+   resources using the URLs as the resource indicators
 
    GET /authorize?response_type=code
      &client_id=client123
      &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
      &scope=resource%3Aread
      &state=abc123
-     &resource=https%3A%2F%2Fresource.example.com%2F
+     &resource=https%3A%2F%2FresourceA.example.com%2F
+     &resource=https%3A%2F%2FresourceB.example.com%2F
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
      &code_challenge_method=S256
    HTTP/1.1
@@ -276,6 +273,8 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
 
 4.1.2.3.  Token Request
 
+   Client exchanges the authorization code for an access token
+
    POST /token HTTP/1.1
    Host: authorization-server.example.com
    Content-Type: application/x-www-form-urlencoded
@@ -288,7 +287,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
 
 4.1.2.4.  Token Response
 
-   Resource is confirmed and unambiguous.
+   Both resources are confirmed and unambiguous.
 
    HTTP/1.1 200 OK
    Content-Type: application/json
@@ -299,7 +298,10 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
      "token_type": "Bearer",
      "expires_in": 3600,
      "scope": "resource:read",
-     "resource": "https://resource.example.com/"
+     "resource": [
+       "https://resourceA.example.com/",
+       "https://resourceB.example.com/"
+     ]
    }
 
 4.1.3.  Default Resource
