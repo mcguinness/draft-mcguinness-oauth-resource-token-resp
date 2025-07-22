@@ -51,9 +51,24 @@ This specification defines a new parameter, `resource`, to be returned in OAuth 
 
 OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple resources (or APIs) are involved, the {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the resource server for which the token is intended.
 
-However, the current specification does not require the authorization server to return any confirmation of the resource to which the access token applies. This leads to ambiguity in the client's interpretation of the token's audience, potentially resulting in **resource mix-up attacks** or incorrect token usage.
+However, Resource Indicators for OAuth 2.0 {{RFC8707}} does not require the authorization server to return any confirmation of the resource to which the access token applies (audience restricted).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
 
-This document introduces a new parameter, `resource`, to be returned in the token response, so the client can validate that the issued token corresponds to the intended resource.
+An authorization server MAY:
+
+  - Ignore the resource parameter (e.g., if it does not support {{RFC8707}}) and audience-restrict the issued access token to a default resource or set of resources.
+  - Accept and honor all requested resource values, audience-restricting the issued access token to the entire set of requested resources.
+  - Accept a subset of the requested resource values, audience-restricting the token accordingly.
+  - Override the requested resource values and issue a token audience-restricted to an authorization-server-defined set of resources, based on local policy or client registration.
+  - Reject one or more requested resource values and return an OAuth 2.0 error response with the error code invalid_target as defined in {{RFC8707}}.
+
+This leads to ambiguity in the client's interpretation of the token's audience, potentially resulting in **resource mix-up attacks** or incorrect token usage such as:
+
+  1. A client requests an access token for Resource A.
+  2. The authorization server issues a token for Resource B (intentionally or due to configuration).
+  3. The client unknowingly sends the token to Resource A, which may mistakenly accept it or return a misleading error.
+  4. The client misuses a token for a different audience, causing a confidentiality or access control breach.
+
+This document introduces a new parameter, `resource`, to be returned in the access token response, so the client can validate that the issued token corresponds to the intended resource.
 
 # Conventions and Terminology
 
