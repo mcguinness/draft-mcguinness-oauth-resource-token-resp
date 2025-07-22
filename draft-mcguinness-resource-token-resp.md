@@ -38,6 +38,7 @@ normative:
   RFC8414:
   RFC9207:
   RFC3986:
+  RFC7519:
 
 informative:
 
@@ -76,12 +77,11 @@ This document introduces a new parameter, `resource`, to be returned in the acce
 
 ## Terminology
 
-    StringOrURI
-      A JSON string value, with the additional requirement that while
-      arbitrary string values MAY be used, any value containing a ":"
-      character MUST be a URI {{RFC3986}}.  StringOrURI values are
-      compared as case-sensitive strings with no transformations or
-      canonicalizations applied.
+The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" is defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
+
+The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
+
+The term "StringOrURI" is defined by the JWT specification {{RFC7519}}.
 
 # Resource Parameter in Token Response
 
