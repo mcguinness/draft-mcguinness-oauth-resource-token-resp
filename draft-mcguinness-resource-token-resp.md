@@ -51,15 +51,15 @@ This specification defines a new parameter, `resource`, to be returned in OAuth 
 
 OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple resources (or APIs) are involved, the {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the resource server for which the token is intended.
 
-However, Resource Indicators for OAuth 2.0 {{RFC8707}} does not require the authorization server to return any confirmation of the resource to which the access token applies (audience restricted).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
+However, Resource Indicators for OAuth 2.0 {{RFC8707}} does not require the authorization server to return any confirmation of the resource to which the access token applies (audience).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
 
 An authorization server MAY:
 
-  - Ignore the resource parameter (e.g., if it does not support {{RFC8707}}) and audience-restrict the issued access token to a default resource or set of resources.
-  - Accept and honor all requested resource values, audience-restricting the issued access token to the entire set of requested resources.
-  - Accept a subset of the requested resource values, audience-restricting the token accordingly.
-  - Override the requested resource values and issue a token audience-restricted to an authorization-server-defined set of resources, based on local policy or client registration.
-  - Reject one or more requested resource values and return an OAuth 2.0 error response with the error code invalid_target as defined in {{RFC8707}}.
+  - Ignore the `resource` parameter (e.g., if it does not support {{RFC8707}}) and audience-restrict the issued access token to a default resource or set of resources.
+  - Accept and honor all requested `resource` values, audience-restricting the issued access token to the entire set of requested resources.
+  - Accept a subset of the requested `resource` values, audience-restricting the token accordingly.
+  - Override the requested `resource` values and issue a token audience-restricted to an authorization-server-defined set of resources, based on policy or client registration.
+  - Reject one or more requested `resource` values and return an OAuth 2.0 error response with the error code `invalid_target` as defined in {{RFC8707}}.
 
 This leads to ambiguity in the client's interpretation of the token's audience, potentially resulting in **resource mix-up attacks** or incorrect token usage such as:
 
