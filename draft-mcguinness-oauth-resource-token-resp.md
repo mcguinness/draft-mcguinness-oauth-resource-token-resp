@@ -1,7 +1,7 @@
 ---
 title: "OAuth 2.0 Resource Parameter in Access Token Response"
 abbrev: "Resource Token Response Parameter"
-docName: "draft-mcguinness-resource-token-resp-latest"
+docName: "draft-mcguinness-oauth-resource-token-resp-latest"
 category:  "std"
 workgroup: "Web Authorization Protocol"
 area: "Security"
@@ -17,8 +17,8 @@ venue:
   type: "Working Group"
   mail: "oauth@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/oauth/"
-  github: "mcguinness/draft-mcguinness-resource-token-resp"
-  latest: "https://mcguinness.github.io/draft-mcguinness-resource-token-resp/draft-mcguinness-resource-token-resp.html"
+  github: "mcguinness/draft-mcguinness-oauth-resource-token-resp"
+  latest: "https://mcguinness.github.io/draft-mcguinness-oauth-resource-token-resp/draft-mcguinness-oauth-resource-token-resp.html"
 
 author:
  -
