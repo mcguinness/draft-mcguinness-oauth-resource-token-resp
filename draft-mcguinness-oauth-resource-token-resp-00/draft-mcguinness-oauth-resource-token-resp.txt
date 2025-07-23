@@ -10,7 +10,7 @@ Expires: 24 January 2026                                    Keycard Labs
 
 
          OAuth 2.0 Resource Parameter in Access Token Response
-              draft-mcguinness-resource-token-resp-latest
+           draft-mcguinness-oauth-resource-token-resp-latest
 
 Abstract
 
@@ -27,10 +27,11 @@ About This Document
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://mcguinness.github.io/draft-mcguinness-resource-token-resp/
-   draft-mcguinness-resource-token-resp.html.  Status information for
-   this document may be found at https://datatracker.ietf.org/doc/draft-
-   mcguinness-resource-token-resp/.
+   https://mcguinness.github.io/draft-mcguinness-oauth-resource-token-
+   resp/draft-mcguinness-oauth-resource-token-resp.html.  Status
+   information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-mcguinness-oauth-resource-
+   token-resp/.
 
    Discussion of this document takes place on the Web Authorization
    Protocol Working Group mailing list (mailto:oauth@ietf.org), which is
@@ -38,7 +39,8 @@ About This Document
    Subscribe at https://www.ietf.org/mailman/listinfo/oauth/.
 
    Source for this draft and an issue tracker can be found at
-   https://github.com/mcguinness/draft-mcguinness-resource-token-resp.
+   https://github.com/mcguinness/draft-mcguinness-oauth-resource-token-
+   resp.
 
 Status of This Memo
 
