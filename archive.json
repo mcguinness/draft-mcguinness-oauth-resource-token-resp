@@ -1,7 +1,7 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-07-22T00:56:42.902920+00:00",
-  "repo": "mcguinness/draft-mcguinness-resource-token-resp",
+  "timestamp": "2025-07-24T01:06:59.325495+00:00",
+  "repo": "mcguinness/draft-mcguinness-oauth-resource-token-resp",
   "labels": [
     {
       "name": "bug",
@@ -55,7 +55,7 @@
       "number": 1,
       "id": "PR_kwDOO-u0L86f53Y0",
       "title": "Allow resource to be array of URIs",
-      "url": "https://github.com/mcguinness/draft-mcguinness-resource-token-resp/pull/1",
+      "url": "https://github.com/mcguinness/draft-mcguinness-oauth-resource-token-resp/pull/1",
       "state": "MERGED",
       "author": "mcguinness",
       "authorAssociation": "OWNER",
@@ -64,10 +64,10 @@
       "body": "",
       "createdAt": "2025-07-21T18:01:58Z",
       "updatedAt": "2025-07-22T00:14:14Z",
-      "baseRepository": "mcguinness/draft-mcguinness-resource-token-resp",
+      "baseRepository": "mcguinness/draft-mcguinness-oauth-resource-token-resp",
       "baseRefName": "main",
       "baseRefOid": "b7e3c7d28215a73c0e46478692a8248cfaa183b0",
-      "headRepository": "mcguinness/draft-mcguinness-resource-token-resp",
+      "headRepository": "mcguinness/draft-mcguinness-oauth-resource-token-resp",
       "headRefName": "multi-resource",
       "headRefOid": "c15ad2c2dee887d64a0522c31432c5161cd01c35",
       "closedAt": "2025-07-22T00:14:14Z",
