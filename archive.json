@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2025-08-12T01:02:31.216745+00:00",
+  "timestamp": "2025-08-14T01:04:26.810985+00:00",
   "repo": "mcguinness/draft-mcguinness-oauth-resource-token-resp",
   "labels": [
     {
@@ -49,7 +49,24 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 2,
+      "id": "I_kwDOO-u0L87FbxdB",
+      "title": "Guidance needed for client on caching of a issued token",
+      "url": "https://github.com/mcguinness/draft-mcguinness-oauth-resource-token-resp/issues/2",
+      "state": "OPEN",
+      "author": "mcguinness",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Draft should provide more details about how a client should cache issued tokens and build a cookie-jar like implementation so it can send the right token to the  right resource without having to round-trip back to the AS for every protected resource URL",
+      "createdAt": "2025-08-12T03:33:10Z",
+      "updatedAt": "2025-08-12T03:33:10Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
