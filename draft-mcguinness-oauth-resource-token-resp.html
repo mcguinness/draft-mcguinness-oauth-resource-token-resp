@@ -1760,16 +1760,18 @@ Host: authorization-server.example.com
 </li>
       </ul>
 <p id="section-5-3">This specification addresses such issues by explicitly returning the resource URI in the token response, similar in spirit to the <code>iss</code> parameter defined in <span>[<a href="#RFC9207" class="cite xref">RFC9207</a>]</span>.<a href="#section-5-3" class="pilcrow">¶</a></p>
-<p id="section-5-4">Clients are advised to:<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-4">In scenarios where a client obtains an access token for a protected resource, a malicious protected resource could potentially intercept the token during the client's legitimate request and subsequently reuse that token to access other resources that trust the same authorization server and accept tokens with the same audience and scopes. This attack is particularly relevant when the client cannot fully validate the trust relationship between the protected resource and the authorization server, such as in dynamic discovery scenarios using <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">The desired goal for preventing token reuse attacks by malicious protected resources is to bind an access token to a key for proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in <span>[<a href="#RFC9700" class="cite xref">RFC9700</a>]</span>. Proof-of-possession mechanisms bind the access token to a cryptographic key that is held by the client. When the client presents the token to a protected resource, it must also demonstrate possession of the corresponding private key (for example, by signing the request with DPoP). This ensures that even if a malicious protected resource intercepts the access token, it cannot reuse the token at other resources because it does not possess the client's private key. Authorization servers that support proof-of-possession mechanisms <span class="bcp14">SHOULD</span> bind issued access tokens to the client's proof-of-possession key when such mechanisms are available.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">Resource validation through the <code>resource</code> parameter in the token response provides defense-in-depth for the client. While it helps the client detect when an authorization server has issued a token for a different resource than requested, it does not prevent a malicious protected resource from reusing an intercepted token at other resources. Clients are advised to:<a href="#section-5-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-5-5.1">
-          <p id="section-5-5.1.1">Validate the <code>resource</code> parameter when present;<a href="#section-5-5.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-5-7.1">
+          <p id="section-5-7.1.1">Validate the <code>resource</code> parameter when present as a defense-in-depth measure;<a href="#section-5-7.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-5-5.2">
-          <p id="section-5-5.2.1">Avoid use of access tokens with unverified or unintended resources;<a href="#section-5-5.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-5-7.2">
+          <p id="section-5-7.2.1">Avoid use of access tokens with unverified or unintended resources;<a href="#section-5-7.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-5-5.3">
-          <p id="section-5-5.3.1">Treat absence of the <code>resource</code> parameter as a potential ambiguity if the client requires strict audience binding.<a href="#section-5-5.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-5-7.3">
+          <p id="section-5-7.3.1">Treat absence of the <code>resource</code> parameter as a potential ambiguity if the client requires strict audience binding.<a href="#section-5-7.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>

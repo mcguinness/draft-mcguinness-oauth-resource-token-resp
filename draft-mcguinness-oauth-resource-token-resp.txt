@@ -564,9 +564,39 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    resource URI in the token response, similar in spirit to the iss
    parameter defined in [RFC9207].
 
-   Clients are advised to:
+   In scenarios where a client obtains an access token for a protected
+   resource, a malicious protected resource could potentially intercept
+   the token during the client's legitimate request and subsequently
+   reuse that token to access other resources that trust the same
+   authorization server and accept tokens with the same audience and
+   scopes.  This attack is particularly relevant when the client cannot
+   fully validate the trust relationship between the protected resource
+   and the authorization server, such as in dynamic discovery scenarios
+   using [RFC9728].
 
-   *  Validate the resource parameter when present;
+   The desired goal for preventing token reuse attacks by malicious
+   protected resources is to bind an access token to a key for proof-of-
+   possession, such as DPoP (Demonstrating Proof-of-Possession) as
+   defined in [RFC9700].  Proof-of-possession mechanisms bind the access
+   token to a cryptographic key that is held by the client.  When the
+   client presents the token to a protected resource, it must also
+   demonstrate possession of the corresponding private key (for example,
+   by signing the request with DPoP).  This ensures that even if a
+   malicious protected resource intercepts the access token, it cannot
+   reuse the token at other resources because it does not possess the
+   client's private key.  Authorization servers that support proof-of-
+   possession mechanisms SHOULD bind issued access tokens to the
+   client's proof-of-possession key when such mechanisms are available.
+
+   Resource validation through the resource parameter in the token
+   response provides defense-in-depth for the client.  While it helps
+   the client detect when an authorization server has issued a token for
+   a different resource than requested, it does not prevent a malicious
+   protected resource from reusing an intercepted token at other
+   resources.  Clients are advised to:
+
+   *  Validate the resource parameter when present as a defense-in-depth
+      measure;
 
    *  Avoid use of access tokens with unverified or unintended
       resources;
