@@ -1,7 +1,7 @@
 ---
 title: "OAuth 2.0 Resource Parameter in Access Token Response"
 abbrev: "Resource Token Response Parameter"
-docName: "draft-mcguinness-resource-token-resp-latest"
+docName: "draft-mcguinness-oauth-resource-token-resp-latest"
 category:  "std"
 workgroup: "Web Authorization Protocol"
 area: "Security"
