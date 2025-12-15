@@ -36,6 +36,7 @@ normative:
   RFC8707:
   RFC9728:
   RFC8414:
+  RFC7235:
   RFC9207:
   RFC3986:
   RFC7519:
@@ -84,6 +85,12 @@ Without explicit confirmation of the resource in the token response, the client 
 
 This document introduces a new parameter, `resource`, to be returned in the access token response, so the client can validate that the issued token corresponds to the intended resource.
 
+In addition, this document defines a profile of OAuth 2.0 Protected Resource Metadata {{RFC9728}} and the HTTP authentication framework {{RFC7235}} that enables protected resources to publish the audience values they will validate on access tokens and to convey those audience values in `WWW-Authenticate` challenges.  This allows clients to:
+
+- Discover which audience values a protected resource will accept.
+- Use those audience values as `resource` indicators in authorization requests.
+- Safely cache and reuse access tokens across multiple protected resources that share the same authorization server, audience, and scopes, without needing to obtain a fresh token for each resource.
+
 ## Resource vs Audience
 
 This specification uses the term "resource" (as defined in {{RFC8707}}) rather than "audience" (as commonly used in access token claims such as the `aud` claim in JWTs) for a fundamental reason: a client cannot assume any relationship between a token's audience and the protected resource (PR) URL it wants to access.
@@ -96,13 +103,13 @@ A given protected resource may trust tokens with audiences that vary significant
   - **Very specific audience**: The same protected resource might alternatively require tokens with a highly specific audience such as `https://api.example.com/some/protected/resource`, matching the exact resource URL.
   - **Cross-domain or logical audience**: A protected resource might accept tokens with a logical or cross-domain audience identifier such as `urn:example:api` or `https://parent.example` , which bears no direct relationship to the resource's URL.
 
-In these dynamic scenarios, the client cannot predict what audience value the authorization server will assign to the token, nor can it determine which audience values a protected resource will accept. This becomes particularly important when clients use OAuth 2.0 Protected Resource Metadata {{RFC9728}} to dynamically discover an authorization server for a protected resource. The metadata document provides the protected resource URL, which the client can use directly in an authorization request. However, the metadata does not provide the audience value that will be embedded in the token, as that is determined by the authorization server's policy and configuration. Different protected resources may trust different authorization servers, each with their own audience assignment policies.
+In these dynamic scenarios, the client cannot predict what audience value the authorization server will assign to the token, nor can it determine which audience values a protected resource will accept. This becomes particularly important when clients use OAuth 2.0 Protected Resource Metadata {{RFC9728}} to dynamically discover an authorization server for a protected resource. Historically, the metadata document provided the protected resource URL, which the client could use directly in an authorization request, but it did not provide the audience value that would be embedded in the token, as that is determined by the authorization server's policy and configuration. Different protected resources may trust different authorization servers, each with their own audience assignment policies.
 
-By returning the `resource` parameter (the protected resource URL) rather than an `audience` parameter, this specification enables clients to:
+By returning the `resource` parameter (the protected resource URL or an audience value that the protected resource accepts) rather than a generic `audience` parameter, this specification enables clients to:
 
-  - **Validate that the token is intended for the specific protected resource URL they requested**, which is the primary security mechanism for preventing resource mix-up attacks. Without this validation, a client cannot detect when an authorization server has issued a token for a different resource than requested, leaving the client vulnerable to mix-up attacks.
-  - Work seamlessly with dynamic discovery mechanisms like {{RFC9728}}, where the client knows the resource URL but not the audience.
-  - Avoid making incorrect assumptions about the relationship between resource URLs and token audiences.
+  - **Validate that the token is intended for the specific protected resource or audience they requested**, which is the primary security mechanism for preventing resource mix-up attacks. Without this validation, a client cannot detect when an authorization server has issued a token for a different resource or audience than requested, leaving the client vulnerable to mix-up attacks.
+  - Work seamlessly with dynamic discovery mechanisms like {{RFC9728}}, where the client knows the resource URL and, when available, the audience values that the protected resource will accept.
+  - Avoid making incorrect assumptions about the relationship between resource URLs and token audiences, while still allowing deployments to explicitly expose acceptable audience values.
 
 # Conventions and Terminology
 
@@ -142,6 +149,51 @@ The value of the `resource` parameter MUST be an array of case-sensitive strings
 - If the requested `resource` is not valid for the client, user, or authorization server, then the authorization server SHOULD return an `invalid_target` OAuth error response code according to {{RFC8707}}
 - If the token is not bound to a specific resource or the concept does not apply, the `resource` parameter SHOULD be omitted.
 
+# Protected Resource Metadata Extensions
+
+This section defines an extension to OAuth 2.0 Protected Resource Metadata {{RFC9728}} that allows a protected resource to publish the audience values that it will validate on access tokens.
+
+## `audiences_supported` Metadata Parameter
+
+Protected resources that support this specification and publish OAuth 2.0 Protected Resource Metadata {{RFC9728}} MAY include an `audiences_supported` metadata parameter.
+
+The `audiences_supported` parameter:
+
+- MUST be an array of case-sensitive strings, each containing a StringOrURI value {{RFC7519}}.
+- Each value identifies an audience that the protected resource will accept in access tokens issued by an authorization server that it trusts (for example, as a value of the `aud` claim in a JWT access token).
+
+When a client obtains Protected Resource Metadata {{RFC9728}}:
+
+- If the metadata includes an `audiences_supported` parameter, the client:
+  - MAY use one or more of these audience values as `resource` indicators in authorization requests per {{RFC8707}}.
+  - If multiple audience values are needed, SHOULD send all required audiences to the authorization server as multiple `resource` request parameters, each containing one of the values from `audiences_supported`.
+- If the metadata does not include an `audiences_supported` parameter, the client SHOULD use the `resource` value from the metadata (if present) as the `resource` indicator in authorization requests.
+
+When both `audiences_supported` and `resource` are present in the Protected Resource Metadata for a given protected resource, the `audiences_supported` values and the `realm` value used in `WWW-Authenticate` challenges (see {{realm-audience}}) are expected to describe the same audience(s) that the protected resource will validate.
+
+# Use of `WWW-Authenticate` Realm for Audience {#realm-audience}
+
+Section 5 of {{RFC9728}} defines the use of the `WWW-Authenticate` header field to advertise the location of a protected resource's metadata.  This specification defines an additional profile of the HTTP authentication framework {{RFC7235}} for the `Bearer` authentication scheme ({{RFC6750}}), in which the `realm` authentication parameter is used to convey an audience value for the protected resource.
+
+When a protected resource that supports this specification issues a `WWW-Authenticate` challenge with a `resource_metadata` parameter as defined in {{RFC9728}} and also publishes the `audiences_supported` metadata parameter defined in this document, it:
+
+- **MUST** include a `realm` authentication parameter on the `Bearer` challenge.
+- The value of `realm` **MUST** be a URL (a StringOrURI {{RFC7519}} that is an absolute URI).
+- The `realm` value **MUST** be equal to one of the values in the `audiences_supported` metadata parameter for that protected resource.
+
+Clients that support this specification and receive such a `WWW-Authenticate` challenge:
+
+- **MUST** parse the `realm` value as a URI.
+- **MUST** compare the host component (and port, if present) of the `realm` URI to the TLS server identity of the HTTP server that sent the response (for example, the host name used in the TLS Server Name Indication (SNI) extension and validated against the server certificate, and typically the host in the HTTP request).  If the host (and port, if applicable) of the `realm` URI does not match the host (and port) of the server to which the client is connected, the client **MUST NOT** treat the `realm` value as an audience for that protected resource.
+- When the `realm` value passes the above validation, the client:
+  - MAY use the `realm` value as a `resource` indicator in authorization requests per {{RFC8707}}.
+  - MAY use the `realm` value, in combination with the `resource` parameter returned in the token response, to determine whether a cached access token is compatible with this protected resource, as described in {{token-caching}}.
+
+If the `realm` value is not a valid URI, or if it does not match the TLS server identity, a client that supports this specification:
+
+- **MUST NOT** use that `realm` value as an audience for token requests or for token caching decisions defined in this document.
+- MAY still process the challenge according to {{RFC9728}} and other applicable specifications, using the `resource` identifier from the Protected Resource Metadata as the `resource` indicator.
+
 # Client Processing
 
 Clients that support this extension:
@@ -149,6 +201,30 @@ Clients that support this extension:
 - SHOULD compare the returned `resource` URIs against the originally requested `resource` URI(s), if applicable.
 - MUST treat mismatches as errors, unless the client is explicitly designed to handle token audience negotiation.
 - MUST NOT use the token with a resource other than the one identified in the response.
+
+# Access Token Caching and Reuse {#token-caching}
+
+Clients often cache access tokens to avoid unnecessary round trips to authorization servers.  However, without clear information about the audience of a token, naive caching can result in clients either over-reusing tokens (risking authorization failures or security issues) or under-reusing tokens (obtaining a new access token for every protected resource interaction).
+
+This specification, together with OAuth 2.0 Protected Resource Metadata {{RFC9728}} and the use of the `realm` parameter described in {{realm-audience}}, enables clients to make informed and safe token caching decisions.
+
+Clients that support this specification MAY cache access tokens and reuse them for additional protected resources when all of the following conditions are met:
+
+- The access token was obtained from the same authorization server that will issue tokens for the target protected resource (for example, the same issuer or token endpoint as discovered via Authorization Server Metadata {{RFC8414}}).
+- The token was issued in response to a request that included a `resource` parameter whose value corresponds to the audience or protected resource that the target protected resource will accept:
+  - When using Protected Resource Metadata, this is typically derived from either the `audiences_supported` metadata parameter (when present) or the `resource` metadata parameter.
+  - When using `WWW-Authenticate` challenges, this may be derived from the validated `realm` value as described in {{realm-audience}}.
+- The token's scope is sufficient for the operation being performed at the target protected resource (for example, the scopes required by the new request are a subset of the scopes associated with the cached access token).
+- The token has not expired, according to the `expires_in` parameter in the token response and/or token lifetime information conveyed by the authorization server.
+- The token type (for example, `Bearer`) matches the authentication scheme required by the target protected resource.
+- Any proof-of-possession binding (for example, mutual TLS, DPoP, or other key-bound mechanisms) associated with the cached token is still valid and applicable to the client and the connection being used.
+
+When multiple protected resources share the same authorization server, audience (for example, as indicated by a common `realm` value validated as described in {{realm-audience}}), and required scopes, a client:
+
+- **MAY** reuse a cached access token that satisfies the above conditions across those protected resources without obtaining a new token for each one.
+- **MUST** still be prepared to receive `401 Unauthorized` or `403 Forbidden` responses and handle them appropriately (for example, by discarding the cached token for that audience and obtaining a new one), since server-side authorization policies or user consent can change over time.
+
+Clients **SHOULD** prefer checking issuer, audience (or protected resource identifier), scopes, expiration, token type, and any binding information before reusing a cached token, rather than relying solely on runtime error handling to discover incompatibilities.
 
 ## Examples
 
@@ -370,6 +446,14 @@ This document registers the following value in the OAuth Parameters registry est
 |----------|----------------------------------------------|--------------------------|
 | resource | Resource to which the access token applies   |  This document          |
 
+This document also registers the following value in the OAuth Protected Resource Metadata Registry defined by {{RFC9728}}.
+
+## OAuth Protected Resource Metadata Registry
+
+| Metadata Name       | Description                                               | Specification  |
+|---------------------|-----------------------------------------------------------|----------------|
+| audiences_supported | Array of audiences the protected resource will accept     | This document  |
+
 
 --- back
 
@@ -485,6 +569,36 @@ Client obtains an access token for the resource
     }
 
 Client verifies the requested a token explicitly bound to the discovered resource.
+
+In deployments that use the `audiences_supported` metadata parameter and the `realm` value as defined by this specification, the protected resource at `https://api.example.com/resource` could additionally advertise:
+
+    HTTP/1.1 401 Unauthorized
+    WWW-Authenticate: Bearer realm="https://api.example.com/resource"
+      resource_metadata="https://api.example.com/.well-known/oauth-protected-resource"
+
+and the corresponding Protected Resource Metadata document could include:
+
+    {
+       "resource":
+         "https://api.example.com/resource",
+       "audiences_supported": [
+         "https://api.example.com/resource"
+       ],
+       "authorization_servers":
+         [ "https://authorization-server.example.com/" ],
+       "bearer_methods_supported":
+         ["header", "body"],
+       "scopes_supported":
+         ["resource.read", "resource.write"],
+       "resource_documentation":
+         "https://api.example.com/resource_documentation.html"
+     }
+
+In this case, the client can:
+
+- Validate that the `realm` value matches the TLS host it is connected to.
+- Use the `realm` (and corresponding `audiences_supported` entry) as the `resource` indicator when obtaining an access token.
+- Cache the resulting access token and safely reuse it for other protected resources that share the same authorization server, `realm` (audience), and required scopes, following the guidance in {{token-caching}}.
 
 # Acknowledgments
 {:numbered="false"}
