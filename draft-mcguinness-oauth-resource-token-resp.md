@@ -88,9 +88,21 @@ Without explicit confirmation of the resource in the token response, the client 
 
 This document introduces a new parameter `resource` to be returned in the access token response so the client can validate that the issued token corresponds to the intended resource.
 
-## Resource vs Audience
+# Conventions and Terminology
 
-This specification uses the term resource (as defined in {{RFC8707}}) rather than audience (as commonly used in access token claims such as the aud claim in JWTs) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and a token’s audience value.
+{::boilerplate bcp14-tagged}
+
+## Terminology
+
+The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" is defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
+
+The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
+
+The term "StringOrURI" is defined by the JWT specification {{RFC7519}}.
+
+### Resource vs Audience
+
+This specification uses the term resource (as defined in {{RFC8707}}) rather than audience (as commonly used in access token claims such as the aud claim in JWTs {{Section 4.1.3 of RFC7519}} or in token introspection {{Section 2.2 of RFC7662}}) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and a token’s audience value.
 
 While a resource and an audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:
 	-	a broadly scoped audience such as `https://api.example.com` that specifies an API-wide identifier for the resource server(s)
@@ -106,18 +118,6 @@ For these reasons, returning an audience value in the token response is less use
 This approach is consistent with Resource Indicators {{RFC8707}}, which defines the resource parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.
 
 Note that a client may use token introspection {{RFC7662}} if supported by an authorization server to determine an issued token's audience if needed.
-
-# Conventions and Terminology
-
-{::boilerplate bcp14-tagged}
-
-## Terminology
-
-The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" is defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
-
-The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
-
-The term "StringOrURI" is defined by the JWT specification {{RFC7519}}.
 
 # Resource Parameter in Token Response
 
