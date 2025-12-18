@@ -574,7 +574,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    The desired goal for preventing token reuse attacks by malicious
    protected resources is to bind an access token to a key for proof-of-
    possession, such as DPoP (Demonstrating Proof-of-Possession) as
-   defined in [RFC9700].  Proof-of-possession mechanisms bind the access
+   defined in [RFC9449].  Proof-of-possession mechanisms bind the access
    token to a cryptographic key that is held by the client.  When the
    client presents the token to a protected resource, it must also
    demonstrate possession of the corresponding private key (for example,
@@ -667,6 +667,11 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
               RFC 9700, DOI 10.17487/RFC9700, January 2025,
               <https://www.rfc-editor.org/info/rfc9700>.
 
+   [RFC9449]  Fett, D., Campbell, B., Bradley, J., Lodderstedt, T.,
+              Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of
+              Possession (DPoP)", RFC 9449, DOI 10.17487/RFC9449,
+              September 2023, <https://www.rfc-editor.org/info/rfc9449>.
+
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
               DOI 10.17487/RFC2119, March 1997,
@@ -733,7 +738,7 @@ Content-Type: application/json
 {
   "issuer": "https://authorization-server.example.com/",
   "authorization_endpoint": "https://authorization-server.example.com/oauth2/authorize",
-  "token_endpoint": "https://authorization-server.saas.com/oauth2/token",
+  "token_endpoint": "https://authorization-server.example.com/oauth2/token",
   "jwks_uri": "https://authorization-server.example.com/oauth2/keys",
   "scopes_supported": [
     "resource.read", "resource.write"
@@ -754,7 +759,7 @@ Content-Type: application/json
      &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
      &scope=resource%3Aread
      &state=abc123
-     &resource=https%3A%2F%api.example.com%2Fresource
+     &resource=https%3A%2F%2F%api.example.com%2Fresource
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
      &code_challenge_method=S256
    HTTP/1.1

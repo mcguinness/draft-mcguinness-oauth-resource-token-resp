@@ -1763,7 +1763,7 @@ Host: authorization-server.example.com
       </ul>
 <p id="section-5-3">This specification addresses such issues by explicitly returning the resource URI in the token response, similar in spirit to the <code>iss</code> parameter defined in <span>[<a href="#RFC9207" class="cite xref">RFC9207</a>]</span>.<a href="#section-5-3" class="pilcrow">¶</a></p>
 <p id="section-5-4">In scenarios where a client obtains an access token for a protected resource, a malicious protected resource could potentially intercept the token during the client's legitimate request and subsequently reuse that token to access other resources that trust the same authorization server and accept tokens with the same audience and scopes. This attack is particularly relevant when the client cannot fully validate the trust relationship between the protected resource and the authorization server, such as in dynamic discovery scenarios using <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>.<a href="#section-5-4" class="pilcrow">¶</a></p>
-<p id="section-5-5">The desired goal for preventing token reuse attacks by malicious protected resources is to bind an access token to a key for proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in <span>[<a href="#RFC9700" class="cite xref">RFC9700</a>]</span>. Proof-of-possession mechanisms bind the access token to a cryptographic key that is held by the client. When the client presents the token to a protected resource, it must also demonstrate possession of the corresponding private key (for example, by signing the request with DPoP). This ensures that even if a malicious protected resource intercepts the access token, it cannot reuse the token at other resources because it does not possess the client's private key. Authorization servers that support proof-of-possession mechanisms <span class="bcp14">SHOULD</span> bind issued access tokens to the client's proof-of-possession key when such mechanisms are available.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-5">The desired goal for preventing token reuse attacks by malicious protected resources is to bind an access token to a key for proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span>. Proof-of-possession mechanisms bind the access token to a cryptographic key that is held by the client. When the client presents the token to a protected resource, it must also demonstrate possession of the corresponding private key (for example, by signing the request with DPoP). This ensures that even if a malicious protected resource intercepts the access token, it cannot reuse the token at other resources because it does not possess the client's private key. Authorization servers that support proof-of-possession mechanisms <span class="bcp14">SHOULD</span> bind issued access tokens to the client's proof-of-possession key when such mechanisms are available.<a href="#section-5-5" class="pilcrow">¶</a></p>
 <p id="section-5-6">Resource validation through the <code>resource</code> parameter in the token response provides defense-in-depth for the client. While it helps the client detect when an authorization server has issued a token for a different resource than requested, it does not prevent a malicious protected resource from reusing an intercepted token at other resources. Clients are advised to:<a href="#section-5-6" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5-7.1">
@@ -1860,6 +1860,10 @@ Host: authorization-server.example.com
       <dd>
 <span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Labunets, A.</span>, and <span class="refAuthor">D. Fett</span>, <span class="refTitle">"Best Current Practice for OAuth 2.0 Security"</span>, <span class="seriesInfo">BCP 240</span>, <span class="seriesInfo">RFC 9700</span>, <span class="seriesInfo">DOI 10.17487/RFC9700</span>, <time datetime="2025-01" class="refDate">January 2025</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9700">https://www.rfc-editor.org/info/rfc9700</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC9449">[RFC9449]</dt>
+      <dd>
+<span class="refAuthor">Fett, D.</span>, <span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Lodderstedt, T.</span>, <span class="refAuthor">Jones, M.</span>, and <span class="refAuthor">D. Waite</span>, <span class="refTitle">"OAuth 2.0 Demonstrating Proof of Possession (DPoP)"</span>, <span class="seriesInfo">RFC 9449</span>, <span class="seriesInfo">DOI 10.17487/RFC9449</span>, <time datetime="2023-09" class="refDate">September 2023</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9449">https://www.rfc-editor.org/info/rfc9449</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
       <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
@@ -1935,7 +1939,7 @@ Content-Type: application/json
 {
   "issuer": "https://authorization-server.example.com/",
   "authorization_endpoint": "https://authorization-server.example.com/oauth2/authorize",
-  "token_endpoint": "https://authorization-server.saas.com/oauth2/token",
+  "token_endpoint": "https://authorization-server.example.com/oauth2/token",
   "jwks_uri": "https://authorization-server.example.com/oauth2/keys",
   "scopes_supported": [
     "resource.read", "resource.write"
@@ -1958,7 +1962,7 @@ GET /oauth2/authorize?response_type=code
   &amp;redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
   &amp;scope=resource%3Aread
   &amp;state=abc123
-  &amp;resource=https%3A%2F%api.example.com%2Fresource
+  &amp;resource=https%3A%2F%2F%api.example.com%2Fresource
   &amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
   &amp;code_challenge_method=S256
 HTTP/1.1
