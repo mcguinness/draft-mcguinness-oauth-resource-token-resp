@@ -497,6 +497,12 @@ This proposal builds on prior work in OAuth 2.0 extensibility and security analy
 # Document History
 {:numbered="false"}
 
+-01
+
+* Added attack example
+* Resource vs Audience distinction
+* Document cleanup and consistency
+
 -00
 
 * Initial revision
