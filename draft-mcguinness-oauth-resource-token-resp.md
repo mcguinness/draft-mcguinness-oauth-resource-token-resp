@@ -39,6 +39,7 @@ normative:
   RFC9207:
   RFC3986:
   RFC7519:
+  RFC7662:
   RFC9700:
 
 informative:
@@ -103,6 +104,8 @@ For these reasons, returning an audience value in the token response is less use
 	-	detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
 
 This approach is consistent with Resource Indicators {{RFC8707}}, which defines the resource parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.
+
+Note that a client may use token introspection {{RFC7662}} if supported by an authorization server to determine an issued token's audience if needed.
 
 # Conventions and Terminology
 
