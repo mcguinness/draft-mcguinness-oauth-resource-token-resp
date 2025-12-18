@@ -101,8 +101,8 @@ Table of Contents
 
    OAuth 2.0 defines a framework in which clients request access tokens
    from authorization servers and present them to resource servers.  In
-   deployments where multiple protected resources (or APIs) are
-   involved, the Resource Indicators for OAuth 2.0 [RFC8707]
+   deployments where multiple protected resources or resource servers
+   (APIs) are involved, the Resource Indicators for OAuth 2.0 [RFC8707]
    specification introduced a resource request parameter that allows
    clients to indicate the resource(s) for which the token is intended
    to be used which an authorization server can use to audience-restrict
@@ -250,11 +250,11 @@ Table of Contents
 
    While a resource and an audience may be the same in some deployments,
    they are not equivalent.  A resource server protecting a given
-   resource may accept access tokens with: - a broadly scoped audience
+   resource may accept access tokens with: - A broadly scoped audience
    such as https://api.example.com that specifies an API-wide identifier
-   for the resource server(s) - a narrowly scoped audience such as
+   for the resource server(s).  - A narrowly scoped audience such as
    https://api.example.com/some/protected/resource that specifies the
-   exact URL for a protected resource - a logical or cross-domain
+   exact URL for a protected resource.  - A logical or cross-domain
    audience such as urn:example:api or https://example.net that has no
    direct correspondence to the resource’s URL.
 
@@ -270,10 +270,10 @@ Table of Contents
    For these reasons, returning an audience value in the token response
    is less useful to the client than returning the resource for which
    the token was issued.  By returning the resource parameter, this
-   specification enables a client to: - confirm that the access token is
-   valid for the specific protected resource it requested, and - detect
-   resource mix-up conditions in which an authorization server issues a
-   token for a different resource than intended.
+   specification enables a client to: - Confirm that the access token is
+   valid for the specific resource it requested.  - Detect resource mix-
+   up conditions in which an authorization server issues a token for a
+   different resource than intended.
 
    This approach is consistent with Resource Indicators [RFC8707], which
    defines the resource parameter as the client-facing mechanism for
@@ -792,6 +792,14 @@ Acknowledgments
    security analysis, particularly [RFC8707], [RFC9700], and [RFC9207].
 
 Document History
+
+   -01
+
+   *  Added attack example
+
+   *  Resource vs Audience distinction
+
+   *  Document cleanup and consistency
 
    -00
 
