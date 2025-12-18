@@ -1746,36 +1746,25 @@ Host: authorization-server.example.com
       <h2 id="name-security-considerations">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-5-1">The lack of confirmation about the audience of an access token introduces a security risk in OAuth deployments, particularly when:<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-1">The lack of confirmation about which resource(s) an authorization server has selected for an access token introduces a security risk in OAuth deployments, particularly when:<a href="#section-5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-5-2.1">
-          <p id="section-5-2.1.1">A client uses multiple authorization servers and resource servers<a href="#section-5-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-5-2.1.1">A client uses multiple authorization servers and resource servers.<a href="#section-5-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.2">
-          <p id="section-5-2.2.1">A client dynamically discovers an authorization server and attempts to obtain an access token at runtime via a HTTP authorization challenge with OAuth 2.0 Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span><a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
+          <p id="section-5-2.2.1">A client dynamically discovers an authorization server and attempts to obtain an access token at runtime via an HTTP authorization challenge with OAuth 2.0 Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>.<a href="#section-5-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.3">
-          <p id="section-5-2.3.1">An attacker attempts a <strong>mix-up attack</strong> where a token intended for one resource is used at another;<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
+          <p id="section-5-2.3.1">An attacker attempts a <strong>mix-up attack</strong> where a token intended for one resource is used at another.<a href="#section-5-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-5-2.4">
           <p id="section-5-2.4.1">The authorization server ignores or overrides the requested resource without informing the client.<a href="#section-5-2.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-5-3">This specification addresses such issues by explicitly returning the resource URI in the token response, similar in spirit to the <code>iss</code> parameter defined in <span>[<a href="#RFC9207" class="cite xref">RFC9207</a>]</span>.<a href="#section-5-3" class="pilcrow">¶</a></p>
-<p id="section-5-4">In scenarios where a client obtains an access token for a protected resource, a malicious protected resource could potentially intercept the token during the client's legitimate request and subsequently reuse that token to access other resources that trust the same authorization server and accept tokens with the same audience and scopes. This attack is particularly relevant when the client cannot fully validate the trust relationship between the protected resource and the authorization server, such as in dynamic discovery scenarios using <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>.<a href="#section-5-4" class="pilcrow">¶</a></p>
-<p id="section-5-5">The desired goal for preventing token reuse attacks by malicious protected resources is to bind an access token to a key for proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span>. Proof-of-possession mechanisms bind the access token to a cryptographic key that is held by the client. When the client presents the token to a protected resource, it must also demonstrate possession of the corresponding private key (for example, by signing the request with DPoP). This ensures that even if a malicious protected resource intercepts the access token, it cannot reuse the token at other resources because it does not possess the client's private key. Authorization servers that support proof-of-possession mechanisms <span class="bcp14">SHOULD</span> bind issued access tokens to the client's proof-of-possession key when such mechanisms are available.<a href="#section-5-5" class="pilcrow">¶</a></p>
-<p id="section-5-6">Resource validation through the <code>resource</code> parameter in the token response provides defense-in-depth for the client. While it helps the client detect when an authorization server has issued a token for a different resource than requested, it does not prevent a malicious protected resource from reusing an intercepted token at other resources. Clients are advised to:<a href="#section-5-6" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-5-7.1">
-          <p id="section-5-7.1.1">Validate the <code>resource</code> parameter when present as a defense-in-depth measure;<a href="#section-5-7.1.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-5-7.2">
-          <p id="section-5-7.2.1">Avoid use of access tokens with unverified or unintended resources;<a href="#section-5-7.2.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="section-5-7.3">
-          <p id="section-5-7.3.1">Treat absence of the <code>resource</code> parameter as a potential ambiguity if the client requires strict audience binding.<a href="#section-5-7.3.1" class="pilcrow">¶</a></p>
-</li>
-      </ul>
+<p id="section-5-3">This specification addresses such issues by explicitly returning the resource(s) for which the access token is intended in the token response.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">A malicious protected resource may intercept an access token during a client's legitimate request and subsequently reuse that token to access other resources that trust the same authorization server and accept tokens with the same audience and scopes. This attack is particularly relevant when the client cannot fully validate the trust relationship between the protected resource and the authorization server, such as in dynamic discovery scenarios using <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">To prevent token reuse attacks by malicious protected resources, access tokens <span class="bcp14">SHOULD</span> require proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in <span>[<a href="#RFC9449" class="cite xref">RFC9449</a>]</span>. By binding the access token to a cryptographic key held by the client and requiring demonstration of key possession when using the token, proof-of-possession mechanisms prevent a malicious protected resource that intercepts the access token from reusing it at other resources, since it does not possess the client's private key. Both the client and authorization server must support proof-of-possession mechanisms for this protection to be effective. See <span><a href="https://rfc-editor.org/rfc/rfc9449#section-9" class="relref">Section 9</a> of [<a href="#RFC9449" class="cite xref">RFC9449</a>]</span> for details on how DPoP provides proof-of-possession.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">Validating the <code>resource</code> parameter in the token response provides defense-in-depth for the client. While it helps the client detect when an authorization server has issued a token for a different resource than requested, it does not prevent a malicious protected resource from reusing an intercepted token at other resources. Clients are advised to validate the <code>resource</code> parameter as specified in the Client Processing section and treat mismatches as errors unless explicitly designed to handle token audience negotiation. Clients that require strict resource binding <span class="bcp14">SHOULD</span> treat the absence of the <code>resource</code> parameter as a potential ambiguity.<a href="#section-5-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="privacy-considerations">
@@ -2030,10 +2019,13 @@ Cache-Control: no-store
           <p id="appendix-C-2.1.1">Added attack example<a href="#appendix-C-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-2.2">
-          <p id="appendix-C-2.2.1">Resource vs Audience distinction<a href="#appendix-C-2.2.1" class="pilcrow">¶</a></p>
+          <p id="appendix-C-2.2.1">Added Resource vs Audience distinction<a href="#appendix-C-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-2.3">
-          <p id="appendix-C-2.3.1">Document cleanup and consistency<a href="#appendix-C-2.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-C-2.3.1">Updated Security Considerations<a href="#appendix-C-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.4">
+          <p id="appendix-C-2.4.1">Document cleanup and consistency<a href="#appendix-C-2.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-C-3">-00<a href="#appendix-C-3" class="pilcrow">¶</a></p>
