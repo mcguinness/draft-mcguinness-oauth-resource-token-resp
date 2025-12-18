@@ -41,6 +41,7 @@ normative:
   RFC7519:
   RFC7662:
   RFC9700:
+  RFC9449:
 
 informative:
 
