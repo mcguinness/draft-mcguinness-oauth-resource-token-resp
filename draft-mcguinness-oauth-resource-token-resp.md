@@ -45,7 +45,7 @@ informative:
 
 --- abstract
 
-This specification defines a new parameter, `resource`, to be returned in OAuth 2.0 access token responses. It enables clients to confirm the intended protected resource (resource server) for the issued token. This mitigates ambiguity and certain classes of security vulnerabilities such as resource mix-up attacks, particularly in systems that use the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
+This specification defines a new parameter `resource` to be returned in OAuth 2.0 access token responses. It enables clients to confirm that the issued token corresponds to the intended resource. This mitigates ambiguity and certain classes of security vulnerabilities such as resource mix-up attacks, particularly in systems that use the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
 
 --- middle
 
@@ -70,8 +70,8 @@ This leads to ambiguity in the client's interpretation of the token's audience, 
   - A client wants to access a protected resource at `https://api.example.net/data` but is not statically configured with knowledge of this resource or its authorization server, so it uses OAuth 2.0 Protected Resource Metadata {{RFC9728}} to dynamically discover the authorization server.
   - An attacker controls the protected resource at `https://api.example.net/data` and publishes Protected Resource Metadata that claims `https://legit-as.example.com` (a legitimate, trusted authorization server for the resource owner) is the authorization server for this resource, listing legitimate-looking scopes that are valid for the authorization server (e.g. `data:read data:write`).
   - The client already has a valid client registration established with the legitimate authorization server.
-  - The legitimate authorization server at `https://legit-as.example.com` does not implemment support for {{RFC8707}} and ignores the `resource` parameter in authorization requests and instead audience-restricts issued access tokens based on requested scopes.
-- The user trusts `https://legit-as.example.com` and would consent to legitimate-looking scopes for a legitimite client.
+  - The legitimate authorization server at `https://legit-as.example.com` does not implement support for {{RFC8707}} and ignores the `resource` parameter in authorization requests and instead audience-restricts issued access tokens based on requested scopes.
+  - The user trusts `https://legit-as.example.com` and would consent to legitimate-looking scopes for a legitimite client.
 
 **Attack Flow:**
 
@@ -81,26 +81,26 @@ This leads to ambiguity in the client's interpretation of the token's audience, 
   4. The client receives the token but cannot verify whether it corresponds to `https://api.example.net/data` (the attacker's resource) or some other resource.
   5. The client uses the issued token to request access to `https://api.example.net/data` (the attacker's resource server). The attacker can now replay the access token to obtain access to protected resources from the legitimate resource server the user delegated to the client with `data:read data:write` scope.
 
-The client has no way to validate whether `https://legit-as.example.com` is actually authoritative for `https://api.example.net/data`. While Protected Resource Metadata could theoretically be signed, this would require the client to be pre-configured with trust roots for the signature, which defeats the purpose of dynamic discovery of protected resources at runtime. Similarly, while an authorization server could publish a list of protected resources that are valid for an authorization server it in its metadata {{RFC8414}}, it is not feasible in practice to enumerate every protected resource in large resource domains with hundreds or more resources.
+The client has no way to validate whether `https://legit-as.example.com` is actually authoritative for `https://api.example.net/data`. While Protected Resource Metadata can be signed, this would require the client to be pre-configured with trust roots for the signature key, which defeats the purpose of dynamic discovery of protected resources at runtime. Similarly, while an authorization server could publish a list of protected resources that are valid for an authorization server it in its metadata {{RFC8414}}, it is not feasible in practice to enumerate every protected resource in large resource domains with hundreds or more resources.
 
 Without explicit confirmation of the resource in the token response, the client cannot detect when the authorization server has ignored or overridden the requested resource indicator, leaving it vulnerable to mix-up attacks. The only protection in this scenario is user consent, which may not provide sufficient detail to educate the user about the specific resource being authorized, especially when authorization servers do not prominently display resource indicators in consent screens.
 
-This document introduces a new parameter, `resource`, to be returned in the access token response, so the client can validate that the issued token corresponds to the intended resource.
+This document introduces a new parameter `resource` to be returned in the access token response so the client can validate that the issued token corresponds to the intended resource.
 
 ## Resource vs Audience
 
 This specification uses the term resource (as defined in {{RFC8707}}) rather than audience (as commonly used in access token claims such as the aud claim in JWTs) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and a token’s audience value.
 
 While a resource and an audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:
-	•	a broad audience (e.g., an API-wide identifier),
-	•	a narrow audience (e.g., an exact protected resource URL), or
-	•	a logical or cross-domain audience (e.g., a URN or parent domain) that has no direct correspondence to the resource’s URL.
+	-	a broadly scoped audience such as `https://api.example.com` that specifies an API-wide identifier for the resource server(s)
+	-	a narrowly scoped audience such as `https://api.example.com/some/protected/resource` that specifies the exact URL for a protected resource
+	-	a logical or cross-domain audience such as `urn:example:api` or `https://example.net` that has no direct correspondence to the resource’s URL.
 
 As a result, a client cannot reliably predict the audience value that an authorization server will use to audience-restrict an issued token, nor can it determine which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, where the client can discover the protected resource URL but not the authorization server’s audience assignment policy.
 
 For these reasons, returning an audience value in the token response is less useful to the client than returning the resource for which the token was issued. By returning the resource parameter, this specification enables a client to:
-	•	confirm that the access token is valid for the specific protected resource it requested, and
-	•	detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
+	-	confirm that the access token is valid for the specific protected resource it requested, and
+	-	detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
 
 This approach is consistent with Resource Indicators {{RFC8707}}, which defines the resource parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.
 
