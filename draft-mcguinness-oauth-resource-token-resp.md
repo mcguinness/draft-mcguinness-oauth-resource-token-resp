@@ -353,7 +353,7 @@ This specification addresses such issues by explicitly returning the resource UR
 
 In scenarios where a client obtains an access token for a protected resource, a malicious protected resource could potentially intercept the token during the client's legitimate request and subsequently reuse that token to access other resources that trust the same authorization server and accept tokens with the same audience and scopes. This attack is particularly relevant when the client cannot fully validate the trust relationship between the protected resource and the authorization server, such as in dynamic discovery scenarios using {{RFC9728}}.
 
-The desired goal for preventing token reuse attacks by malicious protected resources is to bind an access token to a key for proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in {{RFC9700}}. Proof-of-possession mechanisms bind the access token to a cryptographic key that is held by the client. When the client presents the token to a protected resource, it must also demonstrate possession of the corresponding private key (for example, by signing the request with DPoP). This ensures that even if a malicious protected resource intercepts the access token, it cannot reuse the token at other resources because it does not possess the client's private key. Authorization servers that support proof-of-possession mechanisms SHOULD bind issued access tokens to the client's proof-of-possession key when such mechanisms are available.
+The desired goal for preventing token reuse attacks by malicious protected resources is to bind an access token to a key for proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in {{RFC9449}}. Proof-of-possession mechanisms bind the access token to a cryptographic key that is held by the client. When the client presents the token to a protected resource, it must also demonstrate possession of the corresponding private key (for example, by signing the request with DPoP). This ensures that even if a malicious protected resource intercepts the access token, it cannot reuse the token at other resources because it does not possess the client's private key. Authorization servers that support proof-of-possession mechanisms SHOULD bind issued access tokens to the client's proof-of-possession key when such mechanisms are available.
 
 Resource validation through the `resource` parameter in the token response provides defense-in-depth for the client. While it helps the client detect when an authorization server has issued a token for a different resource than requested, it does not prevent a malicious protected resource from reusing an intercepted token at other resources. Clients are advised to:
 
@@ -431,7 +431,7 @@ Client discovers the Authorization Server configuration per {{RFC8414}}
     {
       "issuer": "https://authorization-server.example.com/",
       "authorization_endpoint": "https://authorization-server.example.com/oauth2/authorize",
-      "token_endpoint": "https://authorization-server.saas.com/oauth2/token",
+      "token_endpoint": "https://authorization-server.example.com/oauth2/token",
       "jwks_uri": "https://authorization-server.example.com/oauth2/keys",
       "scopes_supported": [
         "resource.read", "resource.write"
@@ -452,7 +452,7 @@ Client makes an authorization request for the resource
       &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
       &scope=resource%3Aread
       &state=abc123
-      &resource=https%3A%2F%api.example.com%2Fresource
+      &resource=https%3A%2F%2F%api.example.com%2Fresource
       &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
       &code_challenge_method=S256
     HTTP/1.1
