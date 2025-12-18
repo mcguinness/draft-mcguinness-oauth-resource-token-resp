@@ -51,9 +51,9 @@ This specification defines a new parameter, `resource`, to be returned in OAuth 
 
 # Introduction
 
-OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple resources (or APIs) are involved, the Resource Indicators for OAuth 2.0 {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the protected resource for which the token is intended.
+OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple protected resources (or APIs) are involved, the Resource Indicators for OAuth 2.0 {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the resource(s) for which the token is intended to be used which an authorization server can use to audience-restrict the issued access token.
 
-However, {{RFC8707}} does not require the authorization server to return any confirmation of the resource to which the access token applies (audience).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
+However, {{RFC8707}} does not require the authorization server to return any confirmation of the resource(s) to which the access token applies (audience).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
 
 An authorization server MAY:
 
@@ -67,18 +67,21 @@ This leads to ambiguity in the client's interpretation of the token's audience, 
 
 **Preconditions:**
 
-  - A client needs to access a protected resource at `https://api.example.com/data` but is not statically configured with knowledge of this resource or its authorization server, so it uses OAuth 2.0 Protected Resource Metadata {{RFC9728}} to dynamically discover the authorization server.
-  - An attacker controls the protected resource at `https://api.example.com/data` and publishes Protected Resource Metadata that claims `https://as.enterprise.example` (a legitimate, trusted authorization server) is the authorization server for this resource, listing legitimate-looking scopes (e.g., `files:read files:write`).
-  - The client has no way to validate a priori whether `https://as.enterprise.example` is actually authoritative for `https://api.example.com/data`. While Protected Resource Metadata could theoretically be signed, this would require the client to be pre-configured with trust roots, which defeats the purpose of dynamic discovery of unknown protected resources at runtime. Similarly, while an authorization server could publish a list of protected resources that trust it in its metadata, it is not feasible in practice for an authorization server to enumerate every protected resource that trusts it, especially in large-scale or federated deployments.
-  - The legitimate authorization server at `https://as.enterprise.example` does not strictly validate the `resource` parameter and does not return the resource in the token response. The user trusts `https://as.enterprise.example` and would consent to legitimate-looking scopes.
+  - A client wants to access a protected resource at `https://api.example.net/data` but is not statically configured with knowledge of this resource or its authorization server, so it uses OAuth 2.0 Protected Resource Metadata {{RFC9728}} to dynamically discover the authorization server.
+  - An attacker controls the protected resource at `https://api.example.net/data` and publishes Protected Resource Metadata that claims `https://legit-as.example.com` (a legitimate, trusted authorization server for the resource owner) is the authorization server for this resource, listing legitimate-looking scopes that are valid for the authorization server (e.g. `data:read data:write`).
+  - The client already has a valid client registration established with the legitimate authorization server.
+  - The legitimate authorization server at `https://legit-as.example.com` does not implemment support for {{RFC8707}} and ignores the `resource` parameter in authorization requests and instead audience-restricts issued access tokens based on requested scopes.
+- The user trusts `https://legit-as.example.com` and would consent to legitimate-looking scopes for a legitimite client.
 
 **Attack Flow:**
 
-  1. The client fetches Protected Resource Metadata from `https://api.example.com/data` and discovers `https://as.enterprise.example` as the authorization server.
-  2. The client makes an authorization request to `https://as.enterprise.example` including `resource=https://api.example.com/data` along with scopes `files:read files:write`.
-  3. The authorization server processes the request based on scopes (ignoring the resource parameter), and after user consent (which may only display scopes without the resource URL), issues a valid access token with an audience appropriate for the scopes, but without returning any indication of the resource.
-  4. The client receives the token but cannot verify whether it corresponds to `https://api.example.com/data` (the attacker's resource) or some other resource.
-  5. The client uses the token at `https://api.example.com/data` (the attacker's resource). The attacker can now replay this token to access other resources that trust `https://as.enterprise.example` and accept tokens with the same audience and scopes.
+  1. The client fetches Protected Resource Metadata from `https://api.example.net/data` and discovers `https://legit-as.example.com` as the authorization server.
+  2. The client makes an authorization request to `https://legit-as.example.com` including `resource=https://api.example.net/data` along with scopes `data:read data:write`.
+  3. The authorization server processes the request based on scopes (ignoring the `resource` parameter), and after user consent (which may only display scopes without the `resource`), issues a valid access token with an audience for a resource server for the application, but without returning any indication of audience-restriction change.
+  4. The client receives the token but cannot verify whether it corresponds to `https://api.example.net/data` (the attacker's resource) or some other resource.
+  5. The client uses the issued token to request access to `https://api.example.net/data` (the attacker's resource server). The attacker can now replay the access token to obtain access to protected resources from the legitimate resource server the user delegated to the client with `data:read data:write` scope.
+
+The client has no way to validate whether `https://legit-as.example.com` is actually authoritative for `https://api.example.net/data`. While Protected Resource Metadata could theoretically be signed, this would require the client to be pre-configured with trust roots for the signature, which defeats the purpose of dynamic discovery of protected resources at runtime. Similarly, while an authorization server could publish a list of protected resources that are valid for an authorization server it in its metadata {{RFC8414}}, it is not feasible in practice to enumerate every protected resource in large resource domains with hundreds or more resources.
 
 Without explicit confirmation of the resource in the token response, the client cannot detect when the authorization server has ignored or overridden the requested resource indicator, leaving it vulnerable to mix-up attacks. The only protection in this scenario is user consent, which may not provide sufficient detail to educate the user about the specific resource being authorized, especially when authorization servers do not prominently display resource indicators in consent screens.
 
