@@ -89,23 +89,20 @@ This document introduces a new parameter, `resource`, to be returned in the acce
 
 ## Resource vs Audience
 
-This specification uses the term "resource" (as defined in {{RFC8707}}) rather than "audience" (as commonly used in access token claims such as the `aud` claim in JWTs) for a fundamental reason: a client cannot assume any relationship between a token's audience and the protected resource (PR) URL it wants to access.
+This specification uses the term resource (as defined in {{RFC8707}}) rather than audience (as commonly used in access token claims such as the aud claim in JWTs) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and a token’s audience value.
 
-This distinction is particularly relevant in scenarios where a client is not statically configured with an audience value and instead dynamically interacts with different protected resources, which may trust different authorization servers. In such dynamic scenarios, the client only knows the URL of the protected resource it needs to access, not the audience value that will be embedded in the token or the audience values that different protected resources will accept.
+While a resource and an audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:
+	•	a broad audience (e.g., an API-wide identifier),
+	•	a narrow audience (e.g., an exact protected resource URL), or
+	•	a logical or cross-domain audience (e.g., a URN or parent domain) that has no direct correspondence to the resource’s URL.
 
-A given protected resource may trust tokens with audiences that vary significantly in scope and format:
+As a result, a client cannot reliably predict the audience value that an authorization server will use to audience-restrict an issued token, nor can it determine which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, where the client can discover the protected resource URL but not the authorization server’s audience assignment policy.
 
-  - **Very broad audience**: A protected resource at `https://api.example.com/some/protected/resource` might accept tokens with an audience of `https://api.example.com`, covering the entire API domain.
-  - **Very specific audience**: The same protected resource might alternatively require tokens with a highly specific audience such as `https://api.example.com/some/protected/resource`, matching the exact resource URL.
-  - **Cross-domain or logical audience**: A protected resource might accept tokens with a logical or cross-domain audience identifier such as `urn:example:api` or `https://parent.example` , which bears no direct relationship to the resource's URL.
+For these reasons, returning an audience value in the token response is less useful to the client than returning the resource for which the token was issued. By returning the resource parameter, this specification enables a client to:
+	•	confirm that the access token is valid for the specific protected resource it requested, and
+	•	detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
 
-In these dynamic scenarios, the client cannot predict what audience value the authorization server will assign to the token, nor can it determine which audience values a protected resource will accept. This becomes particularly important when clients use OAuth 2.0 Protected Resource Metadata {{RFC9728}} to dynamically discover an authorization server for a protected resource. The metadata document provides the protected resource URL, which the client can use directly in an authorization request. However, the metadata does not provide the audience value that will be embedded in the token, as that is determined by the authorization server's policy and configuration. Different protected resources may trust different authorization servers, each with their own audience assignment policies.
-
-By returning the `resource` parameter (the protected resource URL) rather than an `audience` parameter, this specification enables clients to:
-
-  - **Validate that the token is intended for the specific protected resource URL they requested**, which is the primary security mechanism for preventing resource mix-up attacks. Without this validation, a client cannot detect when an authorization server has issued a token for a different resource than requested, leaving the client vulnerable to mix-up attacks.
-  - Work seamlessly with dynamic discovery mechanisms like {{RFC9728}}, where the client knows the resource URL but not the audience.
-  - Avoid making incorrect assumptions about the relationship between resource URLs and token audiences.
+This approach is consistent with Resource Indicators {{RFC8707}}, which defines the resource parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.
 
 # Conventions and Terminology
 
