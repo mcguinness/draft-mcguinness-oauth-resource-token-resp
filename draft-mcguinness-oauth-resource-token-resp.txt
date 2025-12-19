@@ -26,10 +26,11 @@ About This Document
    This note is to be removed before publishing as an RFC.
 
    The latest revision of this draft can be found at
-   https://mcguinness.github.io/draft-mcguinness-resource-token-resp/
-   draft-mcguinness-resource-token-resp.html.  Status information for
-   this document may be found at https://datatracker.ietf.org/doc/draft-
-   mcguinness-oauth-resource-token-resp/.
+   https://mcguinness.github.io/draft-mcguinness-oauth-resource-token-
+   resp/draft-mcguinness-oauth-resource-token-resp.html.  Status
+   information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-mcguinness-oauth-resource-
+   token-resp/.
 
    Discussion of this document takes place on the Web Authorization
    Protocol Working Group mailing list (mailto:oauth@ietf.org), which is
@@ -303,25 +304,25 @@ Table of Contents
 
    Authorization servers that support this specification SHOULD include
    the resource parameter in successful access token responses, as
-   defined in Section 5.1 of [RFC6749].
+   defined in Section 5.1 of [RFC6749], to identify a protected resource
+   for which the access token is valid.
 
    The value of the resource parameter MUST be either:
 
-   *  A single case-sensitive string containing a StringOrURI value when
-      the access token is valid for exactly one resource.
+   *  A single case-sensitive string containing an absolute URI value,
+      as defined in Section 2 of [RFC8707], when the access token is
+      valid for exactly one resource.
 
-   *  An array of case-sensitive strings, each containing a StringOrURI
-      value, when the access token is valid for multiple resources.
+   *  An array of case-sensitive strings, each containing an absolute
+      URI value, as defined in Section 2 of [RFC8707], when the access
+      token is valid for multiple resources.  The array MUST contain at
+      least one element, and each element MUST be unique within the
+      array.
 
-   Each StringOrURI value identifies a protected resource for which the
-   token is valid.  When multiple resources are included, the array MUST
-   contain at least one element, and each element MUST be unique within
-   the array.
-
-   The "resource" parameter uses the same value syntax and requirements
-   as the resource request parameter defined in [RFC8707].  In
-   particular, each value MUST be an absolute URI, MUST NOT contain a
-   fragment component, and SHOULD NOT contain a query component.
+   The resource parameter uses the same value syntax and requirements as
+   the resource request parameter defined in [RFC8707].  In particular,
+   each value MUST be an absolute URI, MUST NOT contain a fragment
+   component, and SHOULD NOT contain a query component.
 
    HTTP/1.1 200 OK
    Content-Type: application/json
@@ -394,7 +395,7 @@ Table of Contents
           token.
 
    2.  When the client included one or more resource parameters in the
-       authorization request or token request (per [RFC8707]:
+       authorization request or token request (per [RFC8707]):
 
        *  The client MUST compare the returned resource value(s) against
           the requested resource value(s) using URI comparison rules as
@@ -897,7 +898,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    client_id=client123&
    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
-   Client obtains an access token for the resource
+   Client obtains an access token for the resource.
 
    HTTP/1.1 200 OK
    Content-Type: application/json
@@ -911,8 +912,8 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
      "resource": "https://api.example.com/resource"
    }
 
-   Client verifies the requested a token explicitly bound to the
-   discovered resource.
+   Client verifies that it obtained an access token explicitly bound to
+   the discovered resource.
 
 Acknowledgments
 
