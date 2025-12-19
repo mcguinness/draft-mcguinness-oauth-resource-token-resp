@@ -155,7 +155,7 @@ When determining whether and how to include the `resource` parameter in the acce
 
 When determining uniqueness of resource values within an array, authorization servers MUST use URI comparison rules as defined in {{Section 6.2.1 of RFC3986}} to ensure equivalent URIs are treated as duplicates.
 
-# Client Processing Rules {#client-processing-rules}
+## Client Processing Rules {#client-processing-rules}
 
 Clients that support this extension:
 
@@ -163,7 +163,7 @@ Clients that support this extension:
 - MUST treat mismatches as errors, unless the client is explicitly designed to handle token audience negotiation.
 - MUST NOT use the token with a resource other than the one identified in the response.
 
-## String Comparison
+### String Comparison
 
 When comparing `resource` parameter values, clients MUST use URI comparison rules as defined in {{Section 6.2.1 of RFC3986}}. Since the `resource` parameter contains URI values (as defined by StringOrURI in {{RFC7519}}), resource strings MUST be compared using syntax-based normalization, which means:
 
