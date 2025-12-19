@@ -18,7 +18,7 @@ venue:
   mail: "oauth@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/oauth/"
   github: "mcguinness/draft-mcguinness-resource-token-resp"
-  latest: "https://mcguinness.github.io/draft-mcguinness-resource-token-resp/draft-mcguinness-resource-token-resp.html"
+  latest: "https://mcguinness.github.io/draft-mcguinness-oauth-resource-token-resp/draft-mcguinness-oauth-resource-token-resp.html"
 
 author:
  -
@@ -125,16 +125,14 @@ Note that a client may use token introspection {{RFC7662}} if supported by an au
 
 # Resource Parameter in Token Response
 
-Authorization servers that support this specification SHOULD include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}.
+Authorization servers that support this specification SHOULD include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}, to identify a protected resource for which the access token is valid.
 
 The value of the `resource` parameter MUST be either:
 
-- A single case-sensitive string containing a StringOrURI value when the access token is valid for exactly one resource.
-- An array of case-sensitive strings, each containing a StringOrURI value, when the access token is valid for multiple resources.
+- A single case-sensitive string containing an absolute URI value, as defined in {{Section 2 of RFC8707}}, when the access token is valid for exactly one resource.
+- An array of case-sensitive strings, each containing an absolute URI value, as defined in {{Section 2 of RFC8707}}, when the access token is valid for multiple resources.  The array MUST contain at least one element, and each element MUST be unique within the array.
 
-Each StringOrURI value identifies a protected resource for which the token is valid. When multiple resources are included, the array MUST contain at least one element, and each element MUST be unique within the array.
-
-The "resource" parameter uses the same value syntax and requirements as the `resource` request parameter defined in {{RFC8707}}.  In particular, each value MUST be an absolute URI, MUST NOT contain a fragment component, and SHOULD NOT contain a query component.
+The `resource` parameter uses the same value syntax and requirements as the `resource` request parameter defined in {{RFC8707}}. In particular, each value MUST be an absolute URI, MUST NOT contain a fragment component, and SHOULD NOT contain a query component.
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -171,7 +169,7 @@ When processing the access token response, clients that support this extension M
    - If the value is an array, the client MUST extract all resource identifiers from the array. Each element in the array MUST be a string containing a resource identifier.
    - If the value is neither a string nor an array, the client MUST treat the response as invalid and MUST NOT use the access token.
 
-2. When the client included one or more `resource` parameters in the authorization request or token request (per {{RFC8707}}:
+2. When the client included one or more `resource` parameters in the authorization request or token request (per {{RFC8707}}):
    - The client MUST compare the returned `resource` value(s) against the requested `resource` value(s) using URI comparison rules as defined in {{Section 6.2.1 of RFC3986}}.
    - To compare resource values, the client MUST normalize both URIs according to {{Section 6.2.2 of RFC3986}} (syntax-based normalization) and then compare the normalized URIs as case-sensitive strings. Two URIs are considered equivalent if their normalized forms are identical.
    - If the client requested a single resource:
@@ -509,7 +507,7 @@ Client exchanges the authorization code for an access token
     client_id=client123&
     code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
-Client obtains an access token for the resource
+Client obtains an access token for the resource.
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -523,7 +521,7 @@ Client obtains an access token for the resource
       "resource": "https://api.example.com/resource"
     }
 
-Client verifies the requested a token explicitly bound to the discovered resource.
+Client verifies that it obtained an access token explicitly bound to the discovered resource.
 
 # Acknowledgments
 {:numbered="false"}
