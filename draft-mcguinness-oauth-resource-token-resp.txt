@@ -5,8 +5,8 @@
 Web Authorization Protocol                                 K. McGuinness
 Internet-Draft                                               Independent
 Intended status: Standards Track                               J. Hanson
-Expires: 21 June 2026                                       Keycard Labs
-                                                        18 December 2025
+Expires: 22 June 2026                                       Keycard Labs
+                                                        19 December 2025
 
 
          OAuth 2.0 Resource Parameter in Access Token Response
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 June 2026.
+   This Internet-Draft will expire on 22 June 2026.
 
 Copyright Notice
 
@@ -77,14 +77,14 @@ Table of Contents
      2.1.  Terminology
        2.1.1.  Resource vs Audience
    3.  Resource Parameter in Token Response
-     3.1.  Syntax
-     3.2.  Semantics
-   4.  Client Processing
-     4.1.  Examples
-       4.1.1.  Single Protected Resource
-       4.1.2.  Multiple Protected Resources
-       4.1.3.  Default Resource
-       4.1.4.  Invalid Resource
+     3.1.  Authorization Server Processing Rules
+   4.  Client Processing Rules
+     4.1.  String Comparison
+     4.2.  Examples
+       4.2.1.  Single Protected Resource
+       4.2.2.  Multiple Protected Resources
+       4.2.3.  Default Resource
+       4.2.4.  Invalid Resource
    5.  Security Considerations
    6.  Privacy Considerations
    7.  IANA Considerations
@@ -295,18 +295,22 @@ Table of Contents
 
 3.  Resource Parameter in Token Response
 
-3.1.  Syntax
-
    Authorization servers that support this specification SHOULD include
    the resource parameter in successful access token responses, as
-   defined in Section 5.1 of [RFC6749] for a valid token request.
+   defined in Section 5.1 of [RFC6749].
 
-   The value of the resource parameter MUST be an array of case-
-   sensitive strings, each containing a StringOrURI value that
-   identifies the protected resource for which the token is valid.  In
-   the special case when the token is targeted to a single resource, the
-   resource value MAY be a single case-sensitive string containing a
-   StringOrURI value.
+   The value of the resource parameter MUST be either:
+
+   *  A single case-sensitive string containing a StringOrURI value when
+      the token is valid for exactly one resource, or
+
+   *  An array of case-sensitive strings, each containing a StringOrURI
+      value, when the token is valid for multiple resources.
+
+   Each StringOrURI value identifies a protected resource for which the
+   token is valid.  When multiple resources are included, the array MUST
+   contain at least one element, and each element MUST be unique within
+   the array.
 
    HTTP/1.1 200 OK
    Content-Type: application/json
@@ -319,23 +323,40 @@ Table of Contents
      "resource": "https://api.example.com/"
    }
 
-3.2.  Semantics
+3.1.  Authorization Server Processing Rules
+
+   When determining whether and how to include the resource parameter in
+   the access token response, authorization servers MUST apply the
+   following rules:
 
    *  If the client included one or more resource parameters in the
-      request per [RFC8707], the resource value in the response MUST
-      reflect the accepted or selected resource(s).
+      authorization request or token request per [RFC8707], and the
+      authorization server accepted those resource(s), the resource
+      value in the response MUST reflect the accepted resource(s).  If
+      the authorization server accepted a subset of the requested
+      resources, the response MUST contain only the accepted subset.
 
-   *  If the authorization server selected a default resource, it SHOULD
+   *  If the client did not include a resource parameter in the request,
+      but the authorization server selected a default resource based on
+      policy or client configuration, the authorization server SHOULD
       return that selected resource in the resource parameter.
 
-   *  If the requested resource is not valid for the client, user, or
-      authorization server, then the authorization server SHOULD return
-      an invalid_target OAuth error response code according to [RFC8707]
+   *  If the requested resource value(s) are not valid for the client,
+      user, or authorization server, the authorization server MUST
+      return an invalid_target error response as defined in [RFC8707],
+      Section 2, rather than issuing a token for a different resource.
 
-   *  If the token is not bound to a specific resource or the concept
-      does not apply, the resource parameter SHOULD be omitted.
+   *  If the token is not bound to any specific resource (e.g., the
+      authorization server does not use resource indicators and the
+      token is not audience-restricted to a specific resource), the
+      resource parameter SHOULD be omitted from the response.
 
-4.  Client Processing
+   When determining uniqueness of resource values within an array,
+   authorization servers MUST use URI comparison rules as defined in
+   Section 6.2.1 of [RFC3986] to ensure equivalent URIs are treated as
+   duplicates.
+
+4.  Client Processing Rules
 
    Clients that support this extension:
 
@@ -348,11 +369,45 @@ Table of Contents
    *  MUST NOT use the token with a resource other than the one
       identified in the response.
 
-4.1.  Examples
+4.1.  String Comparison
 
-4.1.1.  Single Protected Resource
+   When comparing resource parameter values, clients MUST use URI
+   comparison rules as defined in Section 6.2.1 of [RFC3986].  Since the
+   resource parameter contains URI values (as defined by StringOrURI in
+   [RFC7519]), resource strings MUST be compared using syntax-based
+   normalization, which means:
 
-4.1.1.1.  Authorization Request
+   *  Scheme and host components MUST be compared in a case-insensitive
+      manner.  Clients SHOULD normalize schemes to lowercase and hosts
+      to lowercase for comparison purposes.
+
+   *  Percent-encoded octets MUST be compared using case-insensitive
+      hexadecimal digits (e.g., %3A is equivalent to %3a).
+
+   *  The comparison MUST account for default ports, where the explicit
+      port is equivalent to the default port for that scheme (e.g.,
+      https://example.com/ is equivalent to https://example.com:443/).
+
+   *  Path components MUST be compared using a case-sensitive,
+      character-by-character basis.
+
+   *  Query components, if present, MUST be included in the comparison
+      exactly as provided.
+
+   *  Percent-encoded characters representing unreserved characters (as
+      defined in Section 2.3 of [RFC3986]) SHOULD be decoded before
+      comparison for equivalence, though exact encoded form matching is
+      also acceptable.
+
+   Clients MUST apply these normalization rules when comparing the
+   returned resource value(s) against requested resource value(s) to
+   detect mismatches or validate token applicability.
+
+4.2.  Examples
+
+4.2.1.  Single Protected Resource
+
+4.2.1.1.  Authorization Request
 
    Client makes an authorization request for a protected resource using
    the URL as the resource indicator
@@ -368,7 +423,7 @@ Table of Contents
    HTTP/1.1
    Host: authorization-server.example.com
 
-4.1.1.2.  Redirect
+4.2.1.2.  Redirect
 
    User successfully authenticates and delegates access to the client
    for the requested resource and scopes
@@ -376,7 +431,7 @@ Table of Contents
 HTTP/1.1 302 Found
 Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
 
-4.1.1.3.  Token Request
+4.2.1.3.  Token Request
 
    POST /token HTTP/1.1
    Host: authorization-server.example.com
@@ -388,7 +443,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    client_id=client123&
    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
-4.1.1.4.  Token Response
+4.2.1.4.  Token Response
 
    Resource is confirmed and unambiguous.
 
@@ -404,9 +459,9 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
      "resource": "https://resource.example.com/"
    }
 
-4.1.2.  Multiple Protected Resources
+4.2.2.  Multiple Protected Resources
 
-4.1.2.1.  Authorization Request
+4.2.2.1.  Authorization Request
 
    Client makes an authorization request for multiple protected
    resources using the URLs as the resource indicators
@@ -423,7 +478,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    HTTP/1.1
    Host: authorization-server.example.com
 
-4.1.2.2.  Redirect
+4.2.2.2.  Redirect
 
    User successfully authenticates and delegates access to the client
    for the requested resource and scopes
@@ -431,7 +486,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
 HTTP/1.1 302 Found
 Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
 
-4.1.2.3.  Token Request
+4.2.2.3.  Token Request
 
    Client exchanges the authorization code for an access token
 
@@ -445,7 +500,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    client_id=client123&
    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
-4.1.2.4.  Token Response
+4.2.2.4.  Token Response
 
    Both resources are confirmed and unambiguous.
 
@@ -464,9 +519,9 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
      ]
    }
 
-4.1.3.  Default Resource
+4.2.3.  Default Resource
 
-4.1.3.1.  Authorization Request
+4.2.3.1.  Authorization Request
 
    Client makes an authorization request without a resource indicator
 
@@ -480,7 +535,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    HTTP/1.1
    Host: authorization-server.example.com
 
-4.1.3.2.  Redirect
+4.2.3.2.  Redirect
 
    User successfully authenticates and delegates access to the client
    for the requested scopes
@@ -488,7 +543,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
 HTTP/1.1 302 Found
 Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
 
-4.1.3.3.  Token Request
+4.2.3.3.  Token Request
 
    POST /token HTTP/1.1
    Host: authorization-server.example.com
@@ -500,7 +555,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    client_id=client123&
    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
-4.1.3.4.  Token Response
+4.2.3.4.  Token Response
 
    Default resource is confirmed and unambiguous.
 
@@ -516,9 +571,9 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
      "resource": "https://resource.example.com/"
    }
 
-4.1.4.  Invalid Resource
+4.2.4.  Invalid Resource
 
-4.1.4.1.  Authorization Request
+4.2.4.1.  Authorization Request
 
    GET /authorize?response_type=code
      &client_id=client123
@@ -531,7 +586,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    HTTP/1.1
    Host: authorization-server.example.com
 
-4.1.4.2.  Error Redirect
+4.2.4.2.  Error Redirect
 
    The server rejected the requested resource value (e.g authorization
    or policy violation, resource is not valid, etc).
@@ -588,7 +643,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    resource than requested, it does not prevent a malicious protected
    resource from reusing an intercepted token at other resources.
    Clients are advised to validate the resource parameter as specified
-   in the Client Processing section and treat mismatches as errors
+   in Client Processing Rules (Section 4) and treat mismatches as errors
    unless explicitly designed to handle token audience negotiation.
    Clients that require strict resource binding SHOULD treat the absence
    of the resource parameter as a potential ambiguity.
@@ -804,6 +859,8 @@ Document History
    *  Added attack example
 
    *  Added Resource vs Audience distinction
+
+   *  Updated Authorization Server and Client Processing Rules
 
    *  Updated Security Considerations
 
