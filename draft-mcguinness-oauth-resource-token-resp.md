@@ -95,7 +95,7 @@ This document introduces a new parameter `resource` to be returned in the access
 
 ## Terminology
 
-The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" is defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
+The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" are defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
 
 The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
 
@@ -469,7 +469,7 @@ Client makes an authorization request for the resource
       &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
       &scope=resource%3Aread
       &state=abc123
-      &resource=https%3A%2F%2F%api.example.com%2Fresource
+      &resource=https%3A%2F%2Fapi.example.com%2Fresource
       &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
       &code_challenge_method=S256
     HTTP/1.1
