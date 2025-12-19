@@ -156,7 +156,7 @@ When deciding whether and how to include the `resource` parameter in an access t
 
 2. When the client does not request specific resources with a resource indicator:
    - If the authorization server assigns a default resource based on policy or client configuration, it SHOULD include that resource in the `resource` parameter of the response.
-   - If the access token is not bound to any specific resource (for example, when the authorization server does not support resource indicators {{RFC8707}} and the access token has no audience restriction), the `resource` parameter SHOULD be omitted from the response.
+   - If the access token is not bound to any specific resource (for example, when the access token has no audience restriction),the `resource` parameter SHOULD be omitted from the response.
 
 When determining uniqueness of resource values within an array, authorization servers MUST use URI comparison rules as defined in {{Section 6.2.1 of RFC3986}} to ensure equivalent URIs are treated as duplicates.
 
