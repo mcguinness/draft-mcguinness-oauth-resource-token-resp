@@ -367,10 +367,9 @@ Table of Contents
           resource in the resource parameter of the response.
 
        *  If the access token is not bound to any specific resource (for
-          example, when the authorization server does not support
-          resource indicators [RFC8707] and the access token has no
-          audience restriction), the resource parameter SHOULD be
-          omitted from the response.
+          example, when the access token has no audience
+          restriction),the resource parameter SHOULD be omitted from the
+          response.
 
    When determining uniqueness of resource values within an array,
    authorization servers MUST use URI comparison rules as defined in
