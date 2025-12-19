@@ -340,7 +340,7 @@ Table of Contents
    the token response, authorization servers MUST apply the following
    rules:
 
-   1.  *When the client requests specific resources:*
+   1.  When the client requests specific resources:
 
        *  If the client included one or more resource parameters in the
           authorization request or token request per [RFC8707], and the
@@ -357,7 +357,7 @@ Table of Contents
           defined in [RFC8707], Section 2, and MUST NOT issue an access
           token.
 
-   2.  *When the client does not request specific resources:*
+   2.  When the client does not request specific resources:
 
        *  If the authorization server assigns a default resource based
           on policy or client configuration, it SHOULD include that
@@ -379,8 +379,8 @@ Table of Contents
    When processing the access token response, clients that support this
    extension MUST apply the following rules:
 
-   1.  *When the resource parameter is present in the access token
-       response:*
+   1.  When the resource parameter is present in the access token
+       response:
 
        *  If the value is a string, the client MUST treat it as a single
           resource identifier.
@@ -393,8 +393,8 @@ Table of Contents
           treat the response as invalid and MUST NOT use the access
           token.
 
-   2.  *When the client included one or more resource parameters in the
-       authorization request or token request (per [RFC8707]:*
+   2.  When the client included one or more resource parameters in the
+       authorization request or token request (per [RFC8707]:
 
        *  The client MUST compare the returned resource value(s) against
           the requested resource value(s) using URI comparison rules as
@@ -446,8 +446,8 @@ Table of Contents
           condition, MUST NOT use the access token, SHOULD discard the
           access token, and MAY retry the authorization flow.
 
-   3.  *When the client did not include any resource parameters in the
-       authorization request or token request:*
+   3.  When the client did not include any resource parameters in the
+       authorization request or token request:
 
        *  If the response includes a resource parameter, the client MAY
           accept it as the authorization server's default resource
@@ -458,9 +458,9 @@ Table of Contents
           to a specific resource, unless the client requires explicit
           resource binding.
 
-   4.  *When the client included one or more resource parameters in the
+   4.  When the client included one or more resource parameters in the
        authorization request or token request, but the response omits
-       the resource parameter:*
+       the resource parameter:
 
        *  Clients that require strict resource binding MUST treat this
           as an error condition and MUST NOT use the access token.

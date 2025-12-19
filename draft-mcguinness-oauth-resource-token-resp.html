@@ -1397,7 +1397,7 @@ Cache-Control: no-store
 <p id="section-3.1-1">When determining whether and how to include the <code>resource</code> parameter in the token response, authorization servers <span class="bcp14">MUST</span> apply the following rules:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3.1-2">
 <li id="section-3.1-2.1">
-            <p id="section-3.1-2.1.1"><strong>When the client requests specific resources:</strong><a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-2.1.1">When the client requests specific resources:<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.1.2.1">
                 <p id="section-3.1-2.1.2.1.1">If the client included one or more <code>resource</code> parameters in the authorization request or token request per <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, and the authorization server accepted all requested resources, the <code>resource</code> parameter in the response <span class="bcp14">MUST</span> contain the accepted resource(s).<a href="#section-3.1-2.1.2.1.1" class="pilcrow">¶</a></p>
@@ -1411,7 +1411,7 @@ Cache-Control: no-store
             </ul>
 </li>
           <li id="section-3.1-2.2">
-            <p id="section-3.1-2.2.1"><strong>When the client does not request specific resources:</strong><a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-2.2.1">When the client does not request specific resources:<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.2.2.1">
                 <p id="section-3.1-2.2.2.1.1">If the authorization server assigns a default resource based on policy or client configuration, it <span class="bcp14">SHOULD</span> include that resource in the <code>resource</code> parameter of the response.<a href="#section-3.1-2.2.2.1.1" class="pilcrow">¶</a></p>
@@ -1433,7 +1433,7 @@ Cache-Control: no-store
 <p id="section-3.2-1">When processing the access token response, clients that support this extension <span class="bcp14">MUST</span> apply the following rules:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3.2-2">
 <li id="section-3.2-2.1">
-            <p id="section-3.2-2.1.1"><strong>When the <code>resource</code> parameter is present in the access token response:</strong><a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-3.2-2.1.1">When the <code>resource</code> parameter is present in the access token response:<a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-2.1.2.1">
                 <p id="section-3.2-2.1.2.1.1">If the value is a string, the client <span class="bcp14">MUST</span> treat it as a single resource identifier.<a href="#section-3.2-2.1.2.1.1" class="pilcrow">¶</a></p>
@@ -1447,7 +1447,7 @@ Cache-Control: no-store
             </ul>
 </li>
           <li id="section-3.2-2.2">
-            <p id="section-3.2-2.2.1"><strong>When the client included one or more <code>resource</code> parameters in the authorization request or token request (per <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>:</strong><a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-3.2-2.2.1">When the client included one or more <code>resource</code> parameters in the authorization request or token request (per <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>:<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-2.2.2.1">
                 <p id="section-3.2-2.2.2.1.1">The client <span class="bcp14">MUST</span> compare the returned <code>resource</code> value(s) against the requested <code>resource</code> value(s) using URI comparison rules as defined in <span><a href="https://rfc-editor.org/rfc/rfc3986#section-6.2.1" class="relref">Section 6.2.1</a> of [<a href="#RFC3986" class="cite xref">RFC3986</a>]</span>.<a href="#section-3.2-2.2.2.1.1" class="pilcrow">¶</a></p>
@@ -1492,7 +1492,7 @@ Cache-Control: no-store
             </ul>
 </li>
           <li id="section-3.2-2.3">
-            <p id="section-3.2-2.3.1"><strong>When the client did not include any <code>resource</code> parameters in the authorization request or token request:</strong><a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-3.2-2.3.1">When the client did not include any <code>resource</code> parameters in the authorization request or token request:<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-2.3.2.1">
                 <p id="section-3.2-2.3.2.1.1">If the response includes a <code>resource</code> parameter, the client <span class="bcp14">MAY</span> accept it as the authorization server's default resource assignment.<a href="#section-3.2-2.3.2.1.1" class="pilcrow">¶</a></p>
@@ -1503,7 +1503,7 @@ Cache-Control: no-store
             </ul>
 </li>
           <li id="section-3.2-2.4">
-            <p id="section-3.2-2.4.1"><strong>When the client included one or more <code>resource</code> parameters in the authorization request or token request, but the response omits the <code>resource</code> parameter:</strong><a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
+            <p id="section-3.2-2.4.1">When the client included one or more <code>resource</code> parameters in the authorization request or token request, but the response omits the <code>resource</code> parameter:<a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-2.4.2.1">
                 <p id="section-3.2-2.4.2.1.1">Clients that require strict resource binding <span class="bcp14">MUST</span> treat this as an error condition and <span class="bcp14">MUST NOT</span> use the access token.<a href="#section-3.2-2.4.2.1.1" class="pilcrow">¶</a></p>
