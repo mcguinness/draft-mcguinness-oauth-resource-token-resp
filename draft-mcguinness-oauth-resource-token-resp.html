@@ -1393,10 +1393,10 @@ Cache-Control: no-store
         <h3 id="name-authorization-server-proces">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-authorization-server-proces" class="section-name selfRef">Authorization Server Processing Rules</a>
         </h3>
-<p id="section-3.1-1">When determining whether and how to include the <code>resource</code> parameter in the token response, authorization servers <span class="bcp14">MUST</span> apply the following rules:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">When deciding whether and how to include the <code>resource</code> parameter in an access token response, an authorization server that supports this specification <span class="bcp14">MUST</span> apply the following rules:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-3.1-2">
 <li id="section-3.1-2.1">
-            <p id="section-3.1-2.1.1">When the client requests specific resources:<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-2.1.1">When the client requests specific resources with a resource indicator:<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.1.2.1">
                 <p id="section-3.1-2.1.2.1.1">If the client included one or more <code>resource</code> parameters in the authorization request or token request per <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, and the authorization server accepted all requested resources, the <code>resource</code> parameter in the response <span class="bcp14">MUST</span> contain the accepted resource(s).<a href="#section-3.1-2.1.2.1.1" class="pilcrow">¶</a></p>
@@ -1405,12 +1405,12 @@ Cache-Control: no-store
                 <p id="section-3.1-2.1.2.2.1">If the authorization server accepted only a subset of the requested resources, the <code>resource</code> parameter in the response <span class="bcp14">MUST</span> contain only that accepted subset.<a href="#section-3.1-2.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
               <li class="normal" id="section-3.1-2.1.2.3">
-                <p id="section-3.1-2.1.2.3.1">If the authorization server cannot accept any of the requested resources, it <span class="bcp14">MUST</span> return an <code>invalid_target</code> error response as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, Section 2, and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.1-2.1.2.3.1" class="pilcrow">¶</a></p>
+                <p id="section-3.1-2.1.2.3.1">If the authorization server cannot accept any of the requested resources or does not support  <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, it <span class="bcp14">MUST</span> return an <code>invalid_target</code> error response as defined in <span><a href="https://rfc-editor.org/rfc/rfc8707#section-2" class="relref">Section 2</a> of [<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.1-2.1.2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
           <li id="section-3.1-2.2">
-            <p id="section-3.1-2.2.1">When the client does not request specific resources:<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+            <p id="section-3.1-2.2.1">When the client does not request specific resources with a resource indicator:<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.1-2.2.2.1">
                 <p id="section-3.1-2.2.2.1.1">If the authorization server assigns a default resource based on policy or client configuration, it <span class="bcp14">SHOULD</span> include that resource in the <code>resource</code> parameter of the response.<a href="#section-3.1-2.2.2.1.1" class="pilcrow">¶</a></p>
