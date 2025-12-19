@@ -152,7 +152,7 @@ When deciding whether and how to include the `resource` parameter in an access t
 1. When the client requests specific resources with a resource indicator:
    - If the client included one or more `resource` parameters in the authorization request or token request per {{RFC8707}}, and the authorization server accepted all requested resources, the `resource` parameter in the response MUST contain the accepted resource(s).
    - If the authorization server accepted only a subset of the requested resources, the `resource` parameter in the response MUST contain only that accepted subset.
-   - If the authorization server cannot accept any of the requested resources or does not support  {{RFC8707}}, it MUST return an `invalid_target` error response as defined in {{Section 2 of RFC8707}}, and MUST NOT issue an access token.
+   - If the authorization server cannot accept any of the requested resources or does not support {{RFC8707}}, it MUST return an `invalid_target` error response as defined in {{Section 2 of RFC8707}}, and MUST NOT issue an access token.
 
 2. When the client does not request specific resources with a resource indicator:
    - If the authorization server assigns a default resource based on policy or client configuration, it SHOULD include that resource in the `resource` parameter of the response.
