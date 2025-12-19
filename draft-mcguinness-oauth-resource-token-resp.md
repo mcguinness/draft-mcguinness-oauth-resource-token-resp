@@ -124,11 +124,14 @@ Note that a client may use token introspection {{RFC7662}} if supported by an au
 
 # Resource Parameter in Token Response
 
-## Syntax
+Authorization servers that support this specification SHOULD include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}.
 
-Authorization servers that support this specification SHOULD include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}} for a valid token request.
+The value of the `resource` parameter MUST be either:
 
-The value of the `resource` parameter MUST be an array of case-sensitive strings, each containing a StringOrURI value that identifies the protected resource for which the token is valid.  In the special case when the token is targeted to a single resource, the `resource` value MAY be a single case-sensitive string containing a StringOrURI value.
+- A single case-sensitive string containing a StringOrURI value when the token is valid for exactly one resource, or
+- An array of case-sensitive strings, each containing a StringOrURI value, when the token is valid for multiple resources.
+
+Each StringOrURI value identifies a protected resource for which the token is valid. When multiple resources are included, the array MUST contain at least one element, and each element MUST be unique within the array.
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -141,20 +144,37 @@ The value of the `resource` parameter MUST be an array of case-sensitive strings
       "resource": "https://api.example.com/"
     }
 
-## Semantics
+## Authorization Server Processing Rules
 
-- If the client included one or more `resource` parameters in the request per {{RFC8707}}, the `resource` value in the response MUST reflect the accepted or selected resource(s).
-- If the authorization server selected a default resource, it SHOULD return that selected resource in the `resource` parameter.
-- If the requested `resource` is not valid for the client, user, or authorization server, then the authorization server SHOULD return an `invalid_target` OAuth error response code according to {{RFC8707}}
-- If the token is not bound to a specific resource or the concept does not apply, the `resource` parameter SHOULD be omitted.
+When determining whether and how to include the `resource` parameter in the access token response, authorization servers MUST apply the following rules:
 
-# Client Processing
+- If the client included one or more `resource` parameters in the authorization request or token request per {{RFC8707}}, and the authorization server accepted those resource(s), the `resource` value in the response MUST reflect the accepted resource(s). If the authorization server accepted a subset of the requested resources, the response MUST contain only the accepted subset.
+- If the client did not include a `resource` parameter in the request, but the authorization server selected a default resource based on policy or client configuration, the authorization server SHOULD return that selected resource in the `resource` parameter.
+- If the requested `resource` value(s) are not valid for the client, user, or authorization server, the authorization server MUST return an `invalid_target` error response as defined in {{RFC8707}}, Section 2, rather than issuing a token for a different resource.
+- If the token is not bound to any specific resource (e.g., the authorization server does not use resource indicators and the token is not audience-restricted to a specific resource), the `resource` parameter SHOULD be omitted from the response.
+
+When determining uniqueness of resource values within an array, authorization servers MUST use URI comparison rules as defined in {{Section 6.2.1 of RFC3986}} to ensure equivalent URIs are treated as duplicates.
+
+# Client Processing Rules {#client-processing-rules}
 
 Clients that support this extension:
 
 - SHOULD compare the returned `resource` URIs against the originally requested `resource` URI(s), if applicable.
 - MUST treat mismatches as errors, unless the client is explicitly designed to handle token audience negotiation.
 - MUST NOT use the token with a resource other than the one identified in the response.
+
+## String Comparison
+
+When comparing `resource` parameter values, clients MUST use URI comparison rules as defined in {{Section 6.2.1 of RFC3986}}. Since the `resource` parameter contains URI values (as defined by StringOrURI in {{RFC7519}}), resource strings MUST be compared using syntax-based normalization, which means:
+
+- Scheme and host components MUST be compared in a case-insensitive manner. Clients SHOULD normalize schemes to lowercase and hosts to lowercase for comparison purposes.
+- Percent-encoded octets MUST be compared using case-insensitive hexadecimal digits (e.g., `%3A` is equivalent to `%3a`).
+- The comparison MUST account for default ports, where the explicit port is equivalent to the default port for that scheme (e.g., `https://example.com/` is equivalent to `https://example.com:443/`).
+- Path components MUST be compared using a case-sensitive, character-by-character basis.
+- Query components, if present, MUST be included in the comparison exactly as provided.
+- Percent-encoded characters representing unreserved characters (as defined in {{Section 2.3 of RFC3986}}) SHOULD be decoded before comparison for equivalence, though exact encoded form matching is also acceptable.
+
+Clients MUST apply these normalization rules when comparing the returned `resource` value(s) against requested resource value(s) to detect mismatches or validate token applicability.
 
 ## Examples
 
@@ -356,7 +376,7 @@ A malicious protected resource may intercept an access token during a client's l
 
 To prevent token reuse attacks by malicious protected resources, access tokens SHOULD require proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in {{RFC9449}}. By binding the access token to a cryptographic key held by the client and requiring demonstration of key possession when using the token, proof-of-possession mechanisms prevent a malicious protected resource that intercepts the access token from reusing it at other resources, since it does not possess the client's private key. Both the client and authorization server must support proof-of-possession mechanisms for this protection to be effective. See {{Section 9 of RFC9449}} for details on how DPoP provides proof-of-possession.
 
-Validating the `resource` parameter in the token response provides defense-in-depth for the client. While it helps the client detect when an authorization server has issued a token for a different resource than requested, it does not prevent a malicious protected resource from reusing an intercepted token at other resources. Clients are advised to validate the `resource` parameter as specified in the Client Processing section and treat mismatches as errors unless explicitly designed to handle token audience negotiation. Clients that require strict resource binding SHOULD treat the absence of the `resource` parameter as a potential ambiguity.
+Validating the `resource` parameter in the token response provides defense-in-depth for the client. While it helps the client detect when an authorization server has issued a token for a different resource than requested, it does not prevent a malicious protected resource from reusing an intercepted token at other resources. Clients are advised to validate the `resource` parameter as specified in {{Section client-processing-rules}} and treat mismatches as errors unless explicitly designed to handle token audience negotiation. Clients that require strict resource binding SHOULD treat the absence of the `resource` parameter as a potential ambiguity.
 
 # Privacy Considerations
 
@@ -500,6 +520,7 @@ This proposal builds on prior work in OAuth 2.0 extensibility and security analy
 
 * Added attack example
 * Added Resource vs Audience distinction
+* Updated Authorization Server and Client Processing Rules
 * Updated Security Considerations
 * Document cleanup and consistency
 
