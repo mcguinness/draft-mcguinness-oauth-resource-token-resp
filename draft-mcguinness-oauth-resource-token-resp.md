@@ -53,33 +53,34 @@ This specification defines a new parameter `resource` to be returned in OAuth 2.
 
 # Introduction
 
-OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple protected resources or resource servers (APIs) are involved, the Resource Indicators for OAuth 2.0 {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the resource(s) for which the token is intended to be used which an authorization server can use to audience-restrict the issued access token.
+OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple protected resources or resource servers (APIs) are involved, the Resource Indicators for OAuth 2.0 {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the resource(s) for which the token is intended to be used, which an authorization server can use to restrict the issued access token's audience.
 
 However, {{RFC8707}} does not require the authorization server to return any confirmation of the resource(s) to which the access token applies (audience).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
 
 An authorization server MAY:
 
-  - Ignore the `resource` parameter (e.g., if it does not support {{RFC8707}}) and audience-restrict the issued access token to a default resource or set of resources.
-  - Accept and honor all requested `resource` values, audience-restricting the issued access token to the entire set of requested resources.
-  - Accept a subset of the requested `resource` values, audience-restricting the token accordingly.
-  - Override the requested `resource` values and issue a token audience-restricted to an authorization-server-defined set of resources, based on policy or client registration.
-  - Reject one or more requested `resource` values and return an OAuth 2.0 error response with the error code `invalid_target` as defined in {{RFC8707}}.
+  - Ignore processing the `resource` parameter and issue an access token with no audience restriction, allowing the token to be used for any resource.
+  - Ignore processing the `resource` parameter and issue an access token with an audience restricted to a default resource or set of resources (for example, when the authorization server does not support {{RFC8707}}).
+  - Accept all requested `resource` values and issue an access token with an audience restricted to the complete set of requested resources.
+  - Accept only a subset of requested `resource` values and issue an access token with an audience restricted to that subset,silently rejecting the remaining requested resources.
+  - Override the requested `resource` values and issue an access token with an audience restricted to resources determined by the authorization server's policy or client registration configuration.
+  - Reject the request by returning an error response with the error code `invalid_target` as defined in {{RFC8707}}.
 
-This leads to ambiguity in the client's interpretation of the token's audience, potentially resulting in **resource mix-up attacks**. Consider the following concrete example involving dynamic discovery:
+This leads to ambiguity in the client's interpretation of the access token's audience, potentially resulting in **resource mix-up attacks**. Consider the following concrete example involving dynamic discovery:
 
 **Preconditions:**
 
   - A client wants to access a protected resource at `https://api.example.net/data` but is not statically configured with knowledge of this resource or its authorization server, so it uses OAuth 2.0 Protected Resource Metadata {{RFC9728}} to dynamically discover the authorization server.
   - An attacker controls the protected resource at `https://api.example.net/data` and publishes Protected Resource Metadata that claims `https://legit-as.example.com` (a legitimate, trusted authorization server for the resource owner) is the authorization server for this resource, listing legitimate-looking scopes that are valid for the authorization server (e.g. `data:read data:write`).
   - The client already has a valid client registration established with the legitimate authorization server.
-  - The legitimate authorization server at `https://legit-as.example.com` does not implement support for {{RFC8707}} and ignores the `resource` parameter in authorization requests and instead audience-restricts issued access tokens based on requested scopes.
+  - The legitimate authorization server at `https://legit-as.example.com` does not implement support for {{RFC8707}} and ignores the `resource` parameter in authorization requests and instead restricts issued access tokens to an audience based on requested scopes.
   - The user trusts `https://legit-as.example.com` and would consent to legitimate-looking scopes for a legitimite client.
 
 **Attack Flow:**
 
   1. The client fetches Protected Resource Metadata from `https://api.example.net/data` and discovers `https://legit-as.example.com` as the authorization server.
   2. The client makes an authorization request to `https://legit-as.example.com` including `resource=https://api.example.net/data` along with scopes `data:read data:write`.
-  3. The authorization server processes the request based on scopes (ignoring the `resource` parameter), and after user consent (which may only display scopes without the `resource`), issues a valid access token with an audience for a resource server for the application, but without returning any indication of audience-restriction change.
+  3. The authorization server processes the request based on scopes (ignoring the `resource` parameter), and after user consent (which may only display scopes without the `resource`), issues a valid access token with an audience for a resource server for the application, but without returning any indication of a change in audience restriction.
   4. The client receives the token but cannot verify whether it corresponds to `https://api.example.net/data` (the attacker's resource) or some other resource.
   5. The client uses the issued token to request access to `https://api.example.net/data` (the attacker's resource server). The attacker can now replay the access token to obtain access to protected resources from the legitimate resource server the user delegated to the client with `data:read data:write` scope.
 
@@ -87,7 +88,7 @@ The client has no way to validate whether `https://legit-as.example.com` is actu
 
 Without explicit confirmation of the resource in the token response, the client cannot detect when the authorization server has ignored or overridden the requested resource indicator, leaving it vulnerable to mix-up attacks. The only protection in this scenario is user consent, which may not provide sufficient detail to educate the user about the specific resource being authorized, especially when authorization servers do not prominently display resource indicators in consent screens.
 
-This document introduces a new parameter `resource` to be returned in the access token response so the client can validate that the issued token corresponds to the intended resource.
+This document introduces a new parameter `resource` to be returned in the access token response so the client can validate that the issued access token corresponds to the intended resource.
 
 # Conventions and Terminology
 
@@ -103,22 +104,22 @@ The term "StringOrURI" is defined by the JWT specification {{RFC7519}}.
 
 ### Resource vs Audience
 
-This specification uses the term resource (as defined in {{Section 2 of RFC8707}} and {{RFC9728}}) rather than audience (as commonly used in access token claims such as the aud claim in JWTs {{Section 4.1.3 of RFC7519}} or in token introspection {{Section 2.2 of RFC7662}}) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and a token’s audience value.
+This specification uses the term resource (as defined in {{Section 2 of RFC8707}} and {{RFC9728}}) rather than audience (as commonly used in access token claims such as the aud claim in JWTs {{Section 4.1.3 of RFC7519}} or in token introspection {{Section 2.2 of RFC7662}}) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and an access token’s audience value.
 
-While a resource and an audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:
+While a resource and an access token's audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:
 
-  -	A broadly scoped audience such as `https://api.example.com` that specifies an API-wide identifier for the resource server(s).
-  -	A narrowly scoped audience such as `https://api.example.com/some/protected/resource` that specifies the exact URL for a protected resource.
-  - A logical or cross-domain audience such as `urn:example:api` or `https://example.net` that has no direct correspondence to the resource’s URL.
+  -	A broadly scoped audience restriction such as `https://api.example.com` that specifies an API-wide identifier for the resource server(s).
+  -	A narrowly scoped audience restriction such as `https://api.example.com/some/protected/resource` that specifies the exact URL for a protected resource.
+  - A logical or cross-domain audience restriction such as `urn:example:api` or `https://example.net` that has no direct correspondence to the resource’s URL.
 
-As a result, a client cannot reliably predict the audience value that an authorization server will use to audience-restrict an issued token, nor can it determine which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, where the client can discover the protected resource URL but not the authorization server’s audience assignment policy.
+As a result, a client cannot reliably predict the audience value that an authorization server will use to restrict an issued access token's audience, nor can it determine which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, where the client can discover the protected resource URL but not the authorization server's audience assignment policy.
 
-For these reasons, returning an audience value in the token response is less useful to the client than returning the resource for which the token was issued. By returning the resource parameter, this specification enables a client to:
+For these reasons, returning an audience value in the token response is less useful to the client than returning the resource(s) for which the access token was issued. By returning the `resource` parameter, this specification enables a client to:
 
   -	Confirm that the access token is valid for the specific resource it requested.
   -	Detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
 
-This approach is consistent with Resource Indicators {{RFC8707}} and Protected Resource Metadata {{RFC9728}}, which defines the resource parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.
+This approach is consistent with Resource Indicators {{RFC8707}} and Protected Resource Metadata {{RFC9728}}, which defines the `resource` parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions for access tokens internally.
 
 Note that a client may use token introspection {{RFC7662}} if supported by an authorization server to determine an issued token's audience if needed.
 
@@ -128,10 +129,12 @@ Authorization servers that support this specification SHOULD include the `resour
 
 The value of the `resource` parameter MUST be either:
 
-- A single case-sensitive string containing a StringOrURI value when the token is valid for exactly one resource, or
-- An array of case-sensitive strings, each containing a StringOrURI value, when the token is valid for multiple resources.
+- A single case-sensitive string containing a StringOrURI value when the access token is valid for exactly one resource.
+- An array of case-sensitive strings, each containing a StringOrURI value, when the access token is valid for multiple resources.
 
 Each StringOrURI value identifies a protected resource for which the token is valid. When multiple resources are included, the array MUST contain at least one element, and each element MUST be unique within the array.
+
+The "resource" parameter uses the same value syntax and requirements as the `resource` request parameter defined in {{RFC8707}}.  In particular, each value MUST be an absolute URI, MUST NOT contain a fragment component, and SHOULD NOT contain a query component.
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -146,35 +149,49 @@ Each StringOrURI value identifies a protected resource for which the token is va
 
 ## Authorization Server Processing Rules
 
-When determining whether and how to include the `resource` parameter in the access token response, authorization servers MUST apply the following rules:
+When determining whether and how to include the `resource` parameter in the token response, authorization servers MUST apply the following rules:
 
-- If the client included one or more `resource` parameters in the authorization request or token request per {{RFC8707}}, and the authorization server accepted those resource(s), the `resource` value in the response MUST reflect the accepted resource(s). If the authorization server accepted a subset of the requested resources, the response MUST contain only the accepted subset.
-- If the client did not include a `resource` parameter in the request, but the authorization server selected a default resource based on policy or client configuration, the authorization server SHOULD return that selected resource in the `resource` parameter.
-- If the requested `resource` value(s) are not valid for the client, user, or authorization server, the authorization server MUST return an `invalid_target` error response as defined in {{RFC8707}}, Section 2, rather than issuing a token for a different resource.
-- If the token is not bound to any specific resource (e.g., the authorization server does not use resource indicators and the token is not audience-restricted to a specific resource), the `resource` parameter SHOULD be omitted from the response.
+1. **When the client requests specific resources:**
+   - If the client included one or more `resource` parameters in the authorization request or token request per {{RFC8707}}, and the authorization server accepted all requested resources, the `resource` parameter in the response MUST contain the accepted resource(s).
+   - If the authorization server accepted only a subset of the requested resources, the `resource` parameter in the response MUST contain only that accepted subset.
+   - If the authorization server cannot accept any of the requested resources, it MUST return an `invalid_target` error response as defined in {{RFC8707}}, Section 2, and MUST NOT issue an access token.
+
+2. **When the client does not request specific resources:**
+   - If the authorization server assigns a default resource based on policy or client configuration, it SHOULD include that resource in the `resource` parameter of the response.
+   - If the access token is not bound to any specific resource (for example, when the authorization server does not support resource indicators {{RFC8707}} and the access token has no audience restriction), the `resource` parameter SHOULD be omitted from the response.
 
 When determining uniqueness of resource values within an array, authorization servers MUST use URI comparison rules as defined in {{Section 6.2.1 of RFC3986}} to ensure equivalent URIs are treated as duplicates.
 
 ## Client Processing Rules {#client-processing-rules}
 
-Clients that support this extension:
+When processing the access token response, clients that support this extension MUST apply the following rules:
 
-- SHOULD compare the returned `resource` URIs against the originally requested `resource` URI(s), if applicable.
-- MUST treat mismatches as errors, unless the client is explicitly designed to handle token audience negotiation.
-- MUST NOT use the token with a resource other than the one identified in the response.
+1. **When the `resource` parameter is present in the access token response:**
+   - If the value is a string, the client MUST treat it as a single resource identifier.
+   - If the value is an array, the client MUST extract all resource identifiers from the array. Each element in the array MUST be a string containing a resource identifier.
+   - If the value is neither a string nor an array, the client MUST treat the response as invalid and MUST NOT use the access token.
 
-### String Comparison
+2. **When the client included one or more `resource` parameters in the authorization request or token request (per {{RFC8707}}:**
+   - The client MUST compare the returned `resource` value(s) against the requested `resource` value(s) using URI comparison rules as defined in {{Section 6.2.1 of RFC3986}}.
+   - To compare resource values, the client MUST normalize both URIs according to {{Section 6.2.2 of RFC3986}} (syntax-based normalization) and then compare the normalized URIs as case-sensitive strings. Two URIs are considered equivalent if their normalized forms are identical.
+   - If the client requested a single resource:
+     - If the response contains a single resource string, the client MUST compare them directly.
+     - If the response contains an array with exactly one element, the client MUST compare the requested resource against that single array element.
+     - If the response contains an array with multiple elements, the comparison fails and the client MUST proceed as specified in the error handling below.
+   - If the client requested multiple resources:
+     - The response MUST contain an array. If the response contains a string, the comparison fails and the client MUST proceed as specified in the error handling below.
+     - For each requested resource, the client MUST find a matching resource in the response array using URI comparison as specified above.
+     - Each resource in the response array MUST match exactly one requested resource. If any resource in the response array does not match a requested resource, or if the number of resources in the response array does not equal the number of requested resources, the comparison fails and the client MUST proceed as specified in the error handling below.
+   - If all returned resource values match the requested resource values, the client MAY use the access token. The client MUST use the access token only with the resource(s) identified in the response.
+   - If any returned resource value does not match a requested resource value, the client MUST treat this as an error condition, MUST NOT use the access token, SHOULD discard the access token, and MAY retry the authorization flow.
 
-When comparing `resource` parameter values, clients MUST use URI comparison rules as defined in {{Section 6.2.1 of RFC3986}}. Since the `resource` parameter contains URI values (as defined by StringOrURI in {{RFC7519}}), resource strings MUST be compared using syntax-based normalization, which means:
+3. **When the client did not include any `resource` parameters in the authorization request or token request:**
+   - If the response includes a `resource` parameter, the client MAY accept it as the authorization server's default resource assignment.
+   - If the response omits the `resource` parameter, the client SHOULD treat this as indicating the access token is not bound to a specific resource, unless the client requires explicit resource binding.
 
-- Scheme and host components MUST be compared in a case-insensitive manner. Clients SHOULD normalize schemes to lowercase and hosts to lowercase for comparison purposes.
-- Percent-encoded octets MUST be compared using case-insensitive hexadecimal digits (e.g., `%3A` is equivalent to `%3a`).
-- The comparison MUST account for default ports, where the explicit port is equivalent to the default port for that scheme (e.g., `https://example.com/` is equivalent to `https://example.com:443/`).
-- Path components MUST be compared using a case-sensitive, character-by-character basis.
-- Query components, if present, MUST be included in the comparison exactly as provided.
-- Percent-encoded characters representing unreserved characters (as defined in {{Section 2.3 of RFC3986}}) SHOULD be decoded before comparison for equivalence, though exact encoded form matching is also acceptable.
-
-Clients MUST apply these normalization rules when comparing the returned `resource` value(s) against requested resource value(s) to detect mismatches or validate token applicability.
+4. **When the client included one or more `resource` parameters in the authorization request or token request, but the response omits the `resource` parameter:**
+   - Clients that require strict resource binding MUST treat this as an error condition and MUST NOT use the access token.
+   - Other clients MAY proceed but SHOULD be aware that they cannot verify the access token's intended resource, which may increase vulnerability to resource mix-up attacks as described in the Security Considerations section of this document.
 
 ## Examples
 
@@ -518,9 +535,9 @@ This proposal builds on prior work in OAuth 2.0 extensibility and security analy
 
 -01
 
-* Added attack example
-* Added Resource vs Audience distinction
-* Updated Authorization Server and Client Processing Rules
+* Revised Introduction and included attack example
+* Provided context for use of Resource vs Audience
+* Revised Response to clarify Authorization Server and Client Processing Rules
 * Updated Security Considerations
 * Document cleanup and consistency
 
