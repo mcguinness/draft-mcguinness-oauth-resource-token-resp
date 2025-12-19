@@ -1177,11 +1177,6 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
                 <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-client-processing-rules" class="internal xref">Client Processing Rules</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.1">
-                    <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-string-comparison" class="internal xref">String Comparison</a></p>
-</li>
-                </ul>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
                 <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-examples" class="internal xref">Examples</a></p>
@@ -1245,27 +1240,30 @@ svg :is([fill="white"], [fill^="#fff"]) {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple protected resources or resource servers (APIs) are involved, the Resource Indicators for OAuth 2.0 <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> specification introduced a <code>resource</code> request parameter that allows clients to indicate the resource(s) for which the token is intended to be used which an authorization server can use to audience-restrict the issued access token.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-1">OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple protected resources or resource servers (APIs) are involved, the Resource Indicators for OAuth 2.0 <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> specification introduced a <code>resource</code> request parameter that allows clients to indicate the resource(s) for which the token is intended to be used, which an authorization server can use to restrict the issued access token's audience.<a href="#section-1-1" class="pilcrow">¶</a></p>
 <p id="section-1-2">However, <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> does not require the authorization server to return any confirmation of the resource(s) to which the access token applies (audience).  When an authorization request includes one or more <code>resource</code> parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.<a href="#section-1-2" class="pilcrow">¶</a></p>
 <p id="section-1-3">An authorization server <span class="bcp14">MAY</span>:<a href="#section-1-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-4.1">
-          <p id="section-1-4.1.1">Ignore the <code>resource</code> parameter (e.g., if it does not support <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>) and audience-restrict the issued access token to a default resource or set of resources.<a href="#section-1-4.1.1" class="pilcrow">¶</a></p>
+          <p id="section-1-4.1.1">Ignore processing the <code>resource</code> parameter and issue an access token with no audience restriction, allowing the token to be used for any resource.<a href="#section-1-4.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-4.2">
-          <p id="section-1-4.2.1">Accept and honor all requested <code>resource</code> values, audience-restricting the issued access token to the entire set of requested resources.<a href="#section-1-4.2.1" class="pilcrow">¶</a></p>
+          <p id="section-1-4.2.1">Ignore processing the <code>resource</code> parameter and issue an access token with an audience restricted to a default resource or set of resources (for example, when the authorization server does not support <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>).<a href="#section-1-4.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-4.3">
-          <p id="section-1-4.3.1">Accept a subset of the requested <code>resource</code> values, audience-restricting the token accordingly.<a href="#section-1-4.3.1" class="pilcrow">¶</a></p>
+          <p id="section-1-4.3.1">Accept all requested <code>resource</code> values and issue an access token with an audience restricted to the complete set of requested resources.<a href="#section-1-4.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-4.4">
-          <p id="section-1-4.4.1">Override the requested <code>resource</code> values and issue a token audience-restricted to an authorization-server-defined set of resources, based on policy or client registration.<a href="#section-1-4.4.1" class="pilcrow">¶</a></p>
+          <p id="section-1-4.4.1">Accept only a subset of requested <code>resource</code> values and issue an access token with an audience restricted to that subset,silently rejecting the remaining requested resources.<a href="#section-1-4.4.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-4.5">
-          <p id="section-1-4.5.1">Reject one or more requested <code>resource</code> values and return an OAuth 2.0 error response with the error code <code>invalid_target</code> as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.<a href="#section-1-4.5.1" class="pilcrow">¶</a></p>
+          <p id="section-1-4.5.1">Override the requested <code>resource</code> values and issue an access token with an audience restricted to resources determined by the authorization server's policy or client registration configuration.<a href="#section-1-4.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-1-4.6">
+          <p id="section-1-4.6.1">Reject the request by returning an error response with the error code <code>invalid_target</code> as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.<a href="#section-1-4.6.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-1-5">This leads to ambiguity in the client's interpretation of the token's audience, potentially resulting in <strong>resource mix-up attacks</strong>. Consider the following concrete example involving dynamic discovery:<a href="#section-1-5" class="pilcrow">¶</a></p>
+<p id="section-1-5">This leads to ambiguity in the client's interpretation of the access token's audience, potentially resulting in <strong>resource mix-up attacks</strong>. Consider the following concrete example involving dynamic discovery:<a href="#section-1-5" class="pilcrow">¶</a></p>
 <p id="section-1-6"><strong>Preconditions:</strong><a href="#section-1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-7.1">
@@ -1278,7 +1276,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
           <p id="section-1-7.3.1">The client already has a valid client registration established with the legitimate authorization server.<a href="#section-1-7.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-7.4">
-          <p id="section-1-7.4.1">The legitimate authorization server at <code>https://legit-as.example.com</code> does not implement support for <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and ignores the <code>resource</code> parameter in authorization requests and instead audience-restricts issued access tokens based on requested scopes.<a href="#section-1-7.4.1" class="pilcrow">¶</a></p>
+          <p id="section-1-7.4.1">The legitimate authorization server at <code>https://legit-as.example.com</code> does not implement support for <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and ignores the <code>resource</code> parameter in authorization requests and instead restricts issued access tokens to an audience based on requested scopes.<a href="#section-1-7.4.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-7.5">
           <p id="section-1-7.5.1">The user trusts <code>https://legit-as.example.com</code> and would consent to legitimate-looking scopes for a legitimite client.<a href="#section-1-7.5.1" class="pilcrow">¶</a></p>
@@ -1293,7 +1291,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
           <p id="section-1-9.2.1">The client makes an authorization request to <code>https://legit-as.example.com</code> including <code>resource=https://api.example.net/data</code> along with scopes <code>data:read data:write</code>.<a href="#section-1-9.2.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-1-9.3">
-          <p id="section-1-9.3.1">The authorization server processes the request based on scopes (ignoring the <code>resource</code> parameter), and after user consent (which may only display scopes without the <code>resource</code>), issues a valid access token with an audience for a resource server for the application, but without returning any indication of audience-restriction change.<a href="#section-1-9.3.1" class="pilcrow">¶</a></p>
+          <p id="section-1-9.3.1">The authorization server processes the request based on scopes (ignoring the <code>resource</code> parameter), and after user consent (which may only display scopes without the <code>resource</code>), issues a valid access token with an audience for a resource server for the application, but without returning any indication of a change in audience restriction.<a href="#section-1-9.3.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-1-9.4">
           <p id="section-1-9.4.1">The client receives the token but cannot verify whether it corresponds to <code>https://api.example.net/data</code> (the attacker's resource) or some other resource.<a href="#section-1-9.4.1" class="pilcrow">¶</a></p>
@@ -1304,7 +1302,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
       </ol>
 <p id="section-1-10">The client has no way to validate whether <code>https://legit-as.example.com</code> is actually authoritative for <code>https://api.example.net/data</code>. While Protected Resource Metadata can be signed, this would require the client to be pre-configured with trust roots for the signature key, which defeats the purpose of dynamic discovery of protected resources at runtime. Similarly, while an authorization server could publish a list of protected resources that are valid for an authorization server it in its metadata <span>[<a href="#RFC8414" class="cite xref">RFC8414</a>]</span>, it is not feasible in practice to enumerate every protected resource in large resource domains with hundreds or more resources.<a href="#section-1-10" class="pilcrow">¶</a></p>
 <p id="section-1-11">Without explicit confirmation of the resource in the token response, the client cannot detect when the authorization server has ignored or overridden the requested resource indicator, leaving it vulnerable to mix-up attacks. The only protection in this scenario is user consent, which may not provide sufficient detail to educate the user about the specific resource being authorized, especially when authorization servers do not prominently display resource indicators in consent screens.<a href="#section-1-11" class="pilcrow">¶</a></p>
-<p id="section-1-12">This document introduces a new parameter <code>resource</code> to be returned in the access token response so the client can validate that the issued token corresponds to the intended resource.<a href="#section-1-12" class="pilcrow">¶</a></p>
+<p id="section-1-12">This document introduces a new parameter <code>resource</code> to be returned in the access token response so the client can validate that the issued access token corresponds to the intended resource.<a href="#section-1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions-and-terminology">
@@ -1321,7 +1319,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         <h3 id="name-terminology">
 <a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
         </h3>
-<p id="section-2.1-1">The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" is defined by the OAuth 2.0 Authorization Framework specification <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.1-1">The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" are defined by the OAuth 2.0 Authorization Framework specification <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
 <p id="section-2.1-2">The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
 <p id="section-2.1-3">The term "StringOrURI" is defined by the JWT specification <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 <div id="resource-vs-audience">
@@ -1329,21 +1327,21 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
           <h4 id="name-resource-vs-audience">
 <a href="#section-2.1.1" class="section-number selfRef">2.1.1. </a><a href="#name-resource-vs-audience" class="section-name selfRef">Resource vs Audience</a>
           </h4>
-<p id="section-2.1.1-1">This specification uses the term resource (as defined in <span><a href="https://rfc-editor.org/rfc/rfc8707#section-2" class="relref">Section 2</a> of [<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>) rather than audience (as commonly used in access token claims such as the aud claim in JWTs <span><a href="https://rfc-editor.org/rfc/rfc7519#section-4.1.3" class="relref">Section 4.1.3</a> of [<a href="#RFC7519" class="cite xref">RFC7519</a>]</span> or in token introspection <span><a href="https://rfc-editor.org/rfc/rfc7662#section-2.2" class="relref">Section 2.2</a> of [<a href="#RFC7662" class="cite xref">RFC7662</a>]</span>) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and a token’s audience value.<a href="#section-2.1.1-1" class="pilcrow">¶</a></p>
-<p id="section-2.1.1-2">While a resource and an audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:<a href="#section-2.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-1">This specification uses the term resource (as defined in <span><a href="https://rfc-editor.org/rfc/rfc8707#section-2" class="relref">Section 2</a> of [<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>) rather than audience (as commonly used in access token claims such as the aud claim in JWTs <span><a href="https://rfc-editor.org/rfc/rfc7519#section-4.1.3" class="relref">Section 4.1.3</a> of [<a href="#RFC7519" class="cite xref">RFC7519</a>]</span> or in token introspection <span><a href="https://rfc-editor.org/rfc/rfc7662#section-2.2" class="relref">Section 2.2</a> of [<a href="#RFC7662" class="cite xref">RFC7662</a>]</span>) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and an access token’s audience value.<a href="#section-2.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-2">While a resource and an access token's audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:<a href="#section-2.1.1-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.1.1-3.1">
-              <p id="section-2.1.1-3.1.1">A broadly scoped audience such as <code>https://api.example.com</code> that specifies an API-wide identifier for the resource server(s).<a href="#section-2.1.1-3.1.1" class="pilcrow">¶</a></p>
+              <p id="section-2.1.1-3.1.1">A broadly scoped audience restriction such as <code>https://api.example.com</code> that specifies an API-wide identifier for the resource server(s).<a href="#section-2.1.1-3.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-2.1.1-3.2">
-              <p id="section-2.1.1-3.2.1">A narrowly scoped audience such as <code>https://api.example.com/some/protected/resource</code> that specifies the exact URL for a protected resource.<a href="#section-2.1.1-3.2.1" class="pilcrow">¶</a></p>
+              <p id="section-2.1.1-3.2.1">A narrowly scoped audience restriction such as <code>https://api.example.com/some/protected/resource</code> that specifies the exact URL for a protected resource.<a href="#section-2.1.1-3.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-2.1.1-3.3">
-              <p id="section-2.1.1-3.3.1">A logical or cross-domain audience such as <code>urn:example:api</code> or <code>https://example.net</code> that has no direct correspondence to the resource’s URL.<a href="#section-2.1.1-3.3.1" class="pilcrow">¶</a></p>
+              <p id="section-2.1.1-3.3.1">A logical or cross-domain audience restriction such as <code>urn:example:api</code> or <code>https://example.net</code> that has no direct correspondence to the resource’s URL.<a href="#section-2.1.1-3.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-2.1.1-4">As a result, a client cannot reliably predict the audience value that an authorization server will use to audience-restrict an issued token, nor can it determine which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>, where the client can discover the protected resource URL but not the authorization server’s audience assignment policy.<a href="#section-2.1.1-4" class="pilcrow">¶</a></p>
-<p id="section-2.1.1-5">For these reasons, returning an audience value in the token response is less useful to the client than returning the resource for which the token was issued. By returning the resource parameter, this specification enables a client to:<a href="#section-2.1.1-5" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-4">As a result, a client cannot reliably predict the audience value that an authorization server will use to restrict an issued access token's audience, nor can it determine which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>, where the client can discover the protected resource URL but not the authorization server's audience assignment policy.<a href="#section-2.1.1-4" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-5">For these reasons, returning an audience value in the token response is less useful to the client than returning the resource(s) for which the access token was issued. By returning the <code>resource</code> parameter, this specification enables a client to:<a href="#section-2.1.1-5" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-2.1.1-6.1">
               <p id="section-2.1.1-6.1.1">Confirm that the access token is valid for the specific resource it requested.<a href="#section-2.1.1-6.1.1" class="pilcrow">¶</a></p>
@@ -1352,7 +1350,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
               <p id="section-2.1.1-6.2.1">Detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.<a href="#section-2.1.1-6.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-2.1.1-7">This approach is consistent with Resource Indicators <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>, which defines the resource parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.<a href="#section-2.1.1-7" class="pilcrow">¶</a></p>
+<p id="section-2.1.1-7">This approach is consistent with Resource Indicators <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>, which defines the <code>resource</code> parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions for access tokens internally.<a href="#section-2.1.1-7" class="pilcrow">¶</a></p>
 <p id="section-2.1.1-8">Note that a client may use token introspection <span>[<a href="#RFC7662" class="cite xref">RFC7662</a>]</span> if supported by an authorization server to determine an issued token's audience if needed.<a href="#section-2.1.1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1369,14 +1367,15 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 <p id="section-3-2">The value of the <code>resource</code> parameter <span class="bcp14">MUST</span> be either:<a href="#section-3-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-3.1">
-          <p id="section-3-3.1.1">A single case-sensitive string containing a StringOrURI value when the token is valid for exactly one resource, or<a href="#section-3-3.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-3.1.1">A single case-sensitive string containing a StringOrURI value when the access token is valid for exactly one resource.<a href="#section-3-3.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-3-3.2">
-          <p id="section-3-3.2.1">An array of case-sensitive strings, each containing a StringOrURI value, when the token is valid for multiple resources.<a href="#section-3-3.2.1" class="pilcrow">¶</a></p>
+          <p id="section-3-3.2.1">An array of case-sensitive strings, each containing a StringOrURI value, when the access token is valid for multiple resources.<a href="#section-3-3.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-3-4">Each StringOrURI value identifies a protected resource for which the token is valid. When multiple resources are included, the array <span class="bcp14">MUST</span> contain at least one element, and each element <span class="bcp14">MUST</span> be unique within the array.<a href="#section-3-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3-5">
+<p id="section-3-5">The "resource" parameter uses the same value syntax and requirements as the <code>resource</code> request parameter defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.  In particular, each value <span class="bcp14">MUST</span> be an absolute URI, <span class="bcp14">MUST NOT</span> contain a fragment component, and <span class="bcp14">SHOULD NOT</span> contain a query component.<a href="#section-3-5" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3-6">
 <pre>
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -1388,28 +1387,41 @@ Cache-Control: no-store
   "expires_in": 3600,
   "resource": "https://api.example.com/"
 }
-</pre><a href="#section-3-5" class="pilcrow">¶</a>
+</pre><a href="#section-3-6" class="pilcrow">¶</a>
 </div>
 <div id="authorization-server-processing-rules">
 <section id="section-3.1">
         <h3 id="name-authorization-server-proces">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-authorization-server-proces" class="section-name selfRef">Authorization Server Processing Rules</a>
         </h3>
-<p id="section-3.1-1">When determining whether and how to include the <code>resource</code> parameter in the access token response, authorization servers <span class="bcp14">MUST</span> apply the following rules:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">When determining whether and how to include the <code>resource</code> parameter in the token response, authorization servers <span class="bcp14">MUST</span> apply the following rules:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.1-2">
+<li id="section-3.1-2.1">
+            <p id="section-3.1-2.1.1"><strong>When the client requests specific resources:</strong><a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.1-2.1">
-            <p id="section-3.1-2.1.1">If the client included one or more <code>resource</code> parameters in the authorization request or token request per <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, and the authorization server accepted those resource(s), the <code>resource</code> value in the response <span class="bcp14">MUST</span> reflect the accepted resource(s). If the authorization server accepted a subset of the requested resources, the response <span class="bcp14">MUST</span> contain only the accepted subset.<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.1-2.1.2.1">
+                <p id="section-3.1-2.1.2.1.1">If the client included one or more <code>resource</code> parameters in the authorization request or token request per <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, and the authorization server accepted all requested resources, the <code>resource</code> parameter in the response <span class="bcp14">MUST</span> contain the accepted resource(s).<a href="#section-3.1-2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.1-2.2">
-            <p id="section-3.1-2.2.1">If the client did not include a <code>resource</code> parameter in the request, but the authorization server selected a default resource based on policy or client configuration, the authorization server <span class="bcp14">SHOULD</span> return that selected resource in the <code>resource</code> parameter.<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.1-2.1.2.2">
+                <p id="section-3.1-2.1.2.2.1">If the authorization server accepted only a subset of the requested resources, the <code>resource</code> parameter in the response <span class="bcp14">MUST</span> contain only that accepted subset.<a href="#section-3.1-2.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.1-2.3">
-            <p id="section-3.1-2.3.1">If the requested <code>resource</code> value(s) are not valid for the client, user, or authorization server, the authorization server <span class="bcp14">MUST</span> return an <code>invalid_target</code> error response as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, Section 2, rather than issuing a token for a different resource.<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.1-2.1.2.3">
+                <p id="section-3.1-2.1.2.3.1">If the authorization server cannot accept any of the requested resources, it <span class="bcp14">MUST</span> return an <code>invalid_target</code> error response as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>, Section 2, and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.1-2.1.2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.1-2.4">
-            <p id="section-3.1-2.4.1">If the token is not bound to any specific resource (e.g., the authorization server does not use resource indicators and the token is not audience-restricted to a specific resource), the <code>resource</code> parameter <span class="bcp14">SHOULD</span> be omitted from the response.<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
+            </ul>
 </li>
-        </ul>
+          <li id="section-3.1-2.2">
+            <p id="section-3.1-2.2.1"><strong>When the client does not request specific resources:</strong><a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.1-2.2.2.1">
+                <p id="section-3.1-2.2.2.1.1">If the authorization server assigns a default resource based on policy or client configuration, it <span class="bcp14">SHOULD</span> include that resource in the <code>resource</code> parameter of the response.<a href="#section-3.1-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.1-2.2.2.2">
+                <p id="section-3.1-2.2.2.2.1">If the access token is not bound to any specific resource (for example, when the authorization server does not support resource indicators <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and the access token has no audience restriction), the <code>resource</code> parameter <span class="bcp14">SHOULD</span> be omitted from the response.<a href="#section-3.1-2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+        </ol>
 <p id="section-3.1-3">When determining uniqueness of resource values within an array, authorization servers <span class="bcp14">MUST</span> use URI comparison rules as defined in <span><a href="https://rfc-editor.org/rfc/rfc3986#section-6.2.1" class="relref">Section 6.2.1</a> of [<a href="#RFC3986" class="cite xref">RFC3986</a>]</span> to ensure equivalent URIs are treated as duplicates.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1418,47 +1430,90 @@ Cache-Control: no-store
         <h3 id="name-client-processing-rules">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-client-processing-rules" class="section-name selfRef">Client Processing Rules</a>
         </h3>
-<p id="section-3.2-1">Clients that support this extension:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-1">When processing the access token response, clients that support this extension <span class="bcp14">MUST</span> apply the following rules:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-3.2-2">
+<li id="section-3.2-2.1">
+            <p id="section-3.2-2.1.1"><strong>When the <code>resource</code> parameter is present in the access token response:</strong><a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2-2.1">
-            <p id="section-3.2-2.1.1"><span class="bcp14">SHOULD</span> compare the returned <code>resource</code> URIs against the originally requested <code>resource</code> URI(s), if applicable.<a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.2-2.1.2.1">
+                <p id="section-3.2-2.1.2.1.1">If the value is a string, the client <span class="bcp14">MUST</span> treat it as a single resource identifier.<a href="#section-3.2-2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.2-2.2">
-            <p id="section-3.2-2.2.1"><span class="bcp14">MUST</span> treat mismatches as errors, unless the client is explicitly designed to handle token audience negotiation.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.2-2.1.2.2">
+                <p id="section-3.2-2.1.2.2.1">If the value is an array, the client <span class="bcp14">MUST</span> extract all resource identifiers from the array. Each element in the array <span class="bcp14">MUST</span> be a string containing a resource identifier.<a href="#section-3.2-2.1.2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.2-2.3">
-            <p id="section-3.2-2.3.1"><span class="bcp14">MUST NOT</span> use the token with a resource other than the one identified in the response.<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.2-2.1.2.3">
+                <p id="section-3.2-2.1.2.3.1">If the value is neither a string nor an array, the client <span class="bcp14">MUST</span> treat the response as invalid and <span class="bcp14">MUST NOT</span> use the access token.<a href="#section-3.2-2.1.2.3.1" class="pilcrow">¶</a></p>
 </li>
-        </ul>
-<div id="string-comparison">
-<section id="section-3.2.1">
-          <h4 id="name-string-comparison">
-<a href="#section-3.2.1" class="section-number selfRef">3.2.1. </a><a href="#name-string-comparison" class="section-name selfRef">String Comparison</a>
-          </h4>
-<p id="section-3.2.1-1">When comparing <code>resource</code> parameter values, clients <span class="bcp14">MUST</span> use URI comparison rules as defined in <span><a href="https://rfc-editor.org/rfc/rfc3986#section-6.2.1" class="relref">Section 6.2.1</a> of [<a href="#RFC3986" class="cite xref">RFC3986</a>]</span>. Since the <code>resource</code> parameter contains URI values (as defined by StringOrURI in <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>), resource strings <span class="bcp14">MUST</span> be compared using syntax-based normalization, which means:<a href="#section-3.2.1-1" class="pilcrow">¶</a></p>
+            </ul>
+</li>
+          <li id="section-3.2-2.2">
+            <p id="section-3.2-2.2.1"><strong>When the client included one or more <code>resource</code> parameters in the authorization request or token request (per <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>:</strong><a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.1-2.1">
-              <p id="section-3.2.1-2.1.1">Scheme and host components <span class="bcp14">MUST</span> be compared in a case-insensitive manner. Clients <span class="bcp14">SHOULD</span> normalize schemes to lowercase and hosts to lowercase for comparison purposes.<a href="#section-3.2.1-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.2-2.2.2.1">
+                <p id="section-3.2-2.2.2.1.1">The client <span class="bcp14">MUST</span> compare the returned <code>resource</code> value(s) against the requested <code>resource</code> value(s) using URI comparison rules as defined in <span><a href="https://rfc-editor.org/rfc/rfc3986#section-6.2.1" class="relref">Section 6.2.1</a> of [<a href="#RFC3986" class="cite xref">RFC3986</a>]</span>.<a href="#section-3.2-2.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-3.2.1-2.2">
-              <p id="section-3.2.1-2.2.1">Percent-encoded octets <span class="bcp14">MUST</span> be compared using case-insensitive hexadecimal digits (e.g., <code>%3A</code> is equivalent to <code>%3a</code>).<a href="#section-3.2.1-2.2.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.2-2.2.2.2">
+                <p id="section-3.2-2.2.2.2.1">To compare resource values, the client <span class="bcp14">MUST</span> normalize both URIs according to <span><a href="https://rfc-editor.org/rfc/rfc3986#section-6.2.2" class="relref">Section 6.2.2</a> of [<a href="#RFC3986" class="cite xref">RFC3986</a>]</span> (syntax-based normalization) and then compare the normalized URIs as case-sensitive strings. Two URIs are considered equivalent if their normalized forms are identical.<a href="#section-3.2-2.2.2.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-3.2.1-2.3">
-              <p id="section-3.2.1-2.3.1">The comparison <span class="bcp14">MUST</span> account for default ports, where the explicit port is equivalent to the default port for that scheme (e.g., <code>https://example.com/</code> is equivalent to <code>https://example.com:443/</code>).<a href="#section-3.2.1-2.3.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-3.2-2.2.2.3">
+                <p id="section-3.2-2.2.2.3.1">If the client requested a single resource:<a href="#section-3.2-2.2.2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.2.2.3.2.1">
+                    <p id="section-3.2-2.2.2.3.2.1.1">If the response contains a single resource string, the client <span class="bcp14">MUST</span> compare them directly.<a href="#section-3.2-2.2.2.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-3.2.1-2.4">
-              <p id="section-3.2.1-2.4.1">Path components <span class="bcp14">MUST</span> be compared using a case-sensitive, character-by-character basis.<a href="#section-3.2.1-2.4.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.2-2.2.2.3.2.2">
+                    <p id="section-3.2-2.2.2.3.2.2.1">If the response contains an array with exactly one element, the client <span class="bcp14">MUST</span> compare the requested resource against that single array element.<a href="#section-3.2-2.2.2.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-3.2.1-2.5">
-              <p id="section-3.2.1-2.5.1">Query components, if present, <span class="bcp14">MUST</span> be included in the comparison exactly as provided.<a href="#section-3.2.1-2.5.1" class="pilcrow">¶</a></p>
+                  <li class="normal" id="section-3.2-2.2.2.3.2.3">
+                    <p id="section-3.2-2.2.2.3.2.3.1">If the response contains an array with multiple elements, the comparison fails and the client <span class="bcp14">MUST</span> proceed as specified in the error handling below.<a href="#section-3.2-2.2.2.3.2.3.1" class="pilcrow">¶</a></p>
 </li>
-            <li class="normal" id="section-3.2.1-2.6">
-              <p id="section-3.2.1-2.6.1">Percent-encoded characters representing unreserved characters (as defined in <span><a href="https://rfc-editor.org/rfc/rfc3986#section-2.3" class="relref">Section 2.3</a> of [<a href="#RFC3986" class="cite xref">RFC3986</a>]</span>) <span class="bcp14">SHOULD</span> be decoded before comparison for equivalence, though exact encoded form matching is also acceptable.<a href="#section-3.2.1-2.6.1" class="pilcrow">¶</a></p>
+                </ul>
 </li>
-          </ul>
-<p id="section-3.2.1-3">Clients <span class="bcp14">MUST</span> apply these normalization rules when comparing the returned <code>resource</code> value(s) against requested resource value(s) to detect mismatches or validate token applicability.<a href="#section-3.2.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
+              <li class="normal" id="section-3.2-2.2.2.4">
+                <p id="section-3.2-2.2.2.4.1">If the client requested multiple resources:<a href="#section-3.2-2.2.2.4.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.2.2.4.2.1">
+                    <p id="section-3.2-2.2.2.4.2.1.1">The response <span class="bcp14">MUST</span> contain an array. If the response contains a string, the comparison fails and the client <span class="bcp14">MUST</span> proceed as specified in the error handling below.<a href="#section-3.2-2.2.2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                  <li class="normal" id="section-3.2-2.2.2.4.2.2">
+                    <p id="section-3.2-2.2.2.4.2.2.1">For each requested resource, the client <span class="bcp14">MUST</span> find a matching resource in the response array using URI comparison as specified above.<a href="#section-3.2-2.2.2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+                  <li class="normal" id="section-3.2-2.2.2.4.2.3">
+                    <p id="section-3.2-2.2.2.4.2.3.1">Each resource in the response array <span class="bcp14">MUST</span> match exactly one requested resource. If any resource in the response array does not match a requested resource, or if the number of resources in the response array does not equal the number of requested resources, the comparison fails and the client <span class="bcp14">MUST</span> proceed as specified in the error handling below.<a href="#section-3.2-2.2.2.4.2.3.1" class="pilcrow">¶</a></p>
+</li>
+                </ul>
+</li>
+              <li class="normal" id="section-3.2-2.2.2.5">
+                <p id="section-3.2-2.2.2.5.1">If all returned resource values match the requested resource values, the client <span class="bcp14">MAY</span> use the access token. The client <span class="bcp14">MUST</span> use the access token only with the resource(s) identified in the response.<a href="#section-3.2-2.2.2.5.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.2.2.6">
+                <p id="section-3.2-2.2.2.6.1">If any returned resource value does not match a requested resource value, the client <span class="bcp14">MUST</span> treat this as an error condition, <span class="bcp14">MUST NOT</span> use the access token, <span class="bcp14">SHOULD</span> discard the access token, and <span class="bcp14">MAY</span> retry the authorization flow.<a href="#section-3.2-2.2.2.6.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li id="section-3.2-2.3">
+            <p id="section-3.2-2.3.1"><strong>When the client did not include any <code>resource</code> parameters in the authorization request or token request:</strong><a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.3.2.1">
+                <p id="section-3.2-2.3.2.1.1">If the response includes a <code>resource</code> parameter, the client <span class="bcp14">MAY</span> accept it as the authorization server's default resource assignment.<a href="#section-3.2-2.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.3.2.2">
+                <p id="section-3.2-2.3.2.2.1">If the response omits the <code>resource</code> parameter, the client <span class="bcp14">SHOULD</span> treat this as indicating the access token is not bound to a specific resource, unless the client requires explicit resource binding.<a href="#section-3.2-2.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+          <li id="section-3.2-2.4">
+            <p id="section-3.2-2.4.1"><strong>When the client included one or more <code>resource</code> parameters in the authorization request or token request, but the response omits the <code>resource</code> parameter:</strong><a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.2-2.4.2.1">
+                <p id="section-3.2-2.4.2.1.1">Clients that require strict resource binding <span class="bcp14">MUST</span> treat this as an error condition and <span class="bcp14">MUST NOT</span> use the access token.<a href="#section-3.2-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+              <li class="normal" id="section-3.2-2.4.2.2">
+                <p id="section-3.2-2.4.2.2.1">Other clients <span class="bcp14">MAY</span> proceed but <span class="bcp14">SHOULD</span> be aware that they cannot verify the access token's intended resource, which may increase vulnerability to resource mix-up attacks as described in the Security Considerations section of this document.<a href="#section-3.2-2.4.2.2.1" class="pilcrow">¶</a></p>
+</li>
+            </ul>
+</li>
+        </ol>
 </section>
 </div>
 <div id="examples">
@@ -1984,7 +2039,7 @@ GET /oauth2/authorize?response_type=code
   &amp;redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
   &amp;scope=resource%3Aread
   &amp;state=abc123
-  &amp;resource=https%3A%2F%2F%api.example.com%2Fresource
+  &amp;resource=https%3A%2F%2Fapi.example.com%2Fresource
   &amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
   &amp;code_challenge_method=S256
 HTTP/1.1
@@ -2049,13 +2104,13 @@ Cache-Control: no-store
 <p id="appendix-C-1">-01<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-C-2.1">
-          <p id="appendix-C-2.1.1">Added attack example<a href="#appendix-C-2.1.1" class="pilcrow">¶</a></p>
+          <p id="appendix-C-2.1.1">Revised Introduction and included attack example<a href="#appendix-C-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-2.2">
-          <p id="appendix-C-2.2.1">Added Resource vs Audience distinction<a href="#appendix-C-2.2.1" class="pilcrow">¶</a></p>
+          <p id="appendix-C-2.2.1">Provided context for use of Resource vs Audience<a href="#appendix-C-2.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-2.3">
-          <p id="appendix-C-2.3.1">Updated Authorization Server and Client Processing Rules<a href="#appendix-C-2.3.1" class="pilcrow">¶</a></p>
+          <p id="appendix-C-2.3.1">Revised Response to clarify Authorization Server and Client Processing Rules<a href="#appendix-C-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-2.4">
           <p id="appendix-C-2.4.1">Updated Security Considerations<a href="#appendix-C-2.4.1" class="pilcrow">¶</a></p>
