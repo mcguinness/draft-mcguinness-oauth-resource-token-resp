@@ -151,12 +151,12 @@ The "resource" parameter uses the same value syntax and requirements as the `res
 
 When determining whether and how to include the `resource` parameter in the token response, authorization servers MUST apply the following rules:
 
-1. **When the client requests specific resources:**
+1. When the client requests specific resources:
    - If the client included one or more `resource` parameters in the authorization request or token request per {{RFC8707}}, and the authorization server accepted all requested resources, the `resource` parameter in the response MUST contain the accepted resource(s).
    - If the authorization server accepted only a subset of the requested resources, the `resource` parameter in the response MUST contain only that accepted subset.
    - If the authorization server cannot accept any of the requested resources, it MUST return an `invalid_target` error response as defined in {{RFC8707}}, Section 2, and MUST NOT issue an access token.
 
-2. **When the client does not request specific resources:**
+2. When the client does not request specific resources:
    - If the authorization server assigns a default resource based on policy or client configuration, it SHOULD include that resource in the `resource` parameter of the response.
    - If the access token is not bound to any specific resource (for example, when the authorization server does not support resource indicators {{RFC8707}} and the access token has no audience restriction), the `resource` parameter SHOULD be omitted from the response.
 
@@ -166,12 +166,12 @@ When determining uniqueness of resource values within an array, authorization se
 
 When processing the access token response, clients that support this extension MUST apply the following rules:
 
-1. **When the `resource` parameter is present in the access token response:**
+1. When the `resource` parameter is present in the access token response:
    - If the value is a string, the client MUST treat it as a single resource identifier.
    - If the value is an array, the client MUST extract all resource identifiers from the array. Each element in the array MUST be a string containing a resource identifier.
    - If the value is neither a string nor an array, the client MUST treat the response as invalid and MUST NOT use the access token.
 
-2. **When the client included one or more `resource` parameters in the authorization request or token request (per {{RFC8707}}:**
+2. When the client included one or more `resource` parameters in the authorization request or token request (per {{RFC8707}}:
    - The client MUST compare the returned `resource` value(s) against the requested `resource` value(s) using URI comparison rules as defined in {{Section 6.2.1 of RFC3986}}.
    - To compare resource values, the client MUST normalize both URIs according to {{Section 6.2.2 of RFC3986}} (syntax-based normalization) and then compare the normalized URIs as case-sensitive strings. Two URIs are considered equivalent if their normalized forms are identical.
    - If the client requested a single resource:
@@ -185,11 +185,11 @@ When processing the access token response, clients that support this extension M
    - If all returned resource values match the requested resource values, the client MAY use the access token. The client MUST use the access token only with the resource(s) identified in the response.
    - If any returned resource value does not match a requested resource value, the client MUST treat this as an error condition, MUST NOT use the access token, SHOULD discard the access token, and MAY retry the authorization flow.
 
-3. **When the client did not include any `resource` parameters in the authorization request or token request:**
+3. When the client did not include any `resource` parameters in the authorization request or token request:
    - If the response includes a `resource` parameter, the client MAY accept it as the authorization server's default resource assignment.
    - If the response omits the `resource` parameter, the client SHOULD treat this as indicating the access token is not bound to a specific resource, unless the client requires explicit resource binding.
 
-4. **When the client included one or more `resource` parameters in the authorization request or token request, but the response omits the `resource` parameter:**
+4. When the client included one or more `resource` parameters in the authorization request or token request, but the response omits the `resource` parameter:
    - Clients that require strict resource binding MUST treat this as an error condition and MUST NOT use the access token.
    - Other clients MAY proceed but SHOULD be aware that they cannot verify the access token's intended resource, which may increase vulnerability to resource mix-up attacks as described in the Security Considerations section of this document.
 
