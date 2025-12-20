@@ -145,20 +145,53 @@ The `resource` parameter uses the same value syntax and requirements as the `res
       "resource": "https://api.example.com/"
     }
 
-## Authorization Server Processing Rules
+### Authorization Server Processing Rules {#authorization-server-processing-rules}
 
-When deciding whether and how to include the `resource` parameter in an access token response, an authorization server that supports this specification MUST apply the following rules:
+An authorization server that supports this specification MUST decide whether and how to include the `resource` parameter in a successful access token response (see {{RFC6749}}, Section 5.1) according to the rules in this section.
 
-1. When the client requests specific resources with a resource indicator:
-   - If the client included one or more `resource` parameters in the authorization request or token request per {{RFC8707}}, and the authorization server accepted all requested resources, the `resource` parameter in the response MUST contain the accepted resource(s).
-   - If the authorization server accepted only a subset of the requested resources, the `resource` parameter in the response MUST contain only that accepted subset.
-   - If the authorization server cannot accept any of the requested resources or does not support {{RFC8707}}, it MUST return an `invalid_target` error response as defined in {{Section 2 of RFC8707}}, and MUST NOT issue an access token.
+#### Overview
 
-2. When the client does not request specific resources with a resource indicator:
-   - If the authorization server assigns a default resource based on policy or client configuration, it SHOULD include that resource in the `resource` parameter of the response.
-   - If the access token is not bound to any specific resource (for example, when the access token has no audience restriction),the `resource` parameter SHOULD be omitted from the response.
+Authorization server processing is driven by the number of `resource` parameters included in the authorization request or token request (see {{RFC8707}}). The rules below are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
 
-When determining uniqueness of resource values within an array, authorization servers MUST use URI comparison rules as defined in {{Section 6.2.1 of RFC3986}} to ensure equivalent URIs are treated as duplicates.
+These authorization server processing rules apply equally to access tokens issued using the authorization code grant and to access tokens issued using a refresh token grant.
+
+Access tokens issued under these rules are valid for the resource(s) identified in the response.
+
+#### Summary Table
+
+| Client Request Shape | Authorization Server Outcome | Authorization Server Processing Rules |
+|----------------------|------------------------------|---------------------------------------|
+| **Exactly one `resource` requested** | No acceptable resource | MUST return `invalid_target` and MUST NOT issue an access token. |
+|                      | One acceptable resource | MUST issue an access token and MUST include `resource` as a string containing the accepted resource. |
+| **Multiple `resource` values requested** | No acceptable resources | MUST return `invalid_target` and MUST NOT issue an access token. |
+|                      | Subset of requested resources acceptable | MUST issue an access token and MUST include `resource` as an array containing only the accepted subset. |
+|                      | All requested resources acceptable | MUST issue an access token and MUST include `resource` as an array containing all accepted resources. |
+| **No `resource` requested** | Default resource(s) assigned | SHOULD issue an access token and SHOULD include the assigned resource(s) in the `resource` parameter. |
+|                      | No resource-specific restriction | SHOULD issue an access token and SHOULD omit the `resource` parameter. |
+
+#### Resource Identifier Comparison
+
+When comparing resource identifiers (for example, to determine uniqueness or to evaluate requested resources against policy), the authorization server MUST apply the URI comparison rules defined in {{Section 6.2.1 of RFC3986}}, after applying syntax-based normalization as defined in {{Section 6.2.2 of RFC3986}}. Resource identifiers that are equivalent under these rules MUST be treated as identical.
+
+#### Client Requested One or More Resources
+
+If the client included one or more `resource` parameters in the authorization request or token request:
+
+- The authorization server MUST evaluate the requested resource set according to local policy and determine the accepted resource set.
+- If the accepted resource set is empty, the authorization server MUST return an `invalid_target` error response as defined in {{RFC8707}} and MUST NOT issue an access token.
+- If the accepted resource set is non-empty:
+  - The authorization server MUST include the `resource` parameter in the access token response.
+  - The resource values in the response MUST be limited to the accepted resource set and MUST NOT include any resource value that was not requested by the client.
+  - The authorization server MUST ensure that the returned resource set contains no duplicate resource identifiers (including identifiers that differ only by URI normalization).
+  - If the accepted resource set contains exactly one resource, the `resource` parameter value MUST be a string containing that single resource identifier.
+  - If the accepted resource set contains more than one resource, the `resource` parameter value MUST be an array of strings containing those resource identifiers.
+
+#### Client Did Not Request a Resource
+
+If the client did not include any `resource` parameters in the authorization request or token request:
+
+- If the authorization server assigns one or more default resources based on policy or client configuration, it SHOULD include the assigned resource(s) in the `resource` parameter of the response.
+- If the access token is not valid for any specific resource (for example, when the access token has no resource-specific restriction), the `resource` parameter SHOULD be omitted from the response.
 
 ## Client Processing Rules {#client-processing-rules}
 
