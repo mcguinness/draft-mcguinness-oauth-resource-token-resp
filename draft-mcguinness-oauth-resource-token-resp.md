@@ -47,7 +47,7 @@ informative:
 
 --- abstract
 
-This specification defines a new parameter `resource` to be returned in OAuth 2.0 access token responses. It enables clients to confirm that the issued token corresponds to the intended resource. This mitigates ambiguity and certain classes of security vulnerabilities such as resource mix-up attacks, particularly in systems that use the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
+This specification defines a new parameter `resource` to be returned in OAuth 2.0 access token responses. It enables clients to confirm that the issued token is valid for to the intended resource. This mitigates ambiguity and certain classes of security vulnerabilities such as resource mix-up attacks, particularly in systems that use the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
 
 --- middle
 
@@ -55,7 +55,9 @@ This specification defines a new parameter `resource` to be returned in OAuth 2.
 
 OAuth 2.0 defines a framework in which clients request access tokens from authorization servers and present them to resource servers. In deployments where multiple protected resources or resource servers (APIs) are involved, the Resource Indicators for OAuth 2.0 {{RFC8707}} specification introduced a `resource` request parameter that allows clients to indicate the resource(s) for which the token is intended to be used, which an authorization server can use to restrict the issued access token's audience.
 
-However, {{RFC8707}} does not require the authorization server to return any confirmation of the resource(s) to which the access token applies (audience).  When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
+While OAuth 2.0 Resource Indicators {{RFC8707}} define how clients request access tokens for specific resources, that specification does not define any mechanism for an authorization server to confirm, in the token response, which resource or resources were ultimately accepted. As a result, clients have no interoperable way to validate the effective resource scope of an issued access token, particularly in cases where a subset of requested resources is accepted or where authorization servers apply dynamic policy.
+
+When an authorization request includes one or more `resource` parameters, the authorization server can exhibit a range of behaviors depending on its capabilities and policy configuration.
 
 An authorization server MAY:
 
@@ -88,7 +90,7 @@ The client has no way to validate whether `https://legit-as.example.com` is actu
 
 Without explicit confirmation of the resource in the token response, the client cannot detect when the authorization server has ignored or overridden the requested resource indicator, leaving it vulnerable to mix-up attacks. The only protection in this scenario is user consent, which may not provide sufficient detail to educate the user about the specific resource being authorized, especially when authorization servers do not prominently display resource indicators in consent screens.
 
-This document introduces a new parameter `resource` to be returned in the access token response so the client can validate that the issued access token corresponds to the intended resource.
+This document introduces a new parameter `resource` to be returned in the access token response so the client can validate that the issued access token is valid for to the intended resource.
 
 # Conventions and Terminology
 
@@ -96,7 +98,7 @@ This document introduces a new parameter `resource` to be returned in the access
 
 ## Terminology
 
-The terms "client", "authorization server", "resource server', "access token", "protected resource",  "authorization request", "access token request", "access token response" are defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
+The terms "client", "authorization server", "resource server', "access token", "protected resource", "authorization request", "authorization response", "access token request", "access token response" are defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
 
 The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
 
@@ -104,24 +106,29 @@ The term "StringOrURI" is defined by the JWT specification {{RFC7519}}.
 
 ### Resource vs Audience
 
-This specification uses the term resource (as defined in {{Section 2 of RFC8707}} and {{RFC9728}}) rather than audience (as commonly used in access token claims such as the aud claim in JWTs {{Section 4.1.3 of RFC7519}} or in token introspection {{Section 2.2 of RFC7662}}) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and an access token’s audience value.
+This specification uses the term **resource** (as defined in {{Section 2 of RFC8707}} and {{RFC9728}}) rather than **audience** (as used in access token claims such as the `aud` claim in JWTs {{Section 4.1.3 of RFC7519}} or in token introspection {{Section 2.2 of RFC7662}}) because a client cannot assume a fixed or discoverable relationship between a protected resource URL and an access token’s audience value.
 
-While a resource and an access token's audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:
+Audience values are token-format-specific and are commonly used to represent authorization servers, tenants, resource servers, or logical identifiers rather than concrete protected resource URLs. As a result, a client cannot rely on audience claims alone to determine where an access token is valid for use, particularly when tokens are opaque or when multiple protected resources share an authorization server.
 
-  - A broadly scoped audience restriction such as `https://api.example.com` that specifies an API-wide identifier for the resource server(s).
-  - A narrowly scoped audience restriction such as `https://api.example.com/some/protected/resource` that specifies the exact URL for a protected resource.
-  - A logical or cross-domain audience restriction such as `urn:example:api` or `https://example.net` that has no direct correspondence to the resource’s URL.
+While a resource identifier and an access token’s audience value may coincide in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with audience restrictions that are:
 
-As a result, a client cannot reliably predict the audience value that an authorization server will use to restrict an issued access token's audience, nor can it determine which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, where the client can discover the protected resource URL but not the authorization server's audience assignment policy.
+- **Broad**, such as `https://api.example.com`, representing an API-wide identifier.
+- **Narrow**, such as `https://api.example.com/some/protected/resource`, representing a specific protected resource.
+- **Logical or indirect**, such as `urn:example:api` or `https://example.net`, which have no direct correspondence to the resource’s URL.
 
-For these reasons, returning an audience value in the token response is less useful to the client than returning the resource(s) for which the access token was issued. By returning the `resource` parameter, this specification enables a client to:
+Because audience assignment is a matter of authorization server policy, a client cannot reliably predict which audience value will be used in an issued access token or which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, where a client can discover the protected resource URL but not the authorization server’s audience assignment policy.
 
-  - Confirm that the access token is valid for the specific resource it requested.
-  - Detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
+For these reasons, returning audience information in the token response is less useful to a client than returning the resource or resources for which the access token was issued. By returning the `resource` parameter, this specification enables a client to:
 
-This approach is consistent with Resource Indicators {{RFC8707}} and Protected Resource Metadata {{RFC9728}}, which defines the `resource` parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions for access tokens internally.
+- Confirm that the access token is valid for the specific resource it requested.
+- Detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
 
-Note that a client may use token introspection {{RFC7662}} if supported by an authorization server to determine an issued token's audience if needed.
+This approach is consistent with Resource Indicators {{RFC8707}} and Protected Resource Metadata {{RFC9728}}, which define the `resource` parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.
+
+**Non-Goal:** This specification does not define, constrain, or replace the use of audience values in access tokens, nor does it require any particular token format. How authorization servers encode audience information and how resource servers enforce audience restrictions are explicitly out of scope.
+
+If supported by the authorization server, a client MAY use token introspection {{RFC7662}} to obtain audience information for an issued access token when such information is required.
+
 
 # Resource Parameter in Token Response
 
