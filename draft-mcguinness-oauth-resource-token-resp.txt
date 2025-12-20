@@ -5,8 +5,8 @@
 Web Authorization Protocol                                 K. McGuinness
 Internet-Draft                                               Independent
 Intended status: Standards Track                               J. Hanson
-Expires: 22 June 2026                                       Keycard Labs
-                                                        19 December 2025
+Expires: 23 June 2026                                       Keycard Labs
+                                                        20 December 2025
 
 
          OAuth 2.0 Resource Parameter in Access Token Response
@@ -55,7 +55,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 June 2026.
+   This Internet-Draft will expire on 23 June 2026.
 
 Copyright Notice
 
@@ -80,11 +80,14 @@ Table of Contents
    3.  Resource Parameter in Token Response
      3.1.  Authorization Server Processing Rules
      3.2.  Client Processing Rules
-     3.3.  Examples
-       3.3.1.  Single Protected Resource
-       3.3.2.  Multiple Protected Resources
-       3.3.3.  Default Resource
-       3.3.4.  Invalid Resource
+       3.2.1.  Overview
+       3.2.2.  Summary Table
+       3.2.3.  Parsing the resource Parameter
+       3.2.4.  Resource Identifier Comparison
+       3.2.5.  Client Requested Exactly One Resource
+       3.2.6.  Client Requested Multiple Resources
+       3.2.7.  Client Did Not Request a Resource
+       3.2.8.  Invalid Resource
    4.  Security Considerations
    5.  Privacy Considerations
    6.  IANA Considerations
@@ -378,129 +381,154 @@ Table of Contents
 
 3.2.  Client Processing Rules
 
-   When processing the access token response, clients that support this
-   extension MUST apply the following rules:
+   A client that supports this extension MUST process the access token
+   response according to the rules in this section.
 
-   1.  When the resource parameter is present in the access token
-       response:
+3.2.1.  Overview
 
-       *  If the value is a string, the client MUST treat it as a single
-          resource identifier.
+   Client processing is driven by the number of resource parameters
+   included in the authorization request or token request (see
+   [RFC8707]).  The rules below are mutually exclusive and depend on
+   whether the client requested zero, exactly one, or more than one
+   resource.
 
-       *  If the value is an array, the client MUST extract all resource
-          identifiers from the array.  Each element in the array MUST be
-          a string containing a resource identifier.
+   If client validation succeeds, the client MAY use the access token
+   and MUST use it only with the resource(s) identified in the response.
+   If client validation fails at any point while applying these rules,
+   the client MUST NOT use the access token and SHOULD discard it.
 
-       *  If the value is neither a string nor an array, the client MUST
-          treat the response as invalid and MUST NOT use the access
-          token.
+   These client processing rules apply equally to access tokens issued
+   using the authorization code grant and to access tokens issued using
+   a refresh token grant.
 
-   2.  When the client included one or more resource parameters in the
-       authorization request or token request (per [RFC8707]):
+3.2.2.  Summary Table
 
-       *  The client MUST compare the returned resource value(s) against
-          the requested resource value(s) using URI comparison rules as
-          defined in Section 6.2.1 of [RFC3986].
+   +=================+======================+==========================+
+   | Client          | Token Response       | Client Processing Rules  |
+   | Request         |                      |                          |
+   | Shape           |                      |                          |
+   +=================+======================+==========================+
+   | *Exactly one    | resource omitted     | Invalid.  Client MUST    |
+   | resource        |                      | NOT use the access token |
+   | requested*      |                      | and SHOULD discard it.   |
+   +-----------------+----------------------+--------------------------+
+   |                 | resource = string    | Valid only if the value  |
+   |                 |                      | matches the requested    |
+   |                 |                      | resource.                |
+   +-----------------+----------------------+--------------------------+
+   |                 | resource = array (1  | Valid only if the        |
+   |                 | element)             | element matches the      |
+   |                 |                      | requested resource.      |
+   +-----------------+----------------------+--------------------------+
+   |                 | resource = array (>1 | Invalid.  Client MUST    |
+   |                 | elements)            | NOT use the access token |
+   |                 |                      | and SHOULD discard it.   |
+   +-----------------+----------------------+--------------------------+
+   | *Multiple       | resource omitted     | Invalid.  Client MUST    |
+   | resource        |                      | NOT use the access token |
+   | values          |                      | and SHOULD discard it.   |
+   | requested*      |                      |                          |
+   +-----------------+----------------------+--------------------------+
+   |                 | resource = string    | Invalid.  Client MUST    |
+   |                 |                      | NOT use the access token |
+   |                 |                      | and SHOULD discard it.   |
+   +-----------------+----------------------+--------------------------+
+   |                 | resource = array     | Valid.  Token is valid   |
+   |                 | (subset of           | only for the returned    |
+   |                 | requested)           | subset.                  |
+   +-----------------+----------------------+--------------------------+
+   |                 | resource = array     | Valid.  Token is valid   |
+   |                 | (exact match)        | for all returned         |
+   |                 |                      | resources.               |
+   +-----------------+----------------------+--------------------------+
+   |                 | resource = array     | Invalid.  Client MUST    |
+   |                 | (includes            | NOT use the access token |
+   |                 | unrequested value)   | and SHOULD discard it.   |
+   +-----------------+----------------------+--------------------------+
+   | *No resource    | resource omitted     | Valid.  Token is not     |
+   | requested*      |                      | resource-specific.       |
+   +-----------------+----------------------+--------------------------+
+   |                 | resource present     | Valid.  Client MAY treat |
+   |                 |                      | the returned value as a  |
+   |                 |                      | default resource         |
+   |                 |                      | assignment.              |
+   +-----------------+----------------------+--------------------------+
+   | *Any request    | error=invalid_target | Client MUST treat this   |
+   | shape*          |                      | as a terminal error and  |
+   |                 |                      | MUST NOT use an access   |
+   |                 |                      | token.                   |
+   +-----------------+----------------------+--------------------------+
 
-       *  To compare resource values, the client MUST normalize both
-          URIs according to Section 6.2.2 of [RFC3986] (syntax-based
-          normalization) and then compare the normalized URIs as case-
-          sensitive strings.  Two URIs are considered equivalent if
-          their normalized forms are identical.
+                                  Table 1
 
-       *  If the client requested a single resource:
+3.2.3.  Parsing the resource Parameter
 
-          -  If the response contains a single resource string, the
-             client MUST compare them directly.
+   If the access token response includes a resource parameter, the
+   client MUST parse it as follows:
 
-          -  If the response contains an array with exactly one element,
-             the client MUST compare the requested resource against that
-             single array element.
+   *  A string value represents a single resource identifier.
 
-          -  If the response contains an array with multiple elements,
-             the comparison fails and the client MUST proceed as
-             specified in the error handling below.
+   *  An array value represents multiple resource identifiers; each
+      element MUST be a string.
 
-       *  If the client requested multiple resources:
+   *  Any other value is invalid; the client MUST NOT use the access
+      token and SHOULD discard it.
 
-          -  The response MUST contain an array.  If the response
-             contains a string, the comparison fails and the client MUST
-             proceed as specified in the error handling below.
+3.2.4.  Resource Identifier Comparison
 
-          -  For each requested resource, the client MUST find a
-             matching resource in the response array using URI
-             comparison as specified above.
+   Resource identifiers MUST be compared using the URI comparison rules
+   defined in Section 6.2.1 of [RFC3986], after applying syntax-based
+   normalization as defined in Section 6.2.2 of [RFC3986].  Resource
+   identifiers that are equivalent under these rules MUST be treated as
+   identical.
 
-          -  Each resource in the response array MUST match exactly one
-             requested resource.  If any resource in the response array
-             does not match a requested resource, or if the number of
-             resources in the response array does not equal the number
-             of requested resources, the comparison fails and the client
-             MUST proceed as specified in the error handling below.
+3.2.5.  Client Requested Exactly One Resource
 
-       *  If all returned resource values match the requested resource
-          values, the client MAY use the access token.  The client MUST
-          use the access token only with the resource(s) identified in
-          the response.
+   If the client included exactly one resource parameter in the token
+   request:
 
-       *  If any returned resource value does not match a requested
-          resource value, the client MUST treat this as an error
-          condition, MUST NOT use the access token, SHOULD discard the
-          access token, and MAY retry the authorization flow.
+   *  The response MUST contain exactly one matching resource
+      identifier.
 
-   3.  When the client did not include any resource parameters in the
-       authorization request or token request:
+   *  The returned resource identifier MUST match the requested
+      resource.
 
-       *  If the response includes a resource parameter, the client MAY
-          accept it as the authorization server's default resource
-          assignment.
+   *  If the response omits the resource parameter or contains zero or
+      more than one resource identifier, validation fails.
 
-       *  If the response omits the resource parameter, the client
-          SHOULD treat this as indicating the access token is not bound
-          to a specific resource, unless the client requires explicit
-          resource binding.
+3.2.5.1.  Authorization Request Example
 
-   4.  When the client included one or more resource parameters in the
-       authorization request or token request, but the response omits
-       the resource parameter:
+   Client obtains an access token for the Customers protected resource
+   (https://api.example.com/customers) using the authorization code
+   grant.
 
-       *  Clients that require strict resource binding MUST treat this
-          as an error condition and MUST NOT use the access token.
+3.2.5.1.1.  Authorization Request
 
-       *  Other clients MAY proceed but SHOULD be aware that they cannot
-          verify the access token's intended resource, which may
-          increase vulnerability to resource mix-up attacks as described
-          in the Security Considerations section of this document.
-
-3.3.  Examples
-
-3.3.1.  Single Protected Resource
-
-3.3.1.1.  Authorization Request
-
-   Client makes an authorization request for a protected resource using
-   the URL as the resource indicator
+   Client makes an authorization request for the Customers protected
+   resource (https://api.example.com/customers).
 
    GET /authorize?response_type=code
      &client_id=client123
-     &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
-     &scope=resource%3Aread
+     &redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+     &scope=customers%3Aread
      &state=abc123
-     &resource=https%3A%2F%2Fresource.example.com%2F
+     &resource=https%3A%2F%2Fapi.example.com%2Fcustomers
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
      &code_challenge_method=S256
    HTTP/1.1
    Host: authorization-server.example.com
 
-3.3.1.2.  Redirect
+3.2.5.1.2.  Redirect
 
-   User successfully authenticates and delegates access to the client
-   for the requested resource and scopes
+   The authorization server redirects the user-agent back to the client
+   with an authorization code.
 
 HTTP/1.1 302 Found
-Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
 
-3.3.1.3.  Token Request
+3.2.5.1.3.  Token Request
+
+   The client exchanges the authorization code for an access token.
 
    POST /token HTTP/1.1
    Host: authorization-server.example.com
@@ -508,56 +536,115 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
 
    grant_type=authorization_code&
    code=SplxlOBeZQQYbYS6WxSbIA&
-   redirect_uri=https%3A%2F%2Fclient.example%2Fcallback&
+   redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&
    client_id=client123&
    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
-3.3.1.4.  Token Response
+3.2.5.1.4.  Token Response
 
-   Resource is confirmed and unambiguous.
+   The authorization server issues an access token that is valid for the
+   Customers protected resource (https://api.example.com/customers).
 
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
 
    {
-     "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+     "access_token": "ACCESS_TOKEN",
      "token_type": "Bearer",
      "expires_in": 3600,
-     "scope": "resource:read",
-     "resource": "https://resource.example.com/"
+     "scope": "customers:read",
+     "resource": "https://api.example.com/customers"
    }
 
-3.3.2.  Multiple Protected Resources
+3.2.5.2.  Refresh Token Request Example
 
-3.3.2.1.  Authorization Request
+   Client refreshes an access token for the Customers protected resource
+   (https://api.example.com/customers).
 
-   Client makes an authorization request for multiple protected
-   resources using the URLs as the resource indicators
+3.2.5.2.1.  Refresh Token Request
+
+   The client uses a refresh token to request a new access token that is
+   valid for the Customers protected resource (https://api.example.com/
+   customers).
+
+   POST /token HTTP/1.1
+   Host: authorization-server.example.com
+   Content-Type: application/x-www-form-urlencoded
+
+   grant_type=refresh_token&
+   refresh_token=REFRESH_TOKEN&
+   client_id=client123&
+   scope=customers%3Aread&
+   resource=https%3A%2F%2Fapi.example.com%2Fcustomers
+
+3.2.5.2.2.  Token Response
+
+   The authorization server issues a new access token that is valid for
+   the Customers protected resource (https://api.example.com/customers).
+
+   HTTP/1.1 200 OK
+   Content-Type: application/json
+   Cache-Control: no-store
+
+   {
+     "access_token": "ACCESS_TOKEN",
+     "token_type": "Bearer",
+     "expires_in": 3600,
+     "scope": "customers:read",
+     "resource": "https://api.example.com/customers"
+   }
+
+3.2.6.  Client Requested Multiple Resources
+
+   If the client included more than one resource parameter in the token
+   request:
+
+   *  The response MUST include a resource parameter.
+
+   *  The value MUST be an array.
+
+   *  Each returned resource identifier MUST match one requested
+      resource.
+
+   *  The returned set MAY be a strict subset of the requested set.
+
+   *  If any unrequested or duplicate resource identifier is present,
+      validation fails.
+
+3.2.6.1.  Authorization Request Example
+
+   Client obtains an access token for the Customers
+   (https://api.example.com/customers) and Orders
+   (https://api.example.com/orders) protected resources.
+
+3.2.6.1.1.  Authorization Request
+
+   Client makes an authorization request for both protected resources.
 
    GET /authorize?response_type=code
      &client_id=client123
-     &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
-     &scope=resource%3Aread
+     &redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+     &scope=customers%3Aread%20orders%3Aread
      &state=abc123
-     &resource=https%3A%2F%2FresourceA.example.com%2F
-     &resource=https%3A%2F%2FresourceB.example.com%2F
+     &resource=https%3A%2F%2Fapi.example.com%2Fcustomers
+     &resource=https%3A%2F%2Fapi.example.com%2Forders
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
      &code_challenge_method=S256
    HTTP/1.1
    Host: authorization-server.example.com
 
-3.3.2.2.  Redirect
+3.2.6.1.2.  Redirect
 
-   User successfully authenticates and delegates access to the client
-   for the requested resource and scopes
+   The authorization server redirects the user-agent back to the client
+   with an authorization code.
 
 HTTP/1.1 302 Found
-Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
 
-3.3.2.3.  Token Request
+3.2.6.1.3.  Token Request
 
-   Client exchanges the authorization code for an access token
+   The client exchanges the authorization code for an access token.
 
    POST /token HTTP/1.1
    Host: authorization-server.example.com
@@ -565,54 +652,113 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
 
    grant_type=authorization_code&
    code=SplxlOBeZQQYbYS6WxSbIA&
-   redirect_uri=https%3A%2F%2Fclient.example%2Fcallback&
+   redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&
    client_id=client123&
    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
-3.3.2.4.  Token Response
+3.2.6.1.4.  Token Response
 
-   Both resources are confirmed and unambiguous.
+   The authorization server issues an access token that is valid for
+   both protected resources.
 
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
 
    {
-     "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+     "access_token": "ACCESS_TOKEN",
      "token_type": "Bearer",
      "expires_in": 3600,
-     "scope": "resource:read",
+     "scope": "customers:read orders:read",
      "resource": [
-       "https://resourceA.example.com/",
-       "https://resourceB.example.com/"
+       "https://api.example.com/customers",
+       "https://api.example.com/orders"
      ]
    }
 
-3.3.3.  Default Resource
+3.2.6.2.  Refresh Token Request Example
 
-3.3.3.1.  Authorization Request
+   Client refreshes an access token for the Customers and Orders
+   protected resources.
 
-   Client makes an authorization request without a resource indicator
+3.2.6.2.1.  Refresh Token Request
+
+   The client uses a refresh token to request a new access token that is
+   valid for both protected resources.
+
+   POST /token HTTP/1.1
+   Host: authorization-server.example.com
+   Content-Type: application/x-www-form-urlencoded
+
+   grant_type=refresh_token&
+   refresh_token=REFRESH_TOKEN&
+   client_id=client123&
+   scope=customers%3Aread%20orders%3Aread&
+   resource=https%3A%2F%2Fapi.example.com%2Fcustomers&
+   resource=https%3A%2F%2Fapi.example.com%2Forders
+
+3.2.6.2.2.  Token Response
+
+   The authorization server issues a new access token that is valid for
+   both protected resources.
+
+   HTTP/1.1 200 OK
+   Content-Type: application/json
+   Cache-Control: no-store
+
+   {
+     "access_token": "ACCESS_TOKEN",
+     "token_type": "Bearer",
+     "expires_in": 3600,
+     "scope": "customers:read orders:read",
+     "resource": [
+       "https://api.example.com/customers",
+       "https://api.example.com/orders"
+     ]
+   }
+
+3.2.7.  Client Did Not Request a Resource
+
+   If the client did not include any resource parameters in the token
+   request:
+
+   *  If the response includes a resource parameter, the client MAY
+      treat it as a default resource assignment.
+
+   *  If the response omits the resource parameter, the token SHOULD be
+      treated as unbounded.
+
+3.2.7.1.  Authorization Request Example
+
+   Client obtains an access token without requesting a specific
+   resource.
+
+3.2.7.1.1.  Authorization Request
+
+   Client makes an authorization request without including a resource
+   indicator.
 
    GET /authorize?response_type=code
      &client_id=client123
-     &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
-     &scope=resource%3Aread
+     &redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+     &scope=orders%3Aread
      &state=abc123
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
      &code_challenge_method=S256
    HTTP/1.1
    Host: authorization-server.example.com
 
-3.3.3.2.  Redirect
+3.2.7.1.2.  Redirect
 
-   User successfully authenticates and delegates access to the client
-   for the requested scopes
+   The authorization server redirects the user-agent back to the client
+   with an authorization code.
 
 HTTP/1.1 302 Found
-Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
 
-3.3.3.3.  Token Request
+3.2.7.1.3.  Token Request
+
+   The client exchanges the authorization code for an access token.
 
    POST /token HTTP/1.1
    Host: authorization-server.example.com
@@ -620,34 +766,86 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
 
    grant_type=authorization_code&
    code=SplxlOBeZQQYbYS6WxSbIA&
-   redirect_uri=https%3A%2F%2Fclient.example%2Fcallback&
+   redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&
    client_id=client123&
    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 
-3.3.3.4.  Token Response
+3.2.7.1.4.  Token Response
 
-   Default resource is confirmed and unambiguous.
+   The authorization server issues an access token that is valid for the
+   default protected resource (https://api.example.com/orders).
 
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
 
    {
-     "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+     "access_token": "ACCESS_TOKEN",
      "token_type": "Bearer",
      "expires_in": 3600,
-     "scope": "resource:read",
-     "resource": "https://resource.example.com/"
+     "scope": "orders:read",
+     "resource": "https://api.example.com/orders"
    }
 
-3.3.4.  Invalid Resource
+3.2.7.2.  Refresh Token Request Example
 
-3.3.4.1.  Authorization Request
+   Client refreshes an access token without explicitly requesting a
+   resource.
+
+3.2.7.2.1.  Refresh Token Request
+
+   The client uses a refresh token to request a new access token without
+   explicitly requesting a resource.
+
+   POST /token HTTP/1.1
+   Host: authorization-server.example.com
+   Content-Type: application/x-www-form-urlencoded
+
+   grant_type=refresh_token&
+   refresh_token=REFRESH_TOKEN&
+   client_id=client123&
+   scope=orders%3Aread
+
+3.2.7.2.2.  Token Response
+
+   The authorization server issues a new access token that is valid for
+   the default protected resource (https://api.example.com/orders).
+
+   HTTP/1.1 200 OK
+   Content-Type: application/json
+   Cache-Control: no-store
+
+   {
+     "access_token": "ACCESS_TOKEN",
+     "token_type": "Bearer",
+     "expires_in": 3600,
+     "scope": "orders:read",
+     "resource": "https://api.example.com/orders"
+   }
+
+3.2.8.  Invalid Resource
+
+   An invalid_target error indicates that none of the requested resource
+   values were acceptable to the authorization server.  This outcome may
+   result from authorization server policy or client configuration.
+
+   Upon receiving an invalid_target error, the client MAY retry the
+   authorization request with a different resource value.
+
+3.2.8.1.  Authorization Request Example
+
+   Client attempts to obtain an access token for a protected resource
+   (https://unknown.example.com) that is not permitted.
+
+3.2.8.1.1.  Authorization Request
+
+   Client makes an authorization request for a protected resource that
+   is not permitted.
 
    GET /authorize?response_type=code
      &client_id=client123
-     &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
-     &scope=resource%3Aread
+     &redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+     &scope=customers%3Aread
      &state=invalid123
      &resource=https%3A%2F%2Fevil.example.net%2F
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
@@ -655,13 +853,46 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    HTTP/1.1
    Host: authorization-server.example.com
 
-3.3.4.2.  Error Redirect
+3.2.8.1.2.  Error Redirect
 
-   The server rejected the requested resource value (e.g authorization
-   or policy violation, resource is not valid, etc).
+   The authorization server rejects the requested resource and does not
+   issue an authorization code.
 
-  HTTP/1.1 302 Found
-  Location: https://client.example/callback?error=invalid_target&error_description=Resource%20not%20allowed&state=invalid123
+HTTP/1.1 302 Found
+Location: https://client.example.com/cb?error=invalid_target&error_description=Resource%20not%20allowed&state=invalid123
+
+3.2.8.2.  Refresh Token Request Example
+
+   Client attempts to refresh an access token for a protected resource
+   (https://unknown.example.com) that is not permitted.
+
+3.2.8.2.1.  Refresh Token Request
+
+   The client uses a refresh token to request a new access token for a
+   protected resource that is not permitted.
+
+   POST /token HTTP/1.1
+   Host: authorization-server.example.com
+   Content-Type: application/x-www-form-urlencoded
+
+   grant_type=refresh_token&
+   refresh_token=REFRESH_TOKEN&
+   client_id=client123&
+   scope=customers%3Aread&
+   resource=https%3A%2F%2Fevil.example.net%2F
+
+3.2.8.2.2.  Error Response
+
+   The authorization server rejects the requested resource.
+
+   HTTP/1.1 400 Bad Request
+   Content-Type: application/json
+   Cache-Control: no-store
+
+   {
+     "error": "invalid_target",
+     "error_description": "Resource not allowed"
+   }
 
 4.  Security Considerations
 
@@ -738,7 +969,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
            |          | access token applies  |               |
            +----------+-----------------------+---------------+
 
-                                 Table 1
+                                 Table 2
 
 7.  Normative References
 
