@@ -108,16 +108,16 @@ This specification uses the term resource (as defined in {{Section 2 of RFC8707}
 
 While a resource and an access token's audience may be the same in some deployments, they are not equivalent. A resource server protecting a given resource may accept access tokens with:
 
-  -	A broadly scoped audience restriction such as `https://api.example.com` that specifies an API-wide identifier for the resource server(s).
-  -	A narrowly scoped audience restriction such as `https://api.example.com/some/protected/resource` that specifies the exact URL for a protected resource.
+  - A broadly scoped audience restriction such as `https://api.example.com` that specifies an API-wide identifier for the resource server(s).
+  - A narrowly scoped audience restriction such as `https://api.example.com/some/protected/resource` that specifies the exact URL for a protected resource.
   - A logical or cross-domain audience restriction such as `urn:example:api` or `https://example.net` that has no direct correspondence to the resource’s URL.
 
 As a result, a client cannot reliably predict the audience value that an authorization server will use to restrict an issued access token's audience, nor can it determine which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as when using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, where the client can discover the protected resource URL but not the authorization server's audience assignment policy.
 
 For these reasons, returning an audience value in the token response is less useful to the client than returning the resource(s) for which the access token was issued. By returning the `resource` parameter, this specification enables a client to:
 
-  -	Confirm that the access token is valid for the specific resource it requested.
-  -	Detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
+  - Confirm that the access token is valid for the specific resource it requested.
+  - Detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.
 
 This approach is consistent with Resource Indicators {{RFC8707}} and Protected Resource Metadata {{RFC9728}}, which defines the `resource` parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions for access tokens internally.
 
