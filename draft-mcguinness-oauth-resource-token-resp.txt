@@ -79,6 +79,7 @@ Table of Contents
        2.1.1.  Resource vs Audience
    3.  Resource Parameter in Token Response
      3.1.  Authorization Server Processing Rules
+       3.1.1.  Overview
      3.2.  Client Processing Rules
        3.2.1.  Overview
        3.2.2.  Summary Table
@@ -340,44 +341,124 @@ Table of Contents
 
 3.1.  Authorization Server Processing Rules
 
-   When deciding whether and how to include the resource parameter in an
-   access token response, an authorization server that supports this
-   specification MUST apply the following rules:
+   An authorization server that supports this specification MUST decide
+   whether and how to include the resource parameter in a successful
+   access token response (see [RFC6749], Section 5.1) according to the
+   rules in this section.
 
-   1.  When the client requests specific resources with a resource
-       indicator:
+3.1.1.  Overview
 
-       *  If the client included one or more resource parameters in the
-          authorization request or token request per [RFC8707], and the
-          authorization server accepted all requested resources, the
-          resource parameter in the response MUST contain the accepted
-          resource(s).
+   Authorization server processing is driven by the number of resource
+   parameters included in the authorization request or token request
+   (see [RFC8707]).  The rules below are mutually exclusive and depend
+   on whether the client requested zero, exactly one, or more than one
+   resource.
 
-       *  If the authorization server accepted only a subset of the
-          requested resources, the resource parameter in the response
-          MUST contain only that accepted subset.
+   These authorization server processing rules apply equally to access
+   tokens issued using the authorization code grant and to access tokens
+   issued using a refresh token grant.
 
-       *  If the authorization server cannot accept any of the requested
-          resources or does not support [RFC8707], it MUST return an
-          invalid_target error response as defined in Section 2 of
-          [RFC8707], and MUST NOT issue an access token.
+   Access tokens issued under these rules are valid for the resource(s)
+   identified in the response.
 
-   2.  When the client does not request specific resources with a
-       resource indicator:
+3.1.1.1.  Summary Table
 
-       *  If the authorization server assigns a default resource based
-          on policy or client configuration, it SHOULD include that
-          resource in the resource parameter of the response.
+     +==============+===================+============================+
+     | Client       | Authorization     | Authorization Server       |
+     | Request      | Server Outcome    | Processing Rules           |
+     | Shape        |                   |                            |
+     +==============+===================+============================+
+     | *Exactly one | No acceptable     | MUST return invalid_target |
+     | resource     | resource          | and MUST NOT issue an      |
+     | requested*   |                   | access token.              |
+     +--------------+-------------------+----------------------------+
+     |              | One acceptable    | MUST issue an access token |
+     |              | resource          | and MUST include resource  |
+     |              |                   | as a string containing the |
+     |              |                   | accepted resource.         |
+     +--------------+-------------------+----------------------------+
+     | *Multiple    | No acceptable     | MUST return invalid_target |
+     | resource     | resources         | and MUST NOT issue an      |
+     | values       |                   | access token.              |
+     | requested*   |                   |                            |
+     +--------------+-------------------+----------------------------+
+     |              | Subset of         | MUST issue an access token |
+     |              | requested         | and MUST include resource  |
+     |              | resources         | as an array containing     |
+     |              | acceptable        | only the accepted subset.  |
+     +--------------+-------------------+----------------------------+
+     |              | All requested     | MUST issue an access token |
+     |              | resources         | and MUST include resource  |
+     |              | acceptable        | as an array containing all |
+     |              |                   | accepted resources.        |
+     +--------------+-------------------+----------------------------+
+     | *No resource | Default           | SHOULD issue an access     |
+     | requested*   | resource(s)       | token and SHOULD include   |
+     |              | assigned          | the assigned resource(s)   |
+     |              |                   | in the resource parameter. |
+     +--------------+-------------------+----------------------------+
+     |              | No resource-      | SHOULD issue an access     |
+     |              | specific          | token and SHOULD omit the  |
+     |              | restriction       | resource parameter.        |
+     +--------------+-------------------+----------------------------+
 
-       *  If the access token is not bound to any specific resource (for
-          example, when the access token has no audience
-          restriction),the resource parameter SHOULD be omitted from the
-          response.
+                                  Table 1
 
-   When determining uniqueness of resource values within an array,
-   authorization servers MUST use URI comparison rules as defined in
-   Section 6.2.1 of [RFC3986] to ensure equivalent URIs are treated as
-   duplicates.
+3.1.1.2.  Resource Identifier Comparison
+
+   When comparing resource identifiers (for example, to determine
+   uniqueness or to evaluate requested resources against policy), the
+   authorization server MUST apply the URI comparison rules defined in
+   Section 6.2.1 of [RFC3986], after applying syntax-based normalization
+   as defined in Section 6.2.2 of [RFC3986].  Resource identifiers that
+   are equivalent under these rules MUST be treated as identical.
+
+3.1.1.3.  Client Requested One or More Resources
+
+   If the client included one or more resource parameters in the
+   authorization request or token request:
+
+   *  The authorization server MUST evaluate the requested resource set
+      according to local policy and determine the accepted resource set.
+
+   *  If the accepted resource set is empty, the authorization server
+      MUST return an invalid_target error response as defined in
+      [RFC8707] and MUST NOT issue an access token.
+
+   *  If the accepted resource set is non-empty:
+
+      -  The authorization server MUST include the resource parameter in
+         the access token response.
+
+      -  The resource values in the response MUST be limited to the
+         accepted resource set and MUST NOT include any resource value
+         that was not requested by the client.
+
+      -  The authorization server MUST ensure that the returned resource
+         set contains no duplicate resource identifiers (including
+         identifiers that differ only by URI normalization).
+
+      -  If the accepted resource set contains exactly one resource, the
+         resource parameter value MUST be a string containing that
+         single resource identifier.
+
+      -  If the accepted resource set contains more than one resource,
+         the resource parameter value MUST be an array of strings
+         containing those resource identifiers.
+
+3.1.1.4.  Client Did Not Request a Resource
+
+   If the client did not include any resource parameters in the
+   authorization request or token request:
+
+   *  If the authorization server assigns one or more default resources
+      based on policy or client configuration, it SHOULD include the
+      assigned resource(s) in the resource parameter of the response.
+
+   *  If the access token is not valid for any specific resource (for
+      example, when the access token has no resource-specific
+      restriction), the resource parameter SHOULD be omitted from the
+      response.
 
 3.2.  Client Processing Rules
 
@@ -459,7 +540,7 @@ Table of Contents
    |                 |                      | token.                   |
    +-----------------+----------------------+--------------------------+
 
-                                  Table 1
+                                  Table 2
 
 3.2.3.  Parsing the resource Parameter
 
@@ -969,7 +1050,7 @@ Location: https://client.example.com/cb?error=invalid_target&error_description=R
            |          | access token applies  |               |
            +----------+-----------------------+---------------+
 
-                                 Table 2
+                                 Table 3
 
 7.  Normative References
 
