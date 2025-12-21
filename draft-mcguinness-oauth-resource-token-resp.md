@@ -221,7 +221,7 @@ If the client included more than one `resource` parameter in the authorization r
   - The `resource` parameter value MUST be an array of strings if there is more than one accepted value.
   - Each returned `resource` value MUST match one of the requested `resource` values according to the rules defined in {{resource-identifier-comparison}}.
   - The returned array MAY contain a strict subset of the requested `resource` values.
-  - The returned array MUST NOT contain duplicate `resource` values, including values that differ only by URI normalization.
+  - The returned array MUST NOT contain duplicate `resource` values, including values that differ only by URI normalization using rules defined in {{resource-identifier-comparison}}.
 
 ### Client Did Not Request a Resource
 
@@ -232,7 +232,6 @@ If the client did not include any `resource` parameters in the authorization req
   - If exactly one `resource` value is assigned, the `resource` parameter value SHOULD be a string.
   - If multiple `resource` values are assigned, the `resource` parameter value SHOULD be an array.
 - If the authorization server does not apply any `resource`-specific restriction to the access token:
-  - The authorization server SHOULD issue an access token.
   - The authorization server SHOULD omit the `resource` parameter from the response.
 
 If the `resource` parameter is omitted, the access token is not valid for any specific resource as defined by this specification.
@@ -265,7 +264,7 @@ These client processing rules apply equally to access tokens issued using the au
 |                      | `resource` = array (exact match) | Valid. Token is valid for all returned resources. |
 |                      | `resource` = array (includes unrequested value) | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
 | **No `resource` requested** | `resource` omitted | Valid. Token is not resource-specific. |
-|                      | `resource` present | Valid. Client MAY treat the returned value as a default resource assignment. |
+|                      | `resource` present | Valid. Client SHOULD treat the returned value as a default resource assignment. |
 | **Any request shape** | `error=invalid_target` | Client MUST treat this as a terminal error and MUST NOT use an access token. |
 
 ### Parsing the `resource` Parameter
