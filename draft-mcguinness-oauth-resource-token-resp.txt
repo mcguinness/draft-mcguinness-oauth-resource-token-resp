@@ -158,7 +158,9 @@ Table of Contents
    In such environments, a client may learn the protected resource URL
    at runtime and discover an authorization server using OAuth 2.0
    Protected Resource Metadata [RFC9728], without any pre-established
-   trust relationship between the client and the resource.
+   trust relationship between the client and the resource.  See
+   Section 1.1 for an example of how this can lead to resource mix-up
+   attacks.
 
    A key challenge in these deployments is that the client has no
    reliable way to validate whether a discovered authorization server is
