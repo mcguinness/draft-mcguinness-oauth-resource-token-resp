@@ -808,10 +808,10 @@ This proposal builds on prior work in OAuth 2.0 extensibility and security analy
 -01
 
 * Revised Introduction and included attack example
-* Provided context for use of Resource vs Audience
-* Revised Response to clarify Authorization Server and Client Processing Rules
+* Added Resource vs Audience to Terminology
+* Revised Response to provide detailed Authorization Server and Client Processing Rules
 * Updated Security Considerations
-* Document cleanup and consistency
+* Editorial cleanup and consistency
 
 -00
 
