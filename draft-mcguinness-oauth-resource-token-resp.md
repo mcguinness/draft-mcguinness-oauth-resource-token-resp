@@ -160,6 +160,7 @@ The `resource` parameter uses the same value syntax and requirements as the `res
     HTTP/1.1 200 OK
     Content-Type: application/json
     Cache-Control: no-store
+    Pragma: no-cache
 
     {
       "access_token": "2YotnFZFEjr1zCsicMWpAA",
