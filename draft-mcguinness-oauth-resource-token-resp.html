@@ -1590,7 +1590,7 @@ Pragma: no-cache
                   <p id="section-3.2.4-2.3.2.4.1">The returned array <span class="bcp14">MAY</span> contain a strict subset of the requested <code>resource</code> values.<a href="#section-3.2.4-2.3.2.4.1" class="pilcrow">¶</a></p>
 </li>
                 <li class="normal" id="section-3.2.4-2.3.2.5">
-                  <p id="section-3.2.4-2.3.2.5.1">The returned array <span class="bcp14">MUST NOT</span> contain duplicate <code>resource</code> values, including values that differ only by URI normalization.<a href="#section-3.2.4-2.3.2.5.1" class="pilcrow">¶</a></p>
+                  <p id="section-3.2.4-2.3.2.5.1">The returned array <span class="bcp14">MUST NOT</span> contain duplicate <code>resource</code> values, including values that differ only by URI normalization using rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.2.4-2.3.2.5.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
@@ -1622,10 +1622,7 @@ Pragma: no-cache
               <p id="section-3.2.5-2.2.1">If the authorization server does not apply any <code>resource</code>-specific restriction to the access token:<a href="#section-3.2.5-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2.5-2.2.2.1">
-                  <p id="section-3.2.5-2.2.2.1.1">The authorization server <span class="bcp14">SHOULD</span> issue an access token.<a href="#section-3.2.5-2.2.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-3.2.5-2.2.2.2">
-                  <p id="section-3.2.5-2.2.2.2.1">The authorization server <span class="bcp14">SHOULD</span> omit the <code>resource</code> parameter from the response.<a href="#section-3.2.5-2.2.2.2.1" class="pilcrow">¶</a></p>
+                  <p id="section-3.2.5-2.2.2.1.1">The authorization server <span class="bcp14">SHOULD</span> omit the <code>resource</code> parameter from the response.<a href="#section-3.2.5-2.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
@@ -1737,7 +1734,7 @@ Pragma: no-cache
                 <td class="text-left" rowspan="1" colspan="1"> </td>
                 <td class="text-left" rowspan="1" colspan="1">
                   <code>resource</code> present</td>
-                <td class="text-left" rowspan="1" colspan="1">Valid. Client <span class="bcp14">MAY</span> treat the returned value as a default resource assignment.</td>
+                <td class="text-left" rowspan="1" colspan="1">Valid. Client <span class="bcp14">SHOULD</span> treat the returned value as a default resource assignment.</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">

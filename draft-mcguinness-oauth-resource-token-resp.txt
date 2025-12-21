@@ -530,7 +530,8 @@ Table of Contents
          resource values.
 
       -  The returned array MUST NOT contain duplicate resource values,
-         including values that differ only by URI normalization.
+         including values that differ only by URI normalization using
+         rules defined in Section 3.1.
 
 3.2.5.  Client Did Not Request a Resource
 
@@ -551,8 +552,6 @@ Table of Contents
 
    *  If the authorization server does not apply any resource-specific
       restriction to the access token:
-
-      -  The authorization server SHOULD issue an access token.
 
       -  The authorization server SHOULD omit the resource parameter
          from the response.
@@ -634,9 +633,9 @@ Table of Contents
    | *No resource    | resource omitted     | Valid.  Token is not     |
    | requested*      |                      | resource-specific.       |
    +-----------------+----------------------+--------------------------+
-   |                 | resource present     | Valid.  Client MAY treat |
-   |                 |                      | the returned value as a  |
-   |                 |                      | default resource         |
+   |                 | resource present     | Valid.  Client SHOULD    |
+   |                 |                      | treat the returned value |
+   |                 |                      | as a default resource    |
    |                 |                      | assignment.              |
    +-----------------+----------------------+--------------------------+
    | *Any request    | error=invalid_target | Client MUST treat this   |
