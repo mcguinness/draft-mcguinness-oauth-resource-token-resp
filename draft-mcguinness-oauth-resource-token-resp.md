@@ -190,12 +190,12 @@ Access tokens issued under these rules are valid for the resource(s) identified 
 | Client Request Shape | Authorization Server Outcome | Authorization Server Processing Rules |
 |----------------------|------------------------------|---------------------------------------|
 | **Exactly one `resource` requested** | No acceptable resource | MUST return `invalid_target` and MUST NOT issue an access token. |
-|                      | One acceptable resource | MUST issue an access token and MUST include `resource` as a string containing the accepted resource. |
+|                      | One acceptable resource | MUST include `resource` as a string containing the accepted resource. |
 | **Multiple `resource` values requested** | No acceptable resources | MUST return `invalid_target` and MUST NOT issue an access token. |
-|                      | Subset of requested resources acceptable | MUST issue an access token and MUST include `resource` as an array containing only the accepted subset. |
-|                      | All requested resources acceptable | MUST issue an access token and MUST include `resource` as an array containing all accepted resources. |
-| **No `resource` requested** | Default resource(s) assigned | SHOULD issue an access token and SHOULD include the assigned resource(s) in the `resource` parameter. |
-|                      | No resource-specific restriction | SHOULD issue an access token and SHOULD omit the `resource` parameter. |
+|                      | Subset of requested resources acceptable | MUST include `resource` as an array containing only the accepted subset. |
+|                      | All requested resources acceptable | MUST include `resource` as an array containing all accepted resources. |
+| **No `resource` requested** | Default resource(s) assigned | SHOULD include the assigned resource(s) in the `resource` parameter. |
+|                      | No resource-specific restriction | SHOULD omit the `resource` parameter. |
 
 When comparing resource identifiers, the authorization server MUST apply the rules defined in {{resource-identifier-comparison}}.
 
