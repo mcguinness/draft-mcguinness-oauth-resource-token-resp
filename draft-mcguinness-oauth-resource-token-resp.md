@@ -141,14 +141,11 @@ For these reasons, returning audience information in the token response is less 
 
 This approach is consistent with Resource Indicators {{RFC8707}} and Protected Resource Metadata {{RFC9728}}, which define the `resource` parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.
 
-**Non-Goal:** This specification does not define, constrain, or replace the use of audience values in access tokens, nor does it require any particular token format. How authorization servers encode audience information and how resource servers enforce audience restrictions are explicitly out of scope.
-
-If supported by the authorization server, a client MAY use token introspection {{RFC7662}} to obtain audience information for an issued access token when such information is required.
-
+This specification does not define, constrain, or replace the use of audience values in access tokens, nor does it require any particular token format. How authorization servers encode audience information and how resource servers enforce audience restrictions are explicitly out of scope.
 
 # Resource Parameter in Token Response
 
-Authorization servers that support this specification SHOULD include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}, to identify a protected resource for which the access token is valid.
+Authorization servers that support this specification MUST include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}, to identify a protected resource for which the access token is valid according to the rules defined in {{authorization-server-processing-rule}}.
 
 The value of the `resource` parameter MUST be either:
 
@@ -174,10 +171,6 @@ The `resource` parameter uses the same value syntax and requirements as the `res
 When comparing resource identifiers (for example, to determine uniqueness, to evaluate requested resources against policy, or to validate that returned resources match requested resources), implementations MUST apply the URI comparison rules defined in {{Section 6.2.1 of RFC3986}}, after applying syntax-based normalization as defined in {{Section 6.2.2 of RFC3986}}. Resource identifiers that are equivalent under these rules MUST be treated as identical.
 
 ## Authorization Server Processing Rules {#authorization-server-processing-rules}
-
-An authorization server that supports this specification MUST decide whether and how to include the `resource` parameter in a successful access token response (see {{RFC6749}}, Section 5.1) according to the rules in this section.
-
-### Overview
 
 Authorization server processing is driven by the number of `resource` parameters included in the authorization request or token request (see {{RFC8707}}). The rules below apply equally to access tokens issued using the authorization code grant or refresh token grant and are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
 
@@ -241,8 +234,6 @@ If the `resource` parameter is omitted, the access token is not valid for any sp
 ## Client Processing Rules {#client-processing-rules}
 
 A client that supports this extension MUST process the access token response according to the rules in this section.
-
-### Overview
 
 Client processing is driven by the number of `resource` parameters included in the authorization request or token request (see {{RFC8707}}). The rules below are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
 
