@@ -243,7 +243,7 @@ A client that supports this extension MUST process the access token response acc
 
 Client processing is driven by the number of `resource` parameters included in the authorization request or token request (see {{RFC8707}}). The rules below are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
 
-If client validation succeeds, the client MAY use the access token and MUST use it only with the resource(s) identified in the response. The returned `scope` value, if present, MUST be interpreted in conjunction with the returned `resource` values. The granted scopes MUST be appropriate for the returned resource(s), consistent with the usage of scope in {{Section 3.3 of RFC 6749}}.
+If client validation succeeds, the client MAY use the access token and MUST use it only with the resource(s) identified in the response. The returned `scope` value, if present, MUST be interpreted in conjunction with the returned `resource` values. The granted scopes MUST be appropriate for the returned resource(s), consistent with the usage of scope in {{Section 3.3 of RFC6749}}.
 
 If client validation fails at any point while applying these rules, the client MUST NOT use the access token and SHOULD discard it.
 
