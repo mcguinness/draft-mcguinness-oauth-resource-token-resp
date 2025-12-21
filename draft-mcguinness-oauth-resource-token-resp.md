@@ -83,7 +83,7 @@ As a result, learning the audience of an issued access token does not provide a 
 
 Consequently, existing OAuth mechanisms do not provide a practical, interoperable way for a client to confirm that an issued access token is valid for the intended resource.
 
-This specification defines a new `resource` parameter to be returned in OAuth 2.0 access token responses. The parameter explicitly identifies the protected resource or resources for which the issued access token is valid, enabling clients to validate token applicability before use and reducing ambiguity across deployments.
+This specification defines a new `resource` parameter to be returned in OAuth 2.0 access token responses that is orthogonal to the token format issued by the authorization server. The parameter explicitly identifies the protected resource or resources for which the issued access token is valid, enabling clients to validate token applicability before use and reducing ambiguity across deployments.
 
 ## Resource Mix-Up via Dynamic Discovery Example {#resource-mix-up-via-dynamic-discovery-example}
 
@@ -145,7 +145,7 @@ This specification does not define, constrain, or replace the use of audience va
 
 # Resource Parameter in Token Response
 
-Authorization servers that support this specification MUST include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}, to identify a protected resource for which the access token is valid according to the rules defined in {{authorization-server-processing-rule}}.
+Authorization servers that support this specification MUST include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}, to identify a protected resource for which the access token is valid according to the rules defined in {{authorization-server-processing-rules}}.
 
 The value of the `resource` parameter MUST be either:
 
