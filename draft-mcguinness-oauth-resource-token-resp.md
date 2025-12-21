@@ -70,7 +70,7 @@ When an authorization request includes one or more `resource` parameters, author
 
 In the absence of explicit confirmation in the token response, a client cannot determine which of these behaviors occurred and may incorrectly assume that an access token is valid for a particular resource.
 
-This ambiguity is especially problematic in deployments that rely on dynamic discovery of protected resources and authorization servers. In such environments, a client may learn the protected resource URL at runtime and discover an authorization server using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, without any pre-established trust relationship between the client and the resource.
+This ambiguity is especially problematic in deployments that rely on dynamic discovery of protected resources and authorization servers. In such environments, a client may learn the protected resource URL at runtime and discover an authorization server using OAuth 2.0 Protected Resource Metadata {{RFC9728}}, without any pre-established trust relationship between the client and the resource. See {{resource-mix-up-via-dynamic-discovery-example}} for an example of how this can lead to resource mix-up attacks.
 
 A key challenge in these deployments is that the client has no reliable way to validate whether a discovered authorization server is actually authoritative for a given protected resource. While {{RFC9728}} allows protected resource metadata to be cryptographically signed, this would require clients to be pre-configured with trust anchors for signature verification, which defeats the purpose of runtime discovery.
 
