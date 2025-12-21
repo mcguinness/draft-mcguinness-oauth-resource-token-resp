@@ -113,9 +113,9 @@ Table of Contents
    The Resource Indicators for OAuth 2.0 specification [RFC8707]
    introduced the resource request parameter, which allows a client to
    indicate the protected resource or resources for which an access
-   token is intended.  An authorization server can use this information
-   when issuing an access token, for example by applying resource-
-   specific restrictions based on policy or configuration.
+   token is intended to be used.  An authorization server can use this
+   information when issuing an access token, for example by applying
+   resource-specific restrictions based on policy or configuration.
 
    However, [RFC8707] does not define any mechanism for an authorization
    server to confirm, in the access token response, which resource or
