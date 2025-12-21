@@ -169,11 +169,11 @@ The `resource` parameter uses the same value syntax and requirements as the `res
       "resource": "https://api.example.com/"
     }
 
-### Authorization Server Processing Rules {#authorization-server-processing-rules}
+## Authorization Server Processing Rules {#authorization-server-processing-rules}
 
 An authorization server that supports this specification MUST decide whether and how to include the `resource` parameter in a successful access token response (see {{RFC6749}}, Section 5.1) according to the rules in this section.
 
-#### Overview
+### Overview
 
 Authorization server processing is driven by the number of `resource` parameters included in the authorization request or token request (see {{RFC8707}}). The rules below are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
 
@@ -181,7 +181,7 @@ These authorization server processing rules apply equally to access tokens issue
 
 Access tokens issued under these rules are valid for the resource(s) identified in the response.
 
-#### Summary Table
+### Summary Table
 
 | Client Request Shape | Authorization Server Outcome | Authorization Server Processing Rules |
 |----------------------|------------------------------|---------------------------------------|
@@ -193,11 +193,11 @@ Access tokens issued under these rules are valid for the resource(s) identified 
 | **No `resource` requested** | Default resource(s) assigned | SHOULD issue an access token and SHOULD include the assigned resource(s) in the `resource` parameter. |
 |                      | No resource-specific restriction | SHOULD issue an access token and SHOULD omit the `resource` parameter. |
 
-#### Resource Identifier Comparison
+### Resource Identifier Comparison
 
 When comparing resource identifiers (for example, to determine uniqueness or to evaluate requested resources against policy), the authorization server MUST apply the URI comparison rules defined in {{Section 6.2.1 of RFC3986}}, after applying syntax-based normalization as defined in {{Section 6.2.2 of RFC3986}}. Resource identifiers that are equivalent under these rules MUST be treated as identical.
 
-#### Client Requested Exactly One Resource
+### Client Requested Exactly One Resource
 
 If the client included exactly one `resource` parameter in the authorization request or token request:
 
@@ -208,7 +208,7 @@ If the client included exactly one `resource` parameter in the authorization req
   - The `resource` parameter value MUST be a string containing the accepted `resource` value.
   - The returned `resource` value MUST match the requested `resource` value after applying the URI comparison rules defined in {{Section 6.2.1 of RFC3986}} and syntax-based normalization defined in {{Section 6.2.2 of RFC3986}}.
 
-#### Client Requested Multiple Resources
+### Client Requested Multiple Resources
 
 If the client included more than one `resource` parameter in the authorization request or token request:
 
@@ -221,7 +221,7 @@ If the client included more than one `resource` parameter in the authorization r
   - The returned array MAY contain a strict subset of the requested `resource` values.
   - The returned array MUST NOT contain duplicate `resource` values, including values that differ only by URI normalization.
 
-#### Client Did Not Request a Resource
+### Client Did Not Request a Resource
 
 If the client did not include any `resource` parameters in the authorization request or token request:
 
