@@ -187,7 +187,7 @@ Table of Contents
    claim when using self-contained token formats such as JWTs [RFC7519].
    However, [RFC6749] treats access tokens as opaque to the client
    (Section 1.4 of [RFC6749]), and audience values remain token-format-
-   specific and policy-defined.. Audience values are also commonly used
+   specific and policy-defined.  Audience values are also commonly used
    to represent authorization servers, tenants, resource servers, or
    other logical identifiers rather than concrete protected resource
    URLs.  A resource server protecting a given resource may accept
@@ -1223,8 +1223,8 @@ A.1.  Requesting a token for a dynamically discovered protected resource
    when a client dynamically discovers an authorization server and
    obtains an access token using [RFC9728] and [RFC8414]
 
-   Client attempts to access a protected a resource without a valid
-   access token
+   Client attempts to access a protected resource without a valid access
+   token
 
    GET /resource
    Host: api.example.com
