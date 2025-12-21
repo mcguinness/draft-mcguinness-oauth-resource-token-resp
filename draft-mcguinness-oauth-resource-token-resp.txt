@@ -422,16 +422,29 @@ Table of Contents
 
    Authorization server processing is driven by the number of resource
    parameters included in the authorization request or token request
-   (see [RFC8707]).  The rules below are mutually exclusive and depend
-   on whether the client requested zero, exactly one, or more than one
-   resource.
+   (see [RFC8707]).  The rules below apply equally to access tokens
+   issued using the authorization code grant or refresh token grant and
+   are mutually exclusive and depend on whether the client requested
+   zero, exactly one, or more than one resource.
 
-   These authorization server processing rules apply equally to access
-   tokens issued using the authorization code grant and to access tokens
-   issued using a refresh token grant.
+   For access tokens issued using an authorization grant or a refresh
+   token, any resource parameters in the token request MUST be evaluated
+   against the resources that are permitted by the underlying grant.  If
+   the client supplies resource in the token request and any requested
+   value is not permitted by the underlying grant, the authorization
+   server MUST return an invalid_target error response as defined in
+   [RFC8707] and MUST NOT issue an access token.
 
-   Access tokens issued under these rules are valid for the resource(s)
-   identified in the response.
+   If the client supplies resource parameters in both the authorization
+   request and the token request, the token request resource values MUST
+   be treated as an additional restriction and MUST be a subset of the
+   resources permitted by the underlying grant.
+
+   An authorization server MAY require that clients include a resource
+   parameter.  If a resource parameter is required by local policy and
+   the client does not include one, the authorization server MUST return
+   an invalid_target error response as defined in [RFC8707] and MUST NOT
+   issue an access token.
 
 3.2.2.  Summary Table
 
