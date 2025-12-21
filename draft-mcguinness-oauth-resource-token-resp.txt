@@ -180,14 +180,15 @@ Table of Contents
    examining its audience information.  If supported by the
    authorization server, a client MAY use token introspection [RFC7662]
    to learn an issued token's audience value, or may inspect the aud
-   claim when using self-contained token formats such as JWTs [RFC7519].
-   However, audience values are token-format-specific and are commonly
-   used to represent authorization servers, tenants, resource servers,
-   or other logical identifiers rather than concrete protected resource
-   URLs.  A resource server protecting a given resource may accept
-   tokens with broad, narrow, or indirect audience values that do not
-   have a predictable or discoverable relationship to the resource's
-   URL.
+   claim when using self-contained token formats such as JWTs [RFC7519]
+   that are not encrypted.  However, access tokens are intended to be
+   opaque to the client, as specified in Section 1.4 of [RFC6749].
+   Audience values are token-format-specific and are commonly used to
+   represent authorization servers, tenants, resource servers, or other
+   logical identifiers rather than concrete protected resource URLs.  A
+   resource server protecting a given resource may accept tokens with
+   broad, narrow, or indirect audience values that do not have a
+   predictable or discoverable relationship to the resource's URL.
 
    As a result, learning the audience of an issued access token does not
    provide a reliable or interoperable way for a client to determine
