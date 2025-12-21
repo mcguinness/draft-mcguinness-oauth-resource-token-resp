@@ -435,46 +435,41 @@ Table of Contents
 
 3.2.2.  Summary Table
 
-     +==============+===================+============================+
-     | Client       | Authorization     | Authorization Server       |
-     | Request      | Server Outcome    | Processing Rules           |
-     | Shape        |                   |                            |
-     +==============+===================+============================+
-     | *Exactly one | No acceptable     | MUST return invalid_target |
-     | resource     | resource          | and MUST NOT issue an      |
-     | requested*   |                   | access token.              |
-     +--------------+-------------------+----------------------------+
-     |              | One acceptable    | MUST issue an access token |
-     |              | resource          | and MUST include resource  |
-     |              |                   | as a string containing the |
-     |              |                   | accepted resource.         |
-     +--------------+-------------------+----------------------------+
-     | *Multiple    | No acceptable     | MUST return invalid_target |
-     | resource     | resources         | and MUST NOT issue an      |
-     | values       |                   | access token.              |
-     | requested*   |                   |                            |
-     +--------------+-------------------+----------------------------+
-     |              | Subset of         | MUST issue an access token |
-     |              | requested         | and MUST include resource  |
-     |              | resources         | as an array containing     |
-     |              | acceptable        | only the accepted subset.  |
-     +--------------+-------------------+----------------------------+
-     |              | All requested     | MUST issue an access token |
-     |              | resources         | and MUST include resource  |
-     |              | acceptable        | as an array containing all |
-     |              |                   | accepted resources.        |
-     +--------------+-------------------+----------------------------+
-     | *No resource | Default           | SHOULD issue an access     |
-     | requested*   | resource(s)       | token and SHOULD include   |
-     |              | assigned          | the assigned resource(s)   |
-     |              |                   | in the resource parameter. |
-     +--------------+-------------------+----------------------------+
-     |              | No resource-      | SHOULD issue an access     |
-     |              | specific          | token and SHOULD omit the  |
-     |              | restriction       | resource parameter.        |
-     +--------------+-------------------+----------------------------+
+   +=================+===================+============================+
+   | Client Request  | Authorization     | Authorization Server       |
+   | Shape           | Server Outcome    | Processing Rules           |
+   +=================+===================+============================+
+   | *Exactly one    | No acceptable     | MUST return invalid_target |
+   | resource        | resource          | and MUST NOT issue an      |
+   | requested*      |                   | access token.              |
+   +-----------------+-------------------+----------------------------+
+   |                 | One acceptable    | MUST include resource as a |
+   |                 | resource          | string containing the      |
+   |                 |                   | accepted resource.         |
+   +-----------------+-------------------+----------------------------+
+   | *Multiple       | No acceptable     | MUST return invalid_target |
+   | resource values | resources         | and MUST NOT issue an      |
+   | requested*      |                   | access token.              |
+   +-----------------+-------------------+----------------------------+
+   |                 | Subset of         | MUST include resource as   |
+   |                 | requested         | an array containing only   |
+   |                 | resources         | the accepted subset.       |
+   |                 | acceptable        |                            |
+   +-----------------+-------------------+----------------------------+
+   |                 | All requested     | MUST include resource as   |
+   |                 | resources         | an array containing all    |
+   |                 | acceptable        | accepted resources.        |
+   +-----------------+-------------------+----------------------------+
+   | *No resource    | Default           | SHOULD include the         |
+   | requested*      | resource(s)       | assigned resource(s) in    |
+   |                 | assigned          | the resource parameter.    |
+   +-----------------+-------------------+----------------------------+
+   |                 | No resource-      | SHOULD omit the resource   |
+   |                 | specific          | parameter.                 |
+   |                 | restriction       |                            |
+   +-----------------+-------------------+----------------------------+
 
-                                  Table 1
+                                 Table 1
 
    When comparing resource identifiers, the authorization server MUST
    apply the rules defined in Section 3.1.
