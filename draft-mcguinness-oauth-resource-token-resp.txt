@@ -81,6 +81,11 @@ Table of Contents
    3.  Resource Parameter in Token Response
      3.1.  Authorization Server Processing Rules
        3.1.1.  Overview
+       3.1.2.  Summary Table
+       3.1.3.  Resource Identifier Comparison
+       3.1.4.  Client Requested Exactly One Resource
+       3.1.5.  Client Requested Multiple Resources
+       3.1.6.  Client Did Not Request a Resource
      3.2.  Client Processing Rules
        3.2.1.  Overview
        3.2.2.  Summary Table
@@ -388,6 +393,7 @@ Table of Contents
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "access_token": "2YotnFZFEjr1zCsicMWpAA",
@@ -418,7 +424,7 @@ Table of Contents
    Access tokens issued under these rules are valid for the resource(s)
    identified in the response.
 
-3.1.1.1.  Summary Table
+3.1.2.  Summary Table
 
      +==============+===================+============================+
      | Client       | Authorization     | Authorization Server       |
@@ -461,7 +467,7 @@ Table of Contents
 
                                   Table 1
 
-3.1.1.2.  Resource Identifier Comparison
+3.1.3.  Resource Identifier Comparison
 
    When comparing resource identifiers (for example, to determine
    uniqueness or to evaluate requested resources against policy), the
@@ -470,7 +476,7 @@ Table of Contents
    as defined in Section 6.2.2 of [RFC3986].  Resource identifiers that
    are equivalent under these rules MUST be treated as identical.
 
-3.1.1.3.  Client Requested Exactly One Resource
+3.1.4.  Client Requested Exactly One Resource
 
    If the client included exactly one resource parameter in the
    authorization request or token request:
@@ -495,7 +501,7 @@ Table of Contents
          Section 6.2.1 of [RFC3986] and syntax-based normalization
          defined in Section 6.2.2 of [RFC3986].
 
-3.1.1.4.  Client Requested Multiple Resources
+3.1.5.  Client Requested Multiple Resources
 
    If the client included more than one resource parameter in the
    authorization request or token request:
@@ -527,7 +533,7 @@ Table of Contents
       -  The returned array MUST NOT contain duplicate resource values,
          including values that differ only by URI normalization.
 
-3.1.1.5.  Client Did Not Request a Resource
+3.1.6.  Client Did Not Request a Resource
 
    If the client did not include any resource parameters in the
    authorization request or token request:
@@ -570,6 +576,11 @@ Table of Contents
 
    If client validation succeeds, the client MAY use the access token
    and MUST use it only with the resource(s) identified in the response.
+   The returned scope value, if present, MUST be interpreted in
+   conjunction with the returned resource values.  The granted scopes
+   MUST be appropriate for the returned resource(s), consistent with the
+   usage of scope in Section 3.3 of [RFC6749].
+
    If client validation fails at any point while applying these rules,
    the client MUST NOT use the access token and SHOULD discard it.
 
@@ -724,6 +735,7 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "access_token": "ACCESS_TOKEN",
@@ -762,6 +774,7 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "access_token": "ACCESS_TOKEN",
@@ -840,6 +853,7 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "access_token": "ACCESS_TOKEN",
@@ -881,6 +895,7 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "access_token": "ACCESS_TOKEN",
@@ -954,6 +969,7 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "access_token": "ACCESS_TOKEN",
@@ -990,6 +1006,7 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "access_token": "ACCESS_TOKEN",
@@ -1064,6 +1081,7 @@ Location: https://client.example.com/cb?error=invalid_target&error_description=R
    HTTP/1.1 400 Bad Request
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "error": "invalid_target",
@@ -1152,6 +1170,11 @@ Location: https://client.example.com/cb?error=invalid_target&error_description=R
    [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
               RFC 6749, DOI 10.17487/RFC6749, October 2012,
               <https://www.rfc-editor.org/info/rfc6749>.
+
+   [RFC6750]  Jones, M. and D. Hardt, "The OAuth 2.0 Authorization
+              Framework: Bearer Token Usage", RFC 6750,
+              DOI 10.17487/RFC6750, October 2012,
+              <https://www.rfc-editor.org/info/rfc6750>.
 
    [RFC8707]  Campbell, B., Bradley, J., and H. Tschofenig, "Resource
               Indicators for OAuth 2.0", RFC 8707, DOI 10.17487/RFC8707,
@@ -1311,6 +1334,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
    HTTP/1.1 200 OK
    Content-Type: application/json
    Cache-Control: no-store
+   Pragma: no-cache
 
    {
      "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -1334,14 +1358,14 @@ Document History
 
    *  Revised Introduction and included attack example
 
-   *  Provided context for use of Resource vs Audience
+   *  Added Resource vs Audience to Terminology
 
-   *  Revised Response to clarify Authorization Server and Client
-      Processing Rules
+   *  Revised Response to provide detailed Authorization Server and
+      Client Processing Rules
 
    *  Updated Security Considerations
 
-   *  Document cleanup and consistency
+   *  Editorial cleanup and consistency
 
    -00
 
