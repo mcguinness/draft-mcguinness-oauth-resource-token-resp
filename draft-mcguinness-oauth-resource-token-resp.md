@@ -55,7 +55,7 @@ This specification defines a new parameter `resource` to be returned in OAuth 2.
 
 OAuth 2.0 defines a framework in which clients obtain access tokens from authorization servers and present them to protected resources. In deployments involving multiple protected resources or resource servers (APIs), clients often need to determine whether a given access token is valid for a specific resource.
 
-The Resource Indicators for OAuth 2.0 specification {{RFC8707}} introduced the `resource` request parameter, which allows a client to indicate the protected resource or resources for which an access token is intended. An authorization server can use this information when issuing an access token, for example by applying resource-specific restrictions based on policy or configuration.
+The Resource Indicators for OAuth 2.0 specification {{RFC8707}} introduced the `resource` request parameter, which allows a client to indicate the protected resource or resources for which an access token is intended to be used. An authorization server can use this information when issuing an access token, for example by applying resource-specific restrictions based on policy or configuration.
 
 However, {{RFC8707}} does not define any mechanism for an authorization server to confirm, in the access token response, which resource or resources were ultimately accepted. As a result, a client has no interoperable way to validate the effective resource scope of an issued access token.
 
