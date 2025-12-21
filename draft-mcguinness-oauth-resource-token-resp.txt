@@ -16,9 +16,9 @@ Abstract
 
    This specification defines a new parameter resource to be returned in
    OAuth 2.0 access token responses.  It enables clients to confirm that
-   the issued token is valid for to the intended resource.  This
-   mitigates ambiguity and certain classes of security vulnerabilities
-   such as resource mix-up attacks, particularly in systems that use the
+   the issued token is valid for the intended resource.  This mitigates
+   ambiguity and certain classes of security vulnerabilities such as
+   resource mix-up attacks, particularly in systems that use the
    Resource Indicators for OAuth 2.0 specification [RFC8707].
 
 About This Document
@@ -180,15 +180,16 @@ Table of Contents
    examining its audience information.  If supported by the
    authorization server, a client MAY use token introspection [RFC7662]
    to learn an issued token's audience value, or may inspect the aud
-   claim when using self-contained token formats such as JWTs [RFC7519]
-   that are not encrypted.  However, access tokens are intended to be
-   opaque to the client, as specified in Section 1.4 of [RFC6749].
-   Audience values are token-format-specific and are commonly used to
-   represent authorization servers, tenants, resource servers, or other
-   logical identifiers rather than concrete protected resource URLs.  A
-   resource server protecting a given resource may accept tokens with
-   broad, narrow, or indirect audience values that do not have a
-   predictable or discoverable relationship to the resource's URL.
+   claim when using self-contained token formats such as JWTs [RFC7519].
+   However, [RFC6749] treats access tokens as opaque to the client
+   (Section 1.4 of [RFC6749]), and audience values remain token-format-
+   specific and policy-defined.. Audience values are also commonly used
+   to represent authorization servers, tenants, resource servers, or
+   other logical identifiers rather than concrete protected resource
+   URLs.  A resource server protecting a given resource may accept
+   tokens with broad, narrow, or indirect audience values that do not
+   have a predictable or discoverable relationship to the resource's
+   URL.
 
    As a result, learning the audience of an issued access token does not
    provide a reliable or interoperable way for a client to determine
@@ -279,7 +280,7 @@ Table of Contents
 
 2.1.  Terminology
 
-   The terms "client", "authorization server", "resource server',
+   The terms "client", "authorization server", "resource server",
    "access token", "protected resource", "authorization request",
    "authorization response", "access token request", "access token
    response" are defined by the OAuth 2.0 Authorization Framework
@@ -375,7 +376,9 @@ Table of Contents
       URI value, as defined in Section 2 of [RFC8707], when the access
       token is valid for multiple resources.  The array MUST contain at
       least one element, and each element MUST be unique within the
-      array.
+      array when compared using the URI comparison rules defined in
+      Section 6.2.1 of [RFC3986] after applying syntax-based
+      normalization defined in Section 6.2.2 of [RFC3986].
 
    The resource parameter uses the same value syntax and requirements as
    the resource request parameter defined in [RFC8707].  In particular,
@@ -467,52 +470,90 @@ Table of Contents
    as defined in Section 6.2.2 of [RFC3986].  Resource identifiers that
    are equivalent under these rules MUST be treated as identical.
 
-3.1.1.3.  Client Requested One or More Resources
+3.1.1.3.  Client Requested Exactly One Resource
 
-   If the client included one or more resource parameters in the
+   If the client included exactly one resource parameter in the
    authorization request or token request:
 
-   *  The authorization server MUST evaluate the requested resource set
-      according to local policy and determine the accepted resource set.
+   *  The authorization server MUST evaluate the requested resource
+      value according to local policy.
 
-   *  If the accepted resource set is empty, the authorization server
-      MUST return an invalid_target error response as defined in
-      [RFC8707] and MUST NOT issue an access token.
+   *  If the requested resource value is not acceptable, the
+      authorization server MUST return an invalid_target error response
+      as defined in [RFC8707] and MUST NOT issue an access token.
 
-   *  If the accepted resource set is non-empty:
+   *  If the requested resource value is acceptable:
 
       -  The authorization server MUST include the resource parameter in
          the access token response.
 
-      -  The resource values in the response MUST be limited to the
-         accepted resource set and MUST NOT include any resource value
-         that was not requested by the client.
+      -  The resource parameter value MUST be a string containing the
+         accepted resource value.
 
-      -  The authorization server MUST ensure that the returned resource
-         set contains no duplicate resource identifiers (including
-         identifiers that differ only by URI normalization).
+      -  The returned resource value MUST match the requested resource
+         value after applying the URI comparison rules defined in
+         Section 6.2.1 of [RFC3986] and syntax-based normalization
+         defined in Section 6.2.2 of [RFC3986].
 
-      -  If the accepted resource set contains exactly one resource, the
-         resource parameter value MUST be a string containing that
-         single resource identifier.
+3.1.1.4.  Client Requested Multiple Resources
 
-      -  If the accepted resource set contains more than one resource,
-         the resource parameter value MUST be an array of strings
-         containing those resource identifiers.
+   If the client included more than one resource parameter in the
+   authorization request or token request:
 
-3.1.1.4.  Client Did Not Request a Resource
+   *  The authorization server MUST evaluate the requested resource
+      values according to local policy and determine which requested
+      values are acceptable.
+
+   *  If none of the requested resource values are acceptable, the
+      authorization server MUST return an invalid_target error response
+      as defined in [RFC8707] and MUST NOT issue an access token.
+
+   *  If one or more requested resource values are acceptable:
+
+      -  The authorization server MUST include the resource parameter in
+         the access token response.
+
+      -  The resource parameter value MUST be an array of strings if
+         there is more than one accepted value.
+
+      -  Each returned resource value MUST match one of the requested
+         resource values after applying the URI comparison rules defined
+         in Section 6.2.1 of [RFC3986] and syntax-based normalization
+         defined in Section 6.2.2 of [RFC3986].
+
+      -  The returned array MAY contain a strict subset of the requested
+         resource values.
+
+      -  The returned array MUST NOT contain duplicate resource values,
+         including values that differ only by URI normalization.
+
+3.1.1.5.  Client Did Not Request a Resource
 
    If the client did not include any resource parameters in the
    authorization request or token request:
 
-   *  If the authorization server assigns one or more default resources
-      based on policy or client configuration, it SHOULD include the
-      assigned resource(s) in the resource parameter of the response.
+   *  If the authorization server assigns one or more default resource
+      values based on policy or client configuration:
 
-   *  If the access token is not valid for any specific resource (for
-      example, when the access token has no resource-specific
-      restriction), the resource parameter SHOULD be omitted from the
-      response.
+      -  The authorization server SHOULD include the assigned resource
+         value or values in the resource parameter of the response.
+
+      -  If exactly one resource value is assigned, the resource
+         parameter value SHOULD be a string.
+
+      -  If multiple resource values are assigned, the resource
+         parameter value SHOULD be an array.
+
+   *  If the authorization server does not apply any resource-specific
+      restriction to the access token:
+
+      -  The authorization server SHOULD issue an access token.
+
+      -  The authorization server SHOULD omit the resource parameter
+         from the response.
+
+   If the resource parameter is omitted, the access token is not valid
+   for any specific resource as defined by this specification.
 
 3.2.  Client Processing Rules
 
@@ -982,7 +1023,7 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
      &redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
      &scope=customers%3Aread
      &state=invalid123
-     &resource=https%3A%2F%2Fevil.example.net%2F
+     &resource=https%3A%2F%2Funknown.example.com%2F
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
      &code_challenge_method=S256
    HTTP/1.1
@@ -1014,7 +1055,7 @@ Location: https://client.example.com/cb?error=invalid_target&error_description=R
    refresh_token=REFRESH_TOKEN&
    client_id=client123&
    scope=customers%3Aread&
-   resource=https%3A%2F%2Fevil.example.net%2F
+   resource=https%3A%2F%2Funknown.example.com%2F
 
 3.2.8.2.2.  Error Response
 
@@ -1279,7 +1320,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
      "resource": "https://api.example.com/resource"
    }
 
-   Client verifies that it obtained an access token explicitly bound to
+   Client verifies that it obtained an access token that is valid for
    the discovered resource.
 
 Acknowledgments
