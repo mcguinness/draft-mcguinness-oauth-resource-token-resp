@@ -77,7 +77,7 @@ A key challenge in these deployments is that the client has no reliable way to v
 
 Similarly, an authorization server could publish a list of protected resources it supports in its metadata {{RFC8414}}, but this approach does not scale in practice for large APIs or resource domains with many distinct resource identifiers, nor does it address cases where authorization server policy dynamically determines resource validity.
 
-Some clients attempt to infer the applicability of an access token by examining its audience information. If supported by the authorization server, a client MAY use token introspection {{RFC7662}} to learn an issued token's audience value, or may inspect the `aud` claim when using self-contained token formats such as JWTs {{RFC7519}}. However, {{RFC6749}} treats access tokens as opaque to the client ({{Section 1.4 of RFC6749}}), and audience values remain token-format-specific and policy-defined.. Audience values are also commonly used to represent authorization servers, tenants, resource servers, or other logical identifiers rather than concrete protected resource URLs. A resource server protecting a given resource may accept tokens with broad, narrow, or indirect audience values that do not have a predictable or discoverable relationship to the resource's URL.
+Some clients attempt to infer the applicability of an access token by examining its audience information. If supported by the authorization server, a client MAY use token introspection {{RFC7662}} to learn an issued token's audience value, or may inspect the `aud` claim when using self-contained token formats such as JWTs {{RFC7519}}. However, {{RFC6749}} treats access tokens as opaque to the client ({{Section 1.4 of RFC6749}}), and audience values remain token-format-specific and policy-defined. Audience values are also commonly used to represent authorization servers, tenants, resource servers, or other logical identifiers rather than concrete protected resource URLs. A resource server protecting a given resource may accept tokens with broad, narrow, or indirect audience values that do not have a predictable or discoverable relationship to the resource's URL.
 
 As a result, learning the audience of an issued access token does not provide a reliable or interoperable way for a client to determine whether the token is valid for the intended resource, particularly when multiple protected resources share an authorization server or when the client interacts with resources discovered dynamically at runtime. This document uses the term *resource* as defined in {{RFC8707}}. The relationship between resources and token audience values is discussed further in {{resource-vs-audience}}.
 
@@ -689,7 +689,7 @@ This document registers the following value in the OAuth Parameters registry est
 The following example details the need for the `resource` parameter when a client dynamically discovers an authorization server and obtains an access token using {{RFC9728}} and {{RFC8414}}
 
 
-Client attempts to access a protected a resource without a valid access token
+Client attempts to access a protected resource without a valid access token
 
     GET /resource
     Host: api.example.com
