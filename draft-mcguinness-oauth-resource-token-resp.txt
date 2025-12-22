@@ -460,11 +460,11 @@ Table of Contents
 
    Authorization server processing is determined by the number of
    resource parameters included in the authorization request or token
-   request, as defined in [RFC8707].  The rules in this section apply
-   equally to access tokens issued using the authorization code grant
-   and the refresh token grant and are mutually exclusive based on
-   whether the client requested zero, exactly one, or more than one
-   resource.
+   request, as defined in [RFC8707].
+
+   The following rules describe how an authorization server evaluates
+   requested resources and determines the effective resource or
+   resources associated with an issued access token.
 
    When issuing an access token, any resource parameters included in the
    token request represent an additional restriction on the resources
@@ -623,13 +623,9 @@ Table of Contents
 3.3.  Client Processing Rules
 
    A client that supports this extension MUST process access token
-   responses according to the rules in this section.
-
-   Client processing is determined by the number of resource parameters
-   included in the authorization request or token request, as defined in
-   [RFC8707].  The rules below are mutually exclusive and depend on
-   whether the client requested zero, exactly one, or more than one
-   resource.
+   responses according to the rules in this section, which are
+   determined by the number of resource parameters included in the
+   authorization request or token request, as defined in [RFC8707].
 
    When a resource parameter is included in an access token response,
    the client MUST interpret and compare the returned resource
@@ -1147,6 +1143,11 @@ Location: https://client.example.com/cb?error=invalid_target&error_description=R
    }
 
 3.4.  Security Considerations
+
+   This section describes security threats related to ambiguous resource
+   selection and access token reuse, and explains how this specification
+   mitigates those threats, either directly or in combination with other
+   OAuth security mechanisms.
 
 3.4.1.  Resource Selection Ambiguity and Mix-Up Attacks
 
