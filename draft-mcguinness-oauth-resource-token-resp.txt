@@ -415,11 +415,12 @@ Table of Contents
       applying syntax-based normalization as defined in Section 6.2.2 of
       [RFC3986].
 
-   When the access token is valid for exactly one resource, the
+   When an access token is valid for exactly one resource, the
    authorization server SHOULD represent the resource parameter value as
-   a single string.  When the access token is valid for more than one
-   resource, the authorization server MUST represent the resource
-   parameter value as an array.
+   a single string to improve interoperability and ease of processing.
+   When the access token is valid for more than one resource, the
+   authorization server MUST represent the resource parameter value as
+   an array.
 
    This representation is determined solely by the number of resources
    for which the access token is valid and applies regardless of how
@@ -1171,12 +1172,13 @@ Location: https://client.example.com/cb?error=invalid_target&error_description=R
    protected resource and the authorization server.
 
    *Mitigation:* This specification mitigates resource selection
-   ambiguity by requiring authorization servers to explicitly return the
-   resource or resources for which an access token is valid in the
-   access token response.  By providing issuance-time confirmation of
-   the effective resource selection, clients can detect cases where a
-   requested resource was narrowed, substituted, or overridden, and can
-   avoid using access tokens with unintended protected resources.
+   ambiguity and OAuth mix-up attacks by requiring authorization servers
+   to explicitly return the resource or resources for which an access
+   token is valid in the access token response.  By providing issuance-
+   time confirmation of the effective resource selection, clients can
+   detect cases where a requested resource was narrowed, substituted, or
+   overridden, and can avoid using access tokens with unintended
+   protected resources.
 
 3.4.2.  Limitations of Discovery-Time Mechanisms
 
@@ -1214,15 +1216,15 @@ Location: https://client.example.com/cb?error=invalid_target&error_description=R
 
    *Mitigation:* To prevent token reuse attacks, access tokens SHOULD
    require proof-of-possession, such as Demonstrating Proof-of-
-   Possession (DPoP) as defined in [RFC9449].  Proof-of-possession
-   mechanisms bind the access token to a cryptographic key held by the
-   client and require demonstration of key possession when the token is
-   used.  This prevents a malicious protected resource that intercepts
-   an access token from reusing it at other resources, as it does not
-   possess the client's private key.  Both the client and authorization
-   server must support proof-of-possession mechanisms for this
-   protection to be effective.  See Section 9 of [RFC9449] for
-   additional details.
+   Possession (DPoP) as defined in [RFC9449].  Other proof-of-possession
+   mechanisms may also be applicable.  Proof-of-possession mechanisms
+   bind the access token to a cryptographic key held by the client and
+   require demonstration of key possession when the token is used.  This
+   prevents a malicious protected resource that intercepts an access
+   token from reusing it at other resources, as it does not possess the
+   client's private key.  Both the client and authorization server must
+   support proof-of-possession mechanisms for this protection to be
+   effective.  See Section 9 of [RFC9449] for additional details.
 
 3.4.4.  Client Validation and Defense in Depth
 
