@@ -646,22 +646,51 @@ The authorization server rejects the requested resource.
       "error_description": "Resource not allowed"
     }
 
-# Security Considerations
+## Security Considerations
 
-The lack of confirmation about which resource(s) an authorization server has selected for an access token introduces a security risk in OAuth deployments, particularly when:
+### Resource Selection Ambiguity and Mix-Up Attacks
 
-- A client uses multiple authorization servers and resource servers.
-- A client dynamically discovers an authorization server and attempts to obtain an access token at runtime via an HTTP authorization challenge with OAuth 2.0 Protected Resource Metadata {{RFC9728}}.
-- An attacker attempts a **mix-up attack** where a token intended for one resource is used at another.
-- The authorization server ignores or overrides the requested resource without informing the client.
+**Threat:**
+An authorization server issues a successful access token response without clearly indicating the protected resource or resources for which the token is valid. This can occur when the server applies default resource selection, narrows a requested resource set, or substitutes a different resource according to local policy without communicating that decision to the client. Such conditions are more likely in deployments where a client interacts with multiple authorization servers and protected resources, or dynamically discovers authorization servers at runtime, including via HTTP authorization challenges using OAuth 2.0 Protected Resource Metadata {{RFC9728}}.
 
-This specification addresses such issues by explicitly returning the resource(s) for which the access token is intended in the token response.
+**Impact:**
+A client may incorrectly assume that an access token is valid for a different protected resource than the one actually authorized. This can result in access token misuse, unintended token disclosure to an incorrect protected resource, or resource mix-up attacks in which a token intended for one resource is presented to another. These risks are amplified in dynamic environments where the client cannot fully validate the trust relationship between a protected resource and the authorization server.
 
-A malicious protected resource may intercept an access token during a client's legitimate request and subsequently reuse that token to access other resources that trust the same authorization server and accept tokens with the same audience and scopes. This attack is particularly relevant when the client cannot fully validate the trust relationship between the protected resource and the authorization server, such as in dynamic discovery scenarios using {{RFC9728}}.
+**Mitigation:**
+This specification mitigates resource selection ambiguity by requiring authorization servers to explicitly return the resource or resources for which an access token is valid in the access token response. By providing issuance-time confirmation of the effective resource selection, clients can detect cases where a requested resource was narrowed, substituted, or overridden, and can avoid using access tokens with unintended protected resources.
 
-To prevent token reuse attacks by malicious protected resources, access tokens SHOULD require proof-of-possession, such as DPoP (Demonstrating Proof-of-Possession) as defined in {{RFC9449}}. By binding the access token to a cryptographic key held by the client and requiring demonstration of key possession when using the token, proof-of-possession mechanisms prevent a malicious protected resource that intercepts the access token from reusing it at other resources, since it does not possess the client's private key. Both the client and authorization server must support proof-of-possession mechanisms for this protection to be effective. See {{Section 9 of RFC9449}} for details on how DPoP provides proof-of-possession.
+### Limitations of Discovery-Time Mechanisms
 
-Validating the `resource` parameter in the token response provides defense-in-depth for the client. While it helps the client detect when an authorization server has issued a token for a different resource than requested, it does not prevent a malicious protected resource from reusing an intercepted token at other resources. Clients are advised to validate the `resource` parameter as specified in [Client Processing Rules](#client-processing-rules) and treat mismatches as errors unless explicitly designed to handle token audience negotiation. Clients that require strict resource binding SHOULD treat the absence of the `resource` parameter as a potential ambiguity.
+**Threat:**
+Clients rely on protected resource metadata {{RFC9728}} or authorization server metadata {{RFC8414}} to determine which authorization server is authoritative for a protected resource and assume that successful token issuance implies correct resource binding.
+
+**Impact:**
+Metadata describes static relationships and supported capabilities, but does not reflect issuance-time authorization decisions. As a result, clients may be unable to detect cases where an authorization server issues an access token valid for a different resource than the one requested, particularly in dynamic or multi-resource environments.
+
+**Mitigation:**
+By returning the effective resource selection in the token response, this specification complements discovery-time mechanisms with issuance-time confirmation. This enables clients to verify that an access token is valid for the intended protected resource regardless of how authorization server relationships were discovered.
+
+### Token Reuse by Malicious Protected Resources
+
+**Threat:**
+A malicious protected resource intercepts an access token during a client's legitimate request and reuses that token to access other protected resources that trust the same authorization server and accept tokens with the same audience and scopes.
+
+**Impact:**
+Token reuse can lead to unauthorized access to protected resources beyond those intended by the client, particularly in environments where multiple resources trust a common authorization server and audience values are broad or indirect.
+
+**Mitigation:**
+To prevent token reuse attacks, access tokens SHOULD require proof-of-possession, such as Demonstrating Proof-of-Possession (DPoP) as defined in {{RFC9449}}. Proof-of-possession mechanisms bind the access token to a cryptographic key held by the client and require demonstration of key possession when the token is used. This prevents a malicious protected resource that intercepts an access token from reusing it at other resources, as it does not possess the client's private key. Both the client and authorization server must support proof-of-possession mechanisms for this protection to be effective. See {{Section 9 of RFC9449}} for additional details.
+
+### Client Validation and Defense in Depth
+
+**Threat:**
+A client fails to validate the resource or resources returned in the access token response and proceeds to use an access token for a protected resource other than the one for which it was issued.
+
+**Impact:**
+Failure to validate the returned `resource` parameter can result in token misuse or unintended interactions with protected resources, even when the authorization server correctly indicates the effective resource selection.
+
+**Mitigation:**
+Clients are advised to validate the `resource` parameter in the token response as specified in {{client-processing-rules}} and to treat mismatches as errors unless explicitly designed to support resource negotiation. While validating the `resource` parameter provides defense in depth by allowing the client to detect resource substitution, it does not prevent token reuse by malicious protected resources. Clients that require strict resource binding SHOULD treat the absence of the `resource` parameter as a potential ambiguity.
 
 # Privacy Considerations
 
