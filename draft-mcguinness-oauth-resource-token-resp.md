@@ -181,7 +181,9 @@ When comparing resource identifiers, implementations MUST apply the URI comparis
 
 ## Authorization Server Processing Rules {#authorization-server-processing-rules}
 
-Authorization server processing is determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}. The rules in this section apply equally to access tokens issued using the authorization code grant and the refresh token grant and are mutually exclusive based on whether the client requested zero, exactly one, or more than one resource.
+Authorization server processing is determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}.
+
+The following rules describe how an authorization server evaluates requested resources and determines the effective resource or resources associated with an issued access token.
 
 When issuing an access token, any `resource` parameters included in the token request represent an additional restriction on the resources permitted by the underlying authorization grant. The authorization server MUST ensure that each requested resource in the token request is within the set of resources authorized by the grant, or otherwise acceptable under local policy consistent with {{RFC8707}}. If this condition is not met, the authorization server MUST return an `invalid_target` error and MUST NOT issue an access token.
 
@@ -244,9 +246,7 @@ If the `resource` parameter is omitted, the access token is not valid for any sp
 
 ## Client Processing Rules {#client-processing-rules}
 
-A client that supports this extension MUST process access token responses according to the rules in this section.
-
-Client processing is determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}. The rules below are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
+A client that supports this extension MUST process access token responses according to the rules in this section, which are determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}.
 
 When a `resource` parameter is included in an access token response, the client MUST interpret and compare the returned resource identifiers using the rules defined in {{resource-identifier-comparison}}. If the client cannot determine that an access token is valid for the intended protected resource, the client MUST NOT use the access token.
 
@@ -655,6 +655,8 @@ The authorization server rejects the requested resource.
     }
 
 ## Security Considerations
+
+This section describes security threats related to ambiguous resource selection and access token reuse, and explains how this specification mitigates those threats, either directly or in combination with other OAuth security mechanisms.
 
 ### Resource Selection Ambiguity and Mix-Up Attacks
 
