@@ -63,7 +63,7 @@ However, {{RFC8707}} does not define any mechanism for an authorization server t
 When an authorization request includes one or more `resource` parameters, authorization servers in deployed systems may exhibit a range of behaviors depending on their capabilities and policy configuration. An authorization server MAY, for example:
 
 - Ignore the `resource` parameter and issue an access token that is not restricted to any specific resource.
-- Ignore the `resource` parameter and issue an access token that is valid for an server-assigned resource or set of resources.
+- Ignore the `resource` parameter and issue an access token that is valid for a server-assigned resource or set of resources.
 - Accept all requested `resource` values and issue an access token that is valid for the complete requested set.
 - Accept only a subset of requested `resource` values and issue an access token that is valid for that subset, without explicitly indicating that other requested resources were rejected.
 - Override the requested `resource` values and issue an access token that is valid for resources determined by authorization server policy or client configuration.
@@ -276,7 +276,7 @@ These client processing rules apply equally to access tokens issued using the au
 |                      | `resource` = array (exact match) | Valid. Token is valid for all returned resources. |
 |                      | `resource` = array (superset: requested + server-assigned) | Valid. All requested resources present; additional elements are server-assigned resources. |
 | **No `resource` requested** | `resource` omitted | Valid. Token is not resource-specific. |
-|                      | `resource` present | Valid. Client SHOULD treat the returned value as an server-assigned resource assignment. |
+|                      | `resource` present | Valid. Client SHOULD treat the returned value as a server-assigned resource assignment. |
 | **Any request shape** | `error=invalid_target` | Client MUST treat this as a terminal error and MUST NOT use an access token. |
 
 ### Parsing the `resource` Parameter
@@ -505,7 +505,7 @@ The authorization server issues a new access token that is valid for both protec
 
 If the client did not include any `resource` parameters in the token request:
 
-- If the response includes a `resource` parameter, the client MAY treat it as an server-assigned resource assignment.
+- If the response includes a `resource` parameter, the client MAY treat it as a server-assigned resource assignment.
 - If the response omits the `resource` parameter, the token SHOULD be treated as unbounded.
 
 #### Authorization Request Example {#ex-default-resource-authz}
@@ -843,9 +843,9 @@ Client verifies that it obtained an access token that is valid for the discovere
 
 ## Scope-defined resource with a resource request {#ex-scope-defined-resource}
 
-An authorization server may determine resources from requested scopes in addition to explicit `resource` parameters. For example, a scope might imply a protected resource URL that the authorization server returns as an server-assigned resource alongside any client-requested resources.
+An authorization server may determine resources from requested scopes in addition to explicit `resource` parameters. For example, a scope might imply a protected resource URL that the authorization server returns as a server-assigned resource alongside any client-requested resources.
 
-The following example uses OpenID Connect: the `openid` scope implies access to the UserInfo endpoint. When a client requests both a protected resource and the `openid` scope, the authorization server may determine the UserInfo endpoint URL from its configuration (e.g., `{issuer}/userinfo`) and return it as an server-assigned resource alongside the client-requested resource.
+The following example uses OpenID Connect: the `openid` scope implies access to the UserInfo endpoint. When a client requests both a protected resource and the `openid` scope, the authorization server may determine the UserInfo endpoint URL from its configuration (e.g., `{issuer}/userinfo`) and return it as a server-assigned resource alongside the client-requested resource.
 
 ### Authorization request example
 
@@ -899,7 +899,7 @@ The authorization server issues an access token valid for both the requested res
       ]
     }
 
-The client validates that the requested resource (`https://api.example.com/data`) is present in the response. The additional resource (`https://idp.example.com/userinfo`) is an server-assigned resource determined by the authorization server based on the `openid` scope, enabling the client to use the same access token for both the API and the UserInfo endpoint.
+The client validates that the requested resource (`https://api.example.com/data`) is present in the response. The additional resource (`https://idp.example.com/userinfo`) is a server-assigned resource determined by the authorization server based on the `openid` scope, enabling the client to use the same access token for both the API and the UserInfo endpoint.
 
 # Acknowledgments
 {:numbered="false"}
