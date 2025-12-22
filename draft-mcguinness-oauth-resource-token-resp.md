@@ -155,6 +155,8 @@ The value of the `resource` parameter MUST be either:
 - A single case-sensitive string containing an absolute URI, as defined in {{Section 2 of RFC8707}}, when the access token is valid for exactly one resource.
 - An array of case-sensitive strings, each containing an absolute URI as defined in {{Section 2 of RFC8707}}, when the access token is valid for more than one resource. The array MUST contain at least one element, and each element MUST be unique when compared using the URI comparison rules in {{Section 6.2.1 of RFC3986}} after applying syntax-based normalization as defined in {{Section 6.2.2 of RFC3986}}.
 
+When the access token is valid for exactly one resource, the authorization server SHOULD represent the `resource` parameter value as a single string. When the access token is valid for more than one resource, the authorization server MUST represent the `resource` parameter value as an array.
+
 This representation is determined solely by the number of resources for which the access token is valid and applies regardless of how many `resource` parameters were included in the request.
 
 The `resource` parameter uses the same value syntax and requirements as the `resource` request parameter defined in {{RFC8707}}. Each value MUST be an absolute URI, MUST NOT contain a fragment component, and SHOULD NOT contain a query component.
@@ -173,15 +175,19 @@ The `resource` parameter uses the same value syntax and requirements as the `res
 
 ## Resource Identifier Comparison {#resource-identifier-comparison}
 
-When comparing resource identifiers (for example, to determine uniqueness, to evaluate requested resources against policy, or to validate that returned resources match requested resources), implementations MUST apply the URI comparison rules defined in {{Section 6.2.1 of RFC3986}}, after applying syntax-based normalization as defined in {{Section 6.2.2 of RFC3986}}. Resource identifiers that are equivalent under these rules MUST be treated as identical.
+This section defines the canonical rules for comparing resource identifiers when determining uniqueness, evaluating requested resources against authorization server policy, or validating that returned resource values correspond to client expectations.
+
+When comparing resource identifiers, implementations MUST apply the URI comparison rules defined in {{Section 6.2.1 of RFC3986}}, after applying syntax-based normalization as defined in {{Section 6.2.2 of RFC3986}}. Resource identifiers that are equivalent under these rules MUST be treated as identical.
 
 ## Authorization Server Processing Rules {#authorization-server-processing-rules}
 
-Authorization server processing is driven by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}. The rules in this section apply equally to access tokens issued using the authorization code grant or the refresh token grant and are mutually exclusive based on whether the client requested zero, exactly one, or more than one resource.
+Authorization server processing is determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}. The rules in this section apply equally to access tokens issued using the authorization code grant and the refresh token grant and are mutually exclusive based on whether the client requested zero, exactly one, or more than one resource.
 
-When issuing an access token based on an authorization grant or a refresh token, any `resource` parameters included in the token request represent an additional restriction on the resources permitted by the underlying grant. The authorization server MUST ensure that each requested resource in the token request is within the set of resources authorized by the grant, or otherwise acceptable under local policy consistent with {{RFC8707}}. If this condition is not met, the authorization server MUST return an `invalid_target` error and MUST NOT issue an access token.
+When issuing an access token, any `resource` parameters included in the token request represent an additional restriction on the resources permitted by the underlying authorization grant. The authorization server MUST ensure that each requested resource in the token request is within the set of resources authorized by the grant, or otherwise acceptable under local policy consistent with {{RFC8707}}. If this condition is not met, the authorization server MUST return an `invalid_target` error and MUST NOT issue an access token.
 
 If the client includes `resource` parameters in both the authorization request and the token request, the values in the token request MUST be treated as a further restriction and MUST be a subset of the resources permitted by the underlying grant. If no `resource` parameter is included in the token request, the authorization server MAY issue an access token for the resource or resources previously authorized by the grant, subject to local policy.
+
+When issuing an access token in response to a refresh token request, the authorization server MUST NOT expand the set of authorized resources beyond those previously bound to the underlying grant. If the client supplies one or more `resource` parameters in the refresh token request, each requested resource MUST be within the previously authorized set or otherwise acceptable under local policy consistent with {{RFC8707}}. If this condition is not met, the authorization server MUST return an `invalid_target` error and MUST NOT issue an access token.
 
 An authorization server MAY require clients to include a `resource` parameter. If a `resource` parameter is required by local policy and the client does not include one, the authorization server MUST return an `invalid_target` error as defined in {{RFC8707}} and MUST NOT issue an access token.
 
@@ -238,15 +244,17 @@ If the `resource` parameter is omitted, the access token is not valid for any sp
 
 ## Client Processing Rules {#client-processing-rules}
 
-A client that supports this extension MUST process the access token response according to the rules in this section.
+A client that supports this extension MUST process access token responses according to the rules in this section.
 
-Client processing is driven by the number of `resource` parameters included in the authorization request or token request (see {{RFC8707}}). The rules below are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
+Client processing is determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}. The rules below are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
 
-If client validation succeeds, the client MAY use the access token and MUST use it only with the resource(s) identified in the response. The returned `scope` value, if present, MUST be interpreted in conjunction with the returned `resource` values. The granted scopes MUST be appropriate for the returned resource(s), consistent with the usage of scope in {{Section 3.3 of RFC6749}}.
+When a `resource` parameter is included in an access token response, the client MUST interpret and compare the returned resource identifiers using the rules defined in {{resource-identifier-comparison}}. If the client cannot determine that an access token is valid for the intended protected resource, the client MUST NOT use the access token.
 
-If client validation fails at any point while applying these rules, the client MUST NOT use the access token and SHOULD discard it.
+If validation succeeds, the client MAY use the access token and MUST use it only with the resource or resources identified in the response. Any returned `scope` value MUST be interpreted in conjunction with the returned `resource` values, and the granted scopes MUST be appropriate for the returned resource or resources, consistent with {{Section 3.3 of RFC6749}}.
 
-These client processing rules apply equally to access tokens issued using the authorization code grant and to access tokens issued using a refresh token grant.
+If validation fails at any point, the client MUST NOT use the access token and SHOULD discard it.
+
+These client processing rules apply equally to access tokens issued using the authorization code grant and to access tokens issued using the refresh token grant.
 
 ### Summary Table
 
