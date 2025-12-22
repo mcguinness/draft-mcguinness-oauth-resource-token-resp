@@ -63,7 +63,7 @@ However, {{RFC8707}} does not define any mechanism for an authorization server t
 When an authorization request includes one or more `resource` parameters, authorization servers in deployed systems may exhibit a range of behaviors depending on their capabilities and policy configuration. An authorization server MAY, for example:
 
 - Ignore the `resource` parameter and issue an access token that is not restricted to any specific resource.
-- Ignore the `resource` parameter and issue an access token that is valid for a default resource or set of resources.
+- Ignore the `resource` parameter and issue an access token that is valid for an server-assigned resource or set of resources.
 - Accept all requested `resource` values and issue an access token that is valid for the complete requested set.
 - Accept only a subset of requested `resource` values and issue an access token that is valid for that subset, without explicitly indicating that other requested resources were rejected.
 - Override the requested `resource` values and issue an access token that is valid for resources determined by authorization server policy or client configuration.
@@ -119,6 +119,8 @@ Without explicit confirmation of the resource in the token response, the client 
 The terms "client", "authorization server", "resource server", "access token", "protected resource", "authorization request", "authorization response", "access token request", "access token response" are defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
 
 The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
+
+The term "server-assigned resource" denotes resource(s) assigned by the authorization server (e.g., defaults or additions based on policy, configuration, or requested scopes).
 
 The term "StringOrURI" is defined by the JWT specification {{RFC7519}}.
 
@@ -181,7 +183,9 @@ When comparing resource identifiers, implementations MUST apply the URI comparis
 
 ## Authorization Server Processing Rules {#authorization-server-processing-rules}
 
-Authorization server processing is determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}. The rules in this section apply equally to access tokens issued using the authorization code grant and the refresh token grant and are mutually exclusive based on whether the client requested zero, exactly one, or more than one resource.
+Authorization server processing is determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}.
+
+The following rules describe how an authorization server evaluates requested resources and determines the effective resource or resources associated with an issued access token.
 
 When issuing an access token, any `resource` parameters included in the token request represent an additional restriction on the resources permitted by the underlying authorization grant. The authorization server MUST ensure that each requested resource in the token request is within the set of resources authorized by the grant, or otherwise acceptable under local policy consistent with {{RFC8707}}. If this condition is not met, the authorization server MUST return an `invalid_target` error and MUST NOT issue an access token.
 
@@ -197,10 +201,12 @@ An authorization server MAY require clients to include a `resource` parameter. I
 |----------------------|------------------------------|---------------------------------------|
 | **Exactly one `resource` requested** | No acceptable resource | MUST return `invalid_target` and MUST NOT issue an access token. |
 |                      | One acceptable resource | MUST include `resource` as a string containing the accepted resource. |
+|                      | Requested resource plus server-assigned resource(s) | MAY include server-assigned resource(s) in addition; MUST use array format when doing so. |
 | **Multiple `resource` values requested** | No acceptable resources | MUST return `invalid_target` and MUST NOT issue an access token. |
 |                      | Subset of requested resources acceptable | MUST include `resource` as an array containing only the accepted subset. |
 |                      | All requested resources acceptable | MUST include `resource` as an array containing all accepted resources. |
-| **No `resource` requested** | Default resource(s) assigned | SHOULD include the assigned resource(s) in the `resource` parameter. |
+|                      | Requested subset plus server-assigned resource(s) | MAY include server-assigned resource(s) in addition; MUST use array format when doing so. |
+| **No `resource` requested** | server-assigned resource(s) | SHOULD include the assigned resource(s) in the `resource` parameter. |
 |                      | No resource-specific restriction | SHOULD omit the `resource` parameter. |
 
 When comparing resource identifiers, the authorization server MUST apply the rules defined in {{resource-identifier-comparison}}.
@@ -213,8 +219,9 @@ If the client included exactly one `resource` parameter in the authorization req
 - If the requested `resource` value is not acceptable, the authorization server MUST return an `invalid_target` error response as defined in {{RFC8707}} and MUST NOT issue an access token.
 - If the requested `resource` value is acceptable:
   - The authorization server MUST include the `resource` parameter in the access token response.
-  - The `resource` parameter value MUST be a string containing the accepted `resource` value.
-  - The returned `resource` value MUST match the requested `resource` value according to the rules defined in {{resource-identifier-comparison}}.
+  - If the authorization server does not assign any additional server-assigned resources, the `resource` parameter value MUST be a string containing the accepted `resource` value.
+  - The authorization server MAY include one or more server-assigned resources in addition to the requested resource. If it does so, the `resource` parameter value MUST be an array containing the accepted resource and the server-assigned resource(s). See {{ex-scope-defined-resource}} for an example using scope-defined resources.
+  - The returned value(s) MUST include the requested `resource` value according to the rules defined in {{resource-identifier-comparison}}.
 
 ### Client Requested Multiple Resources
 
@@ -225,15 +232,16 @@ If the client included more than one `resource` parameter in the authorization r
 - If one or more requested `resource` values are acceptable:
   - The authorization server MUST include the `resource` parameter in the access token response.
   - The `resource` parameter value MUST be an array of strings if there is more than one accepted value.
-  - Each returned `resource` value MUST match one of the requested `resource` values according to the rules defined in {{resource-identifier-comparison}}.
+  - Each returned `resource` value that was requested MUST match one of the requested `resource` values according to the rules defined in {{resource-identifier-comparison}}.
   - The returned array MAY contain a strict subset of the requested `resource` values.
+  - The returned array MAY contain additional server-assigned resources, in addition to the accepted requested values.
   - The returned array MUST NOT contain duplicate `resource` values, including values that differ only by URI normalization using rules defined in {{resource-identifier-comparison}}.
 
 ### Client Did Not Request a Resource
 
 If the client did not include any `resource` parameters in the authorization request or token request:
 
-- If the authorization server assigns one or more default `resource` values based on policy or client configuration:
+- If the authorization server assigns one or more server-assigned `resource` values based on policy or client configuration:
   - The authorization server SHOULD include the assigned `resource` value or values in the `resource` parameter of the response.
   - If exactly one `resource` value is assigned, the `resource` parameter value SHOULD be a string.
   - If multiple `resource` values are assigned, the `resource` parameter value SHOULD be an array.
@@ -244,9 +252,7 @@ If the `resource` parameter is omitted, the access token is not valid for any sp
 
 ## Client Processing Rules {#client-processing-rules}
 
-A client that supports this extension MUST process access token responses according to the rules in this section.
-
-Client processing is determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}. The rules below are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
+A client that supports this extension MUST process access token responses according to the rules in this section, which are determined by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}.
 
 When a `resource` parameter is included in an access token response, the client MUST interpret and compare the returned resource identifiers using the rules defined in {{resource-identifier-comparison}}. If the client cannot determine that an access token is valid for the intended protected resource, the client MUST NOT use the access token.
 
@@ -263,14 +269,14 @@ These client processing rules apply equally to access tokens issued using the au
 | **Exactly one `resource` requested** | `resource` omitted | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
 |                      | `resource` = string | Valid only if the value matches the requested resource. |
 |                      | `resource` = array (1 element) | Valid only if the element matches the requested resource. |
-|                      | `resource` = array (>1 elements) | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
+|                      | `resource` = array (>1 elements) | Valid only if one element matches the requested resource; additional elements are server-assigned resources. |
 | **Multiple `resource` values requested** | `resource` omitted | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
 |                      | `resource` = string | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
 |                      | `resource` = array (subset of requested) | Valid. Token is valid only for the returned subset. |
 |                      | `resource` = array (exact match) | Valid. Token is valid for all returned resources. |
-|                      | `resource` = array (includes unrequested value) | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
+|                      | `resource` = array (superset: requested + server-assigned) | Valid. All requested resources present; additional elements are server-assigned resources. |
 | **No `resource` requested** | `resource` omitted | Valid. Token is not resource-specific. |
-|                      | `resource` present | Valid. Client SHOULD treat the returned value as a default resource assignment. |
+|                      | `resource` present | Valid. Client SHOULD treat the returned value as an server-assigned resource assignment. |
 | **Any request shape** | `error=invalid_target` | Client MUST treat this as a terminal error and MUST NOT use an access token. |
 
 ### Parsing the `resource` Parameter
@@ -287,9 +293,10 @@ When comparing resource identifiers, the client MUST apply the rules defined in 
 
 If the client included exactly one `resource` parameter in the token request:
 
-- The response MUST contain exactly one matching resource identifier.
-- The returned resource identifier MUST match the requested resource.
-- If the response omits the `resource` parameter or contains zero or more than one resource identifier, validation fails.
+- The response MUST contain at least one resource identifier that matches the requested resource.
+- When the response contains exactly one resource identifier, it MUST match the requested resource.
+- When the response contains multiple resource identifiers, one MUST match the requested resource; the others MAY be server-assigned resources.
+- If the response omits the `resource` parameter or contains zero resource identifiers, or if no returned identifier matches the requested resource, validation fails.
 
 #### Authorization Request Example {#ex-single-resource-authz}
 
@@ -389,9 +396,10 @@ If the client included more than one `resource` parameter in the token request:
 
 - The response MUST include a `resource` parameter.
 - The value MUST be an array.
-- Each returned resource identifier MUST match one requested resource.
+- Each requested resource MUST have a matching identifier in the returned set.
 - The returned set MAY be a strict subset of the requested set.
-- If any unrequested or duplicate resource identifier is present, validation fails.
+- The returned set MAY include additional server-assigned resources.
+- If any requested resource is missing from the returned set, or if duplicate resource identifiers are present, validation fails.
 
 #### Authorization Request Example {#ex-multi-resource-authz}
 
@@ -497,7 +505,7 @@ The authorization server issues a new access token that is valid for both protec
 
 If the client did not include any `resource` parameters in the token request:
 
-- If the response includes a `resource` parameter, the client MAY treat it as a default resource assignment.
+- If the response includes a `resource` parameter, the client MAY treat it as an server-assigned resource assignment.
 - If the response omits the `resource` parameter, the token SHOULD be treated as unbounded.
 
 #### Authorization Request Example {#ex-default-resource-authz}
@@ -541,7 +549,7 @@ The client exchanges the authorization code for an access token.
 
 ##### Token Response
 
-The authorization server issues an access token that is valid for the default protected resource (`https://api.example.com/orders`).
+The authorization server issues an access token that is valid for the server-assigned protected resource (`https://api.example.com/orders`).
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -575,7 +583,7 @@ The client uses a refresh token to request a new access token without explicitly
 
 ##### Token Response
 
-The authorization server issues a new access token that is valid for the default protected resource (`https://api.example.com/orders`).
+The authorization server issues a new access token that is valid for the server-assigned protected resource (`https://api.example.com/orders`).
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -656,10 +664,12 @@ The authorization server rejects the requested resource.
 
 ## Security Considerations
 
+This section describes security threats related to ambiguous resource selection and access token reuse, and explains how this specification mitigates those threats, either directly or in combination with other OAuth security mechanisms.
+
 ### Resource Selection Ambiguity and Mix-Up Attacks
 
 **Threat:**
-An authorization server issues a successful access token response without clearly indicating the protected resource or resources for which the token is valid. This can occur when the server applies default resource selection, narrows a requested resource set, or substitutes a different resource according to local policy without communicating that decision to the client. Such conditions are more likely in deployments where a client interacts with multiple authorization servers and protected resources, or dynamically discovers authorization servers at runtime, including via HTTP authorization challenges using OAuth 2.0 Protected Resource Metadata {{RFC9728}}.
+An authorization server issues a successful access token response without clearly indicating the protected resource or resources for which the token is valid. This can occur when the server applies server-assigned resource selection, narrows a requested resource set, or substitutes a different resource according to local policy without communicating that decision to the client. Such conditions are more likely in deployments where a client interacts with multiple authorization servers and protected resources, or dynamically discovers authorization servers at runtime, including via HTTP authorization challenges using OAuth 2.0 Protected Resource Metadata {{RFC9728}}.
 
 **Impact:**
 A client may incorrectly assume that an access token is valid for a different protected resource than the one actually authorized. This can result in access token misuse, unintended token disclosure to an incorrect protected resource, or resource mix-up attacks in which a token intended for one resource is presented to another. These risks are amplified in dynamic environments where the client cannot fully validate the trust relationship between a protected resource and the authorization server.
@@ -830,6 +840,66 @@ Client obtains an access token for the resource.
     }
 
 Client verifies that it obtained an access token that is valid for the discovered resource.
+
+## Scope-defined resource with a resource request {#ex-scope-defined-resource}
+
+An authorization server may determine resources from requested scopes in addition to explicit `resource` parameters. For example, a scope might imply a protected resource URL that the authorization server returns as an server-assigned resource alongside any client-requested resources.
+
+The following example uses OpenID Connect: the `openid` scope implies access to the UserInfo endpoint. When a client requests both a protected resource and the `openid` scope, the authorization server may determine the UserInfo endpoint URL from its configuration (e.g., `{issuer}/userinfo`) and return it as an server-assigned resource alongside the client-requested resource.
+
+### Authorization request example
+
+#### Authorization Request
+
+    GET /authorize?response_type=code
+      &client_id=client123
+      &redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+      &scope=openid%20profile%20data%3Aread
+      &state=oidc123
+      &resource=https%3A%2F%2Fapi.example.com%2Fdata
+      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+      &code_challenge_method=S256
+    HTTP/1.1
+    Host: idp.example.com
+
+#### Redirect
+
+    HTTP/1.1 302 Found
+    Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=oidc123
+
+#### Token Request
+
+    POST /token HTTP/1.1
+    Host: idp.example.com
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=authorization_code&
+    code=SplxlOBeZQQYbYS6WxSbIA&
+    redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&
+    client_id=client123&
+    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+#### Token Response
+
+The authorization server issues an access token valid for both the requested resource (`https://api.example.com/data`) and the UserInfo endpoint (`https://idp.example.com/userinfo`), which it determined from the `openid` scope.
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Cache-Control: no-store
+    Pragma: no-cache
+
+    {
+      "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "openid profile data:read",
+      "resource": [
+        "https://api.example.com/data",
+        "https://idp.example.com/userinfo"
+      ]
+    }
+
+The client validates that the requested resource (`https://api.example.com/data`) is present in the response. The additional resource (`https://idp.example.com/userinfo`) is an server-assigned resource determined by the authorization server based on the `openid` scope, enabling the client to use the same access token for both the API and the UserInfo endpoint.
 
 # Acknowledgments
 {:numbered="false"}
