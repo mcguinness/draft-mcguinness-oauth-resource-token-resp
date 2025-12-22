@@ -155,7 +155,7 @@ The value of the `resource` parameter MUST be either:
 - A single case-sensitive string containing an absolute URI, as defined in {{Section 2 of RFC8707}}, when the access token is valid for exactly one resource.
 - An array of case-sensitive strings, each containing an absolute URI as defined in {{Section 2 of RFC8707}}, when the access token is valid for more than one resource. The array MUST contain at least one element, and each element MUST be unique when compared using the URI comparison rules in {{Section 6.2.1 of RFC3986}} after applying syntax-based normalization as defined in {{Section 6.2.2 of RFC3986}}.
 
-When the access token is valid for exactly one resource, the authorization server SHOULD represent the `resource` parameter value as a single string. When the access token is valid for more than one resource, the authorization server MUST represent the `resource` parameter value as an array.
+When an access token is valid for exactly one resource, the authorization server SHOULD represent the `resource` parameter value as a single string to improve interoperability and ease of processing. When the access token is valid for more than one resource, the authorization server MUST represent the `resource` parameter value as an array.
 
 This representation is determined solely by the number of resources for which the access token is valid and applies regardless of how many `resource` parameters were included in the request.
 
@@ -665,7 +665,7 @@ An authorization server issues a successful access token response without clearl
 A client may incorrectly assume that an access token is valid for a different protected resource than the one actually authorized. This can result in access token misuse, unintended token disclosure to an incorrect protected resource, or resource mix-up attacks in which a token intended for one resource is presented to another. These risks are amplified in dynamic environments where the client cannot fully validate the trust relationship between a protected resource and the authorization server.
 
 **Mitigation:**
-This specification mitigates resource selection ambiguity by requiring authorization servers to explicitly return the resource or resources for which an access token is valid in the access token response. By providing issuance-time confirmation of the effective resource selection, clients can detect cases where a requested resource was narrowed, substituted, or overridden, and can avoid using access tokens with unintended protected resources.
+This specification mitigates resource selection ambiguity and OAuth mix-up attacks by requiring authorization servers to explicitly return the resource or resources for which an access token is valid in the access token response. By providing issuance-time confirmation of the effective resource selection, clients can detect cases where a requested resource was narrowed, substituted, or overridden, and can avoid using access tokens with unintended protected resources.
 
 ### Limitations of Discovery-Time Mechanisms
 
@@ -687,7 +687,7 @@ A malicious protected resource intercepts an access token during a client's legi
 Token reuse can lead to unauthorized access to protected resources beyond those intended by the client, particularly in environments where multiple resources trust a common authorization server and audience values are broad or indirect.
 
 **Mitigation:**
-To prevent token reuse attacks, access tokens SHOULD require proof-of-possession, such as Demonstrating Proof-of-Possession (DPoP) as defined in {{RFC9449}}. Proof-of-possession mechanisms bind the access token to a cryptographic key held by the client and require demonstration of key possession when the token is used. This prevents a malicious protected resource that intercepts an access token from reusing it at other resources, as it does not possess the client's private key. Both the client and authorization server must support proof-of-possession mechanisms for this protection to be effective. See {{Section 9 of RFC9449}} for additional details.
+To prevent token reuse attacks, access tokens SHOULD require proof-of-possession, such as Demonstrating Proof-of-Possession (DPoP) as defined in {{RFC9449}}. Other proof-of-possession mechanisms may also be applicable. Proof-of-possession mechanisms bind the access token to a cryptographic key held by the client and require demonstration of key possession when the token is used. This prevents a malicious protected resource that intercepts an access token from reusing it at other resources, as it does not possess the client's private key. Both the client and authorization server must support proof-of-possession mechanisms for this protection to be effective. See {{Section 9 of RFC9449}} for additional details.
 
 ### Client Validation and Defense in Depth
 
