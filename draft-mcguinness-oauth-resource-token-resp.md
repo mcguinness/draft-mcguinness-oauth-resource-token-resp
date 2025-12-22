@@ -148,14 +148,16 @@ This specification does not define, constrain, or replace the use of audience va
 
 # Resource Parameter in Token Response
 
-Authorization servers that support this specification MUST include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}, to identify a protected resource for which the access token is valid according to the rules defined in {{authorization-server-processing-rules}}.
+Authorization servers that support this specification MUST include the `resource` parameter in successful access token responses, as defined in Section 5.1 of {{RFC6749}}, to identify the protected resource or resources for which the access token is valid, according to the rules in {{authorization-server-processing-rules}}.
 
 The value of the `resource` parameter MUST be either:
 
-- A single case-sensitive string containing an absolute URI value, as defined in {{Section 2 of RFC8707}}, when the access token is valid for exactly one resource.
-- An array of case-sensitive strings, each containing an absolute URI value, as defined in {{Section 2 of RFC8707}}, when the access token is valid for multiple resources.  The array MUST contain at least one element, and each element MUST be unique within the array when compared using the URI comparison rules defined in {{Section 6.2.1 of RFC3986}} after applying syntax-based normalization defined in {{Section 6.2.2 of RFC3986}}.
+- A single case-sensitive string containing an absolute URI, as defined in {{Section 2 of RFC8707}}, when the access token is valid for exactly one resource.
+- An array of case-sensitive strings, each containing an absolute URI as defined in {{Section 2 of RFC8707}}, when the access token is valid for more than one resource. The array MUST contain at least one element, and each element MUST be unique when compared using the URI comparison rules in {{Section 6.2.1 of RFC3986}} after applying syntax-based normalization as defined in {{Section 6.2.2 of RFC3986}}.
 
-The `resource` parameter uses the same value syntax and requirements as the `resource` request parameter defined in {{RFC8707}}. In particular, each value MUST be an absolute URI, MUST NOT contain a fragment component, and SHOULD NOT contain a query component.
+This representation is determined solely by the number of resources for which the access token is valid and applies regardless of how many `resource` parameters were included in the request.
+
+The `resource` parameter uses the same value syntax and requirements as the `resource` request parameter defined in {{RFC8707}}. Each value MUST be an absolute URI, MUST NOT contain a fragment component, and SHOULD NOT contain a query component.
 
     HTTP/1.1 200 OK
     Content-Type: application/json
@@ -175,13 +177,13 @@ When comparing resource identifiers (for example, to determine uniqueness, to ev
 
 ## Authorization Server Processing Rules {#authorization-server-processing-rules}
 
-Authorization server processing is driven by the number of `resource` parameters included in the authorization request or token request (see {{RFC8707}}). The rules below apply equally to access tokens issued using the authorization code grant or refresh token grant and are mutually exclusive and depend on whether the client requested zero, exactly one, or more than one resource.
+Authorization server processing is driven by the number of `resource` parameters included in the authorization request or token request, as defined in {{RFC8707}}. The rules in this section apply equally to access tokens issued using the authorization code grant or the refresh token grant and are mutually exclusive based on whether the client requested zero, exactly one, or more than one resource.
 
-For access tokens issued using an authorization grant or a refresh token, any `resource` parameters in the token request MUST be evaluated against the resources that are permitted by the underlying grant. If the client supplies `resource` in the token request and any requested value is not permitted by the underlying grant, the authorization server MUST return an `invalid_target` error response as defined in {{RFC8707}} and MUST NOT issue an access token.
+When issuing an access token based on an authorization grant or a refresh token, any `resource` parameters included in the token request represent an additional restriction on the resources permitted by the underlying grant. The authorization server MUST ensure that each requested resource in the token request is within the set of resources authorized by the grant, or otherwise acceptable under local policy consistent with {{RFC8707}}. If this condition is not met, the authorization server MUST return an `invalid_target` error and MUST NOT issue an access token.
 
-If the client supplies `resource` parameters in both the authorization request and the token request, the token request `resource` values MUST be treated as an additional restriction and MUST be a subset of the resources permitted by the underlying grant.
+If the client includes `resource` parameters in both the authorization request and the token request, the values in the token request MUST be treated as a further restriction and MUST be a subset of the resources permitted by the underlying grant. If no `resource` parameter is included in the token request, the authorization server MAY issue an access token for the resource or resources previously authorized by the grant, subject to local policy.
 
-An authorization server MAY require that clients include a `resource` parameter. If a `resource` parameter is required by local policy and the client does not include one, the authorization server MUST return an `invalid_target` error response as defined in {{RFC8707}} and MUST NOT issue an access token.
+An authorization server MAY require clients to include a `resource` parameter. If a `resource` parameter is required by local policy and the client does not include one, the authorization server MUST return an `invalid_target` error as defined in {{RFC8707}} and MUST NOT issue an access token.
 
 ### Summary Table
 
