@@ -114,13 +114,15 @@ Without explicit confirmation of the resource in the token response, the client 
 
 {::boilerplate bcp14-tagged}
 
-## Terminology
+## Terminology {#terminology}
 
 The terms "client", "authorization server", "resource server", "access token", "protected resource", "authorization request", "authorization response", "access token request", "access token response" are defined by the OAuth 2.0 Authorization Framework specification {{RFC6749}}.
 
 The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification {{RFC8707}}.
 
 The term "StringOrURI" is defined by the JWT specification {{RFC7519}}.
+
+The term "scope-implied resource" refers to a protected resource URI that an authorization server associates with one or more OAuth 2.0 scope values by policy. When such a scope is included in an authorization request or token request and is granted, the authorization server includes the associated resource URI in the effective resource set of the issued access token, in addition to any resources explicitly requested via the `resource` parameter {{RFC8707}}. The association between a scope value and a resource URI is determined by authorization server policy and MAY be advertised in authorization server metadata as defined in {{scope-resources-metadata}}.
 
 ## Resource vs Audience {#resource-vs-audience}
 
@@ -195,15 +197,21 @@ An authorization server MAY require clients to include a `resource` parameter. I
 
 ### Summary Table
 
-| Client Request Shape | Authorization Server Outcome | Authorization Server Processing Rules |
-|----------------------|------------------------------|---------------------------------------|
-| **Exactly one `resource` requested** | No acceptable resource | MUST return `invalid_target` and MUST NOT issue an access token. |
-|                      | One acceptable resource | MUST include `resource` as a string containing the accepted resource. |
-| **Multiple `resource` values requested** | No acceptable resources | MUST return `invalid_target` and MUST NOT issue an access token. |
-|                      | Subset of requested resources acceptable | MUST include `resource` as an array containing only the accepted subset. |
-|                      | All requested resources acceptable | MUST include `resource` as an array containing all accepted resources. |
-| **No `resource` requested** | Default resource(s) assigned | SHOULD include the assigned resource(s) in the `resource` parameter. |
-|                      | No resource-specific restriction | SHOULD omit the `resource` parameter. |
+| Client Request Shape | Scope-Implied Resources? | Authorization Server Outcome | Authorization Server Processing Rules |
+|----------------------|--------------------------|------------------------------|---------------------------------------|
+| **Exactly one `resource` requested** | No | No acceptable resource | MUST return `invalid_target` and MUST NOT issue an access token. |
+|                      | No | One acceptable resource | MUST include `resource` as a string containing the accepted resource. |
+|                      | Yes | Explicit resource acceptable, scope-implied resources compatible | MUST include `resource` as an array containing the accepted explicit resource and all scope-implied resources. |
+|                      | Yes | Explicit resource acceptable, scope-implied resources incompatible | AS policy: MUST return `invalid_target`, OR MUST include `resource` reflecting only the resources for which the token was issued and MUST reduce `scope` accordingly. |
+|                      | Yes | Explicit resource not acceptable | MUST return `invalid_target` and MUST NOT issue an access token. |
+| **Multiple `resource` values requested** | No | No acceptable resources | MUST return `invalid_target` and MUST NOT issue an access token. |
+|                      | No | Subset of requested resources acceptable | MUST include `resource` as an array containing only the accepted subset. |
+|                      | No | All requested resources acceptable | MUST include `resource` as an array containing all accepted resources. |
+|                      | Yes | One or more explicit resources acceptable | MUST include `resource` as an array containing the accepted explicit resources and all scope-implied resources. |
+|                      | Yes | No explicit resources acceptable | MUST return `invalid_target` and MUST NOT issue an access token. |
+| **No `resource` requested** | Yes | Scope-implied resource(s) determined | MUST include all scope-implied resources in the `resource` parameter. |
+|                      | No | Default resource(s) assigned | SHOULD include the assigned resource(s) in the `resource` parameter. |
+|                      | No | No resource-specific restriction | SHOULD omit the `resource` parameter. |
 
 When comparing resource identifiers, the authorization server MUST apply the rules defined in {{resource-identifier-comparison}}.
 
@@ -215,8 +223,8 @@ If the client included exactly one `resource` parameter in the authorization req
 - If the requested `resource` value is not acceptable, the authorization server MUST return an `invalid_target` error response as defined in {{RFC8707}} and MUST NOT issue an access token.
 - If the requested `resource` value is acceptable:
   - The authorization server MUST include the `resource` parameter in the access token response.
-  - The `resource` parameter value MUST be a string containing the accepted `resource` value.
-  - The returned `resource` value MUST match the requested `resource` value according to the rules defined in {{resource-identifier-comparison}}.
+  - If no granted scopes imply additional resources, the `resource` parameter value MUST be a string containing the accepted `resource` value, and the returned value MUST match the requested `resource` value according to the rules defined in {{resource-identifier-comparison}}.
+  - If one or more granted scopes imply additional resources, the rules in {{scope-implied-resources-as}} apply and the `resource` parameter value MUST be an array containing the accepted explicit resource and all scope-implied resources.
 
 ### Client Requested Multiple Resources
 
@@ -226,16 +234,21 @@ If the client included more than one `resource` parameter in the authorization r
 - If none of the requested `resource` values are acceptable, the authorization server MUST return an `invalid_target` error response as defined in {{RFC8707}} and MUST NOT issue an access token.
 - If one or more requested `resource` values are acceptable:
   - The authorization server MUST include the `resource` parameter in the access token response.
-  - The `resource` parameter value MUST be an array of strings if there is more than one accepted value.
-  - Each returned `resource` value MUST match one of the requested `resource` values according to the rules defined in {{resource-identifier-comparison}}.
+  - The `resource` parameter value MUST be an array.
+  - The array MUST contain each accepted explicit `resource` value; each such value MUST match one of the requested `resource` values according to the rules defined in {{resource-identifier-comparison}}.
   - The returned array MAY contain a strict subset of the requested `resource` values.
+  - If one or more granted scopes imply additional resources, the scope-implied resource URIs MUST also be included in the array per the rules in {{scope-implied-resources-as}}.
   - The returned array MUST NOT contain duplicate `resource` values, including values that differ only by URI normalization using rules defined in {{resource-identifier-comparison}}.
 
 ### Client Did Not Request a Resource
 
 If the client did not include any `resource` parameters in the authorization request or token request:
 
-- If the authorization server assigns one or more default `resource` values based on policy or client configuration:
+- If one or more granted scopes imply resource URIs (see {{scope-implied-resources-as}}):
+  - The authorization server MUST include all scope-implied resources in the `resource` parameter of the response.
+  - If exactly one scope-implied resource is present, the `resource` parameter value MUST be a string.
+  - If more than one scope-implied resource is present, the `resource` parameter value MUST be an array.
+- Otherwise, if the authorization server assigns one or more default `resource` values based on policy or client configuration:
   - The authorization server SHOULD include the assigned `resource` value or values in the `resource` parameter of the response.
   - If exactly one `resource` value is assigned, the `resource` parameter value SHOULD be a string.
   - If multiple `resource` values are assigned, the `resource` parameter value SHOULD be an array.
@@ -243,6 +256,20 @@ If the client did not include any `resource` parameters in the authorization req
   - The authorization server SHOULD omit the `resource` parameter from the response.
 
 If the `resource` parameter is omitted, the access token is not valid for any specific resource as defined by this specification.
+
+### Scope-Implied Resources {#scope-implied-resources-as}
+
+An authorization server MAY associate one or more resource URIs with a scope value such that, when that scope is granted, the authorization server includes the associated resource URI or URIs in the effective resource set of the issued access token. These resource URIs are scope-implied resources as defined in {{terminology}}. Scope-implied resources are additive: they extend, but do not substitute, the set of resources established by the explicit `resource` parameters in the request.
+
+The association between a scope value and a scope-implied resource URI is determined by authorization server policy and MAY be advertised in authorization server metadata as defined in {{scope-resources-metadata}}.
+
+When one or more granted scopes imply resource URIs, the authorization server MUST apply the following rules in addition to the rules defined in the subsections above:
+
+- If the client did not include any `resource` parameters in the request, the authorization server MUST include all scope-implied resources in the `resource` parameter of the token response. This requirement takes precedence over the SHOULD in {{client-did-not-request-a-resource}} for this case.
+
+- If the client included one or more `resource` parameters in the request and the authorization server can issue a single access token valid for both the explicitly requested resource or resources and the scope-implied resources, the authorization server MUST include all accepted explicit resources and all scope-implied resources in the `resource` parameter of the token response. When two or more resource identifiers are returned, the `resource` parameter value MUST be an array.
+
+- If the client included one or more `resource` parameters in the request but the authorization server cannot issue a single access token valid for both the explicitly requested resource or resources and one or more scope-implied resources (for example, due to irreconcilable token format or audience policy constraints), the authorization server MAY return an `invalid_target` error and MUST NOT issue an access token, OR the authorization server MAY issue an access token valid for the subset of resources it can accommodate. In the latter case, the authorization server MUST reduce the granted `scope` to exclude any scope values that imply resources for which the access token is not valid, and the `resource` parameter in the response MUST accurately reflect the effective resource set of the issued access token.
 
 ## Client Processing Rules {#client-processing-rules}
 
@@ -261,16 +288,21 @@ These client processing rules apply equally to access tokens issued using the au
 | Client Request Shape | Token Response | Client Processing Rules |
 |----------------------|----------------|--------------------------|
 | **Exactly one `resource` requested** | `resource` omitted | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
-|                      | `resource` = string | Valid only if the value matches the requested resource. |
-|                      | `resource` = array (1 element) | Valid only if the element matches the requested resource. |
-|                      | `resource` = array (>1 elements) | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
+|                      | `resource` = string matching requested | Valid. |
+|                      | `resource` = array containing requested resource only | Valid. |
+|                      | `resource` = array containing requested resource + scope-implied resources | Valid if all additional entries are verified as scope-implied. See {{scope-implied-resources-client}}. |
+|                      | `resource` = array not containing requested resource | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
+|                      | `resource` = array containing unverifiable unrequested resource | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
 | **Multiple `resource` values requested** | `resource` omitted | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
 |                      | `resource` = string | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
 |                      | `resource` = array (subset of requested) | Valid. Token is valid only for the returned subset. |
-|                      | `resource` = array (exact match) | Valid. Token is valid for all returned resources. |
-|                      | `resource` = array (includes unrequested value) | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
-| **No `resource` requested** | `resource` omitted | Valid. Token is not resource-specific. |
-|                      | `resource` present | Valid. Client SHOULD treat the returned value as a default resource assignment. |
+|                      | `resource` = array (exact match of requested) | Valid. Token is valid for all returned resources. |
+|                      | `resource` = array (requested resources + scope-implied resources) | Valid if all unrequested entries are verified as scope-implied. See {{scope-implied-resources-client}}. |
+|                      | `resource` = array (includes unverifiable unrequested value) | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
+| **No `resource` requested** | `resource` omitted, no scope-implied scopes in request | Valid. Token is not resource-specific. |
+|                      | `resource` omitted, scope-implied scopes were present | Potentially non-compliant AS. Client SHOULD treat the token as not resource-specific. |
+|                      | `resource` present, consistent with scope-implied mappings | Valid. Client SHOULD verify returned resource(s) against `scope_resources` metadata. |
+|                      | `resource` present, default assignment (no scope-implied scopes) | Valid. Client SHOULD treat the returned value as a default resource assignment. |
 | **Any request shape** | `error=invalid_target` | Client MUST treat this as a terminal error and MUST NOT use an access token. |
 
 ### Parsing the `resource` Parameter
@@ -287,9 +319,13 @@ When comparing resource identifiers, the client MUST apply the rules defined in 
 
 If the client included exactly one `resource` parameter in the token request:
 
-- The response MUST contain exactly one matching resource identifier.
-- The returned resource identifier MUST match the requested resource.
-- If the response omits the `resource` parameter or contains zero or more than one resource identifier, validation fails.
+- The response MUST contain the requested resource identifier.
+- The `resource` parameter MAY be a string or an array:
+  - If `resource` is a string, it MUST match the requested resource.
+  - If `resource` is an array, it MUST contain the requested resource. Any additional elements MUST be scope-implied resources consistent with the scopes included in the request. See {{scope-implied-resources-client}}.
+- If the response omits the `resource` parameter, validation fails.
+- If the response does not contain the requested resource identifier, validation fails.
+- If the response contains resource identifiers that cannot be verified as either the explicitly requested resource or a scope-implied resource, validation fails.
 
 #### Authorization Request Example {#ex-single-resource-authz}
 
@@ -389,9 +425,11 @@ If the client included more than one `resource` parameter in the token request:
 
 - The response MUST include a `resource` parameter.
 - The value MUST be an array.
-- Each returned resource identifier MUST match one requested resource.
+- The array MUST contain at least one resource identifier matching a requested resource.
 - The returned set MAY be a strict subset of the requested set.
-- If any unrequested or duplicate resource identifier is present, validation fails.
+- The array MAY contain additional resource identifiers beyond those explicitly requested, provided each such identifier is a scope-implied resource consistent with the scopes included in the request. See {{scope-implied-resources-client}}.
+- If any resource identifier that was neither explicitly requested nor verifiable as a scope-implied resource is present, validation fails.
+- Duplicate resource identifiers MUST NOT be present.
 
 #### Authorization Request Example {#ex-multi-resource-authz}
 
@@ -497,8 +535,10 @@ The authorization server issues a new access token that is valid for both protec
 
 If the client did not include any `resource` parameters in the token request:
 
-- If the response includes a `resource` parameter, the client MAY treat it as a default resource assignment.
-- If the response omits the `resource` parameter, the token SHOULD be treated as unbounded.
+- If the response includes a `resource` parameter and the client included scopes that are known to imply resource URIs, the client SHOULD verify that the returned resource or resources are consistent with the scope-implied mappings advertised in AS metadata. See {{scope-implied-resources-client}}.
+- If the response includes a `resource` parameter and no scope-implied scopes were included, the client MAY treat it as a default resource assignment.
+- If the response omits the `resource` parameter and scope-implied scopes were included in the request, the client SHOULD treat the AS as potentially non-compliant with this specification and SHOULD treat the token as not resource-specific.
+- If the response omits the `resource` parameter and no scope-implied scopes were included, the token SHOULD be treated as unbounded.
 
 #### Authorization Request Example {#ex-default-resource-authz}
 
@@ -590,6 +630,128 @@ The authorization server issues a new access token that is valid for the default
       "resource": "https://api.example.com/orders"
     }
 
+### Validation of Scope-Implied Resources {#scope-implied-resources-client}
+
+A client that includes one or more scopes in an authorization request or token request SHOULD retrieve the `scope_resources` field from the authorization server's metadata as defined in {{scope-resources-metadata}}. Clients SHOULD cache this metadata to avoid repeated retrieval.
+
+When validating the `resource` parameter of a token response, if the response contains resource identifiers that were not explicitly requested by the client, the client MUST determine whether each such identifier is a scope-implied resource:
+
+- If the authorization server's `scope_resources` metadata is available and maps one or more of the scopes included in the request to the extra resource URI, the client MUST treat that URI as a valid scope-implied resource.
+- If the authorization server's `scope_resources` metadata is available but does not map any scope included in the request to the extra resource URI, the client MUST treat the response as invalid and MUST NOT use the access token.
+- If the authorization server's `scope_resources` metadata is not available (for example, because the authorization server does not publish it or the client cannot retrieve it), the client SHOULD accept a resource URI that is consistent with the protocol-defined behavior of the scopes included in the request, provided the client has reasonable grounds to expect scope-implied resources based on those scopes.
+
+If a resource URI in the response cannot be accounted for by either an explicitly requested resource or a verifiable scope-implied resource, the client MUST treat the response as invalid and MUST NOT use the access token.
+
+### Scope-Implied Resource Examples {#ex-scope-implied}
+
+#### Scope-Only Request (No `resource` Parameter) {#ex-scope-only}
+
+Client obtains an access token by requesting a scope that implies a resource, without including an explicit `resource` parameter.
+
+##### Authorization Request
+
+    GET /authorize?response_type=code
+      &client_id=client123
+      &redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+      &scope=openid%20profile
+      &state=abc123
+      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+      &code_challenge_method=S256
+    HTTP/1.1
+    Host: authorization-server.example.com
+
+##### Redirect
+
+    HTTP/1.1 302 Found
+    Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+
+##### Token Request
+
+    POST /token HTTP/1.1
+    Host: authorization-server.example.com
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=authorization_code&
+    code=SplxlOBeZQQYbYS6WxSbIA&
+    redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&
+    client_id=client123&
+    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+##### Token Response
+
+The authorization server determines that the `openid` scope implies the userinfo resource (`https://authorization-server.example.com/userinfo`) per its policy and MUST include it in the response.
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Cache-Control: no-store
+    Pragma: no-cache
+
+    {
+      "access_token": "ACCESS_TOKEN",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "openid profile",
+      "resource": "https://authorization-server.example.com/userinfo"
+    }
+
+The client verifies `https://authorization-server.example.com/userinfo` against the `scope_resources` field in AS metadata, confirming it is the scope-implied resource for the `openid` scope.
+
+#### Combined Explicit Resource and Scope-Implied Resource {#ex-combined-resource}
+
+Client obtains an access token for an explicit protected resource while also requesting a scope that implies an additional resource.
+
+##### Authorization Request
+
+    GET /authorize?response_type=code
+      &client_id=client123
+      &redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+      &scope=openid%20read%3Adata
+      &state=abc123
+      &resource=https%3A%2F%2Fapi.example.com%2Fdata
+      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+      &code_challenge_method=S256
+    HTTP/1.1
+    Host: authorization-server.example.com
+
+##### Redirect
+
+    HTTP/1.1 302 Found
+    Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
+
+##### Token Request
+
+    POST /token HTTP/1.1
+    Host: authorization-server.example.com
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=authorization_code&
+    code=SplxlOBeZQQYbYS6WxSbIA&
+    redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&
+    client_id=client123&
+    code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+
+##### Token Response
+
+The authorization server accepts the explicit resource `https://api.example.com/data` and determines that the `openid` scope implies the userinfo resource. A single access token is issued valid for both, and both are returned as an array.
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+    Cache-Control: no-store
+    Pragma: no-cache
+
+    {
+      "access_token": "ACCESS_TOKEN",
+      "token_type": "Bearer",
+      "expires_in": 3600,
+      "scope": "openid read:data",
+      "resource": [
+        "https://api.example.com/data",
+        "https://authorization-server.example.com/userinfo"
+      ]
+    }
+
+The client validates the response as follows: `https://api.example.com/data` matches the explicitly requested resource; `https://authorization-server.example.com/userinfo` is verified against the `scope_resources` field in AS metadata as the scope-implied resource for the `openid` scope. Both entries are accounted for; validation succeeds.
+
 ### Invalid Resource
 
 An `invalid_target` error indicates that none of the requested resource values were acceptable to the authorization server. This outcome may result from authorization server policy or client configuration.
@@ -654,6 +816,35 @@ The authorization server rejects the requested resource.
       "error_description": "Resource not allowed"
     }
 
+## Authorization Server Metadata {#scope-resources-metadata}
+
+Authorization servers that associate scope values with resource URIs SHOULD advertise these associations in their authorization server metadata {{RFC8414}} using the `scope_resources` parameter.
+
+The `scope_resources` parameter is an OPTIONAL JSON object. Each key is a scope value, and the corresponding value is either:
+
+- A string containing the absolute URI of the single resource associated with that scope, or
+- An array of strings, each containing an absolute URI, when the scope is associated with more than one resource.
+
+Each resource URI in the `scope_resources` object MUST conform to the requirements defined in {{Section 2 of RFC8707}}: it MUST be an absolute URI, MUST NOT contain a fragment component, and SHOULD NOT contain a query component.
+
+The following is a non-normative example of an authorization server metadata document that includes the `scope_resources` parameter:
+
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+      "issuer": "https://authorization-server.example.com",
+      "authorization_endpoint": "https://authorization-server.example.com/authorize",
+      "token_endpoint": "https://authorization-server.example.com/token",
+      "scopes_supported": ["openid", "profile", "read:data"],
+      "scope_resources": {
+        "openid": "https://authorization-server.example.com/userinfo",
+        "profile": "https://authorization-server.example.com/userinfo"
+      }
+    }
+
+In this example, both the `openid` and `profile` scopes imply the same userinfo resource. Clients SHOULD retrieve and cache the authorization server's `scope_resources` metadata and use it to validate scope-implied resources returned in token responses as described in {{scope-implied-resources-client}}.
+
 ## Security Considerations
 
 This section describes security threats related to ambiguous resource selection and access token reuse, and explains how this specification mitigates those threats, either directly or in combination with other OAuth security mechanisms.
@@ -708,13 +899,19 @@ Returning the `resource` value may reveal some information about the protected r
 
 # IANA Considerations
 
-This document registers the following value in the OAuth Parameters registry established by {{RFC6749}}.
+This document registers the following values in the registries established by {{RFC6749}} and {{RFC8414}}.
 
 ## OAuth Access Token Response Parameters Registry
 
 | Name     | Description                                  | Specification           |
 |----------|----------------------------------------------|--------------------------|
 | resource | Resource to which the access token applies   |  This document          |
+
+## OAuth Authorization Server Metadata Registry
+
+| Name            | Description                                                              | Specification  |
+|-----------------|--------------------------------------------------------------------------|----------------|
+| scope_resources | Object mapping scope values to the resource URIs implied by those scopes | This document  |
 
 
 --- back
@@ -840,6 +1037,15 @@ This proposal builds on prior work in OAuth 2.0 extensibility and security analy
 
 # Document History
 {:numbered="false"}
+
+-02
+
+* Added scope-implied resource concept to Terminology
+* Extended Authorization Server Processing Rules to cover scope-implied resources
+* Extended Client Processing Rules to validate scope-implied resources in responses
+* Added `scope_resources` Authorization Server Metadata field for advertising scope-to-resource mappings
+* Added scope-implied resource examples (scope-only and combined with explicit resource)
+* Added OAuth Authorization Server Metadata Registry entry for `scope_resources`
 
 -01
 
