@@ -1484,7 +1484,26 @@ Acknowledgments
    This proposal builds on prior work in OAuth 2.0 extensibility and
    security analysis, particularly [RFC8707], [RFC9700], and [RFC9207].
 
+   The authors would like to thank the following individuals who
+   contributed ideas, feedback, and wording that helped shape this
+   specification: Filip Skokan
+
 Document History
+
+   -02
+
+   *  Modified processing rules to allow server-assigned resources to be
+      combined with requested resources
+
+   *  Added OIDC example
+
+   *  Collapsed one and many processing rules to single "one or more"
+
+   *  Changed OAuth Registry to update existing resource parameter
+
+   *  Editorial cleanup and consistency updates
+
+   *  Updated Acknowledgements
 
    -01
 
