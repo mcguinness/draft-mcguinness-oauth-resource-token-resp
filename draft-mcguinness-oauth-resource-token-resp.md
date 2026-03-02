@@ -680,13 +680,13 @@ Returning the `resource` value may reveal some information about the protected r
 
 # IANA Considerations
 
-This document registers the following value in the OAuth Parameters registry established by {{RFC6749}}.
+This document updates the "resource" parameter in the OAuth Parameters registry established by {{RFC6749}}. The "resource" parameter is defined by {{RFC8707}} for use in authorization requests and token requests. This specification adds the following usage location:
 
-## OAuth Access Token Response Parameters Registry
+## OAuth Parameters Registry
 
-| Name     | Description                                  | Specification           |
-|----------|----------------------------------------------|--------------------------|
-| resource | Resource to which the access token applies   |  This document          |
+| Name     | Parameter Usage Location | Description                                  | Specification           |
+|----------|--------------------------|----------------------------------------------|--------------------------|
+| resource | token response           | Resource to which the access token applies   |  This document          |
 
 
 --- back
@@ -716,7 +716,7 @@ Client fetches the resource's OAuth 2.0 Protected Resource Metadata per {{RFC972
     Host: api.example.com
     Accept: application/json
 
-    HTTP/1.1 200 Ok
+    HTTP/1.1 200 OK
     Content-Type: application/json
 
     {
@@ -738,7 +738,7 @@ Client discovers the Authorization Server configuration per {{RFC8414}}
     Host: authorization-server.example.com
     Accept: application/json
 
-    HTTP/1.1 200 Ok
+    HTTP/1.1 200 OK
     Content-Type: application/json
 
     {
@@ -763,7 +763,7 @@ Client makes an authorization request for the resource
     GET /oauth2/authorize?response_type=code
       &client_id=client123
       &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
-      &scope=resource%3Aread
+      &scope=resource.read
       &state=abc123
       &resource=https%3A%2F%2Fapi.example.com%2Fresource
       &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
@@ -799,7 +799,7 @@ Client obtains an access token for the resource.
       "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
       "token_type": "Bearer",
       "expires_in": 3600,
-      "scope": "resource:read",
+      "scope": "resource.read",
       "resource": "https://api.example.com/resource"
     }
 
