@@ -22,14 +22,14 @@
     Python 3.12.12
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
-    intervaltree 3.1.0
+    intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.0.2
     platformdirs 4.5.1
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.32.5
-    wcwidth 0.2.14
+    wcwidth 0.3.0
 -->
 <link href="draft-mcguinness-oauth-resource-token-resp.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -170,7 +170,7 @@
   font-weight: 400;
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
   font-family: 'Oxygen Mono';
@@ -178,7 +178,8 @@
   font-weight: 400;
   font-display: swap;
   src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 }
 
 @font-face {
@@ -570,6 +571,7 @@ aside, blockquote {
 }
 blockquote {
   margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
 }
 cite {
   display: block;
@@ -640,7 +642,7 @@ a.pilcrow {
   }
 }
 @media not print {
-  :hover > a.pilcrow {
+  :hover > a.pilcrow, a.pilcrow:focus {
     opacity: 1;
   }
   a.pilcrow[href]:hover {
@@ -1048,11 +1050,11 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Resource Token Response Parameter</td>
-<td class="right">December 2025</td>
+<td class="right">March 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">McGuinness &amp; Hanson</td>
-<td class="center">Expires 25 June 2026</td>
+<td class="center">Expires 3 September 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1065,12 +1067,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-mcguinness-oauth-resource-token-resp-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2025-12-22" class="published">22 December 2025</time>
+<time datetime="2026-03-02" class="published">2 March 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-06-25">25 June 2026</time></dd>
+<dd class="expires"><time datetime="2026-09-03">3 September 2026</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1124,7 +1126,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 25 June 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 3 September 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1133,7 +1135,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2025 IETF Trust and the persons identified as the
+            Copyright (c) 2026 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -1185,13 +1187,10 @@ svg :is([fill="white"], [fill^="#fff"]) {
                     <p id="section-toc.1-1.3.2.2.2.1.1"><a href="#section-3.2.1" class="auto internal xref">3.2.1</a>.  <a href="#name-summary-table" class="internal xref">Summary Table</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.2">
-                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-client-requested-exactly-on" class="internal xref">Client Requested Exactly One Resource</a></p>
+                    <p id="section-toc.1-1.3.2.2.2.2.1"><a href="#section-3.2.2" class="auto internal xref">3.2.2</a>.  <a href="#name-client-requested-one-or-mor" class="internal xref">Client Requested One or More Resources</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.3">
-                    <p id="section-toc.1-1.3.2.2.2.3.1"><a href="#section-3.2.3" class="auto internal xref">3.2.3</a>.  <a href="#name-client-requested-multiple-r" class="internal xref">Client Requested Multiple Resources</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2.2.4">
-                    <p id="section-toc.1-1.3.2.2.2.4.1"><a href="#section-3.2.4" class="auto internal xref">3.2.4</a>.  <a href="#name-client-did-not-request-a-re" class="internal xref">Client Did Not Request a Resource</a></p>
+                    <p id="section-toc.1-1.3.2.2.2.3.1"><a href="#section-3.2.3" class="auto internal xref">3.2.3</a>.  <a href="#name-client-did-not-request-a-re" class="internal xref">Client Did Not Request a Resource</a></p>
 </li>
                 </ul>
 </li>
@@ -1205,16 +1204,13 @@ svg :is([fill="white"], [fill^="#fff"]) {
                     <p id="section-toc.1-1.3.2.3.2.2.1"><a href="#section-3.3.2" class="auto internal xref">3.3.2</a>.  <a href="#name-parsing-the-resource-parame" class="internal xref">Parsing the <code>resource</code> Parameter</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.3">
-                    <p id="section-toc.1-1.3.2.3.2.3.1"><a href="#section-3.3.3" class="auto internal xref">3.3.3</a>.  <a href="#name-client-requested-exactly-one" class="internal xref">Client Requested Exactly One Resource</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.3.1"><a href="#section-3.3.3" class="auto internal xref">3.3.3</a>.  <a href="#name-client-requested-one-or-more" class="internal xref">Client Requested One or More Resources</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.4">
-                    <p id="section-toc.1-1.3.2.3.2.4.1"><a href="#section-3.3.4" class="auto internal xref">3.3.4</a>.  <a href="#name-client-requested-multiple-re" class="internal xref">Client Requested Multiple Resources</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.4.1"><a href="#section-3.3.4" class="auto internal xref">3.3.4</a>.  <a href="#name-client-did-not-request-a-res" class="internal xref">Client Did Not Request a Resource</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.5">
-                    <p id="section-toc.1-1.3.2.3.2.5.1"><a href="#section-3.3.5" class="auto internal xref">3.3.5</a>.  <a href="#name-client-did-not-request-a-res" class="internal xref">Client Did Not Request a Resource</a></p>
-</li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3.2.6">
-                    <p id="section-toc.1-1.3.2.3.2.6.1"><a href="#section-3.3.6" class="auto internal xref">3.3.6</a>.  <a href="#name-invalid-resource" class="internal xref">Invalid Resource</a></p>
+                    <p id="section-toc.1-1.3.2.3.2.5.1"><a href="#section-3.3.5" class="auto internal xref">3.3.5</a>.  <a href="#name-invalid-resource" class="internal xref">Invalid Resource</a></p>
 </li>
                 </ul>
 </li>
@@ -1244,7 +1240,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-oauth-access-token-response" class="internal xref">OAuth Access Token Response Parameters Registry</a></p>
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-oauth-parameters-registry" class="internal xref">OAuth Parameters Registry</a></p>
 </li>
             </ul>
 </li>
@@ -1256,6 +1252,14 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
                 <p id="section-toc.1-1.7.2.1.1"><a href="#appendix-A.1" class="auto internal xref">A.1</a>.  <a href="#name-requesting-a-token-for-a-dy" class="internal xref">Requesting a token for a dynamically discovered protected resource</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#appendix-A.2" class="auto internal xref">A.2</a>.  <a href="#name-scope-defined-resource-with" class="internal xref">Scope-defined resource with a resource request</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2.2.1">
+                    <p id="section-toc.1-1.7.2.2.2.1.1"><a href="#appendix-A.2.1" class="auto internal xref">A.2.1</a>.  <a href="#name-authorization-request-example-3" class="internal xref">Authorization request example</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
@@ -1278,15 +1282,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
 <p id="section-1-1">OAuth 2.0 defines a framework in which clients obtain access tokens from authorization servers and present them to protected resources. In deployments involving multiple protected resources or resource servers (APIs), clients often need to determine whether a given access token is valid for a specific resource.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">The Resource Indicators for OAuth 2.0 specification <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> introduced the <code>resource</code> request parameter, which allows a client to indicate the protected resource or resources for which an access token is intended to be used. An authorization server can use this information when issuing an access token, for example by applying resource-specific restrictions based on policy or configuration.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">However, <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> does not define any mechanism for an authorization server to confirm, in the access token response, which resource or resources were ultimately accepted. As a result, a client has no interoperable way to validate the effective resource scope of an issued access token.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-2">The Resource Indicators for OAuth 2.0 specification <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> introduced the <code>resource</code> request parameter, which allows a client to indicate the protected resource(s) for which an access token is intended to be used. An authorization server can use this information when issuing an access token, for example by applying resource-specific restrictions based on policy or configuration.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">However, <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> does not define any mechanism for an authorization server to confirm, in the access token response, which resource(s) were ultimately accepted. As a result, a client has no interoperable way to validate the effective resource scope of an issued access token.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <p id="section-1-4">When an authorization request includes one or more <code>resource</code> parameters, authorization servers in deployed systems may exhibit a range of behaviors depending on their capabilities and policy configuration. An authorization server <span class="bcp14">MAY</span>, for example:<a href="#section-1-4" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-1-5.1">
           <p id="section-1-5.1.1">Ignore the <code>resource</code> parameter and issue an access token that is not restricted to any specific resource.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-5.2">
-          <p id="section-1-5.2.1">Ignore the <code>resource</code> parameter and issue an access token that is valid for a default resource or set of resources.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
+          <p id="section-1-5.2.1">Ignore the <code>resource</code> parameter and issue an access token that is valid for a server-assigned resource or set of resources.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-5.3">
           <p id="section-1-5.3.1">Accept all requested <code>resource</code> values and issue an access token that is valid for the complete requested set.<a href="#section-1-5.3.1" class="pilcrow">¶</a></p>
@@ -1309,7 +1313,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <p id="section-1-11">Audience values are token-format-specific and policy-defined. They do not have standardized semantics across authorization server implementations. As described in <a href="#resource-vs-audience" class="auto internal xref">Section 2.2</a>, audience values commonly identify authorization servers, tenants, resource servers, or other logical entities rather than concrete protected resource identifiers. A protected resource may accept access tokens with broad, narrow, or indirect audience values. There is no predictable or discoverable relationship between such values and the resource’s URL. Clients therefore cannot rely on audience information, whether obtained from a token introspection response or from local inspection of a self-contained access token, to determine whether an access token is applicable to a specific protected resource.<a href="#section-1-11" class="pilcrow">¶</a></p>
 <p id="section-1-12">As a result, learning the audience of an issued access token does not provide a reliable or interoperable way for a client to determine whether the token is valid for the intended resource, particularly when multiple protected resources share an authorization server or when the client interacts with resources discovered dynamically at runtime. This document uses the term <em>resource</em> as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>. The relationship between resources and token audience values is discussed further in <a href="#resource-vs-audience" class="auto internal xref">Section 2.2</a>.<a href="#section-1-12" class="pilcrow">¶</a></p>
 <p id="section-1-13">Consequently, existing OAuth mechanisms do not provide a practical, interoperable way for a client to confirm that an issued access token is valid for the intended resource.<a href="#section-1-13" class="pilcrow">¶</a></p>
-<p id="section-1-14">This specification defines a new <code>resource</code> parameter to be returned in OAuth 2.0 access token responses that is orthogonal to the token format issued by the authorization server. The parameter explicitly identifies the protected resource or resources for which the issued access token is valid, enabling clients to validate token applicability before use and reducing ambiguity across deployments.<a href="#section-1-14" class="pilcrow">¶</a></p>
+<p id="section-1-14">This specification defines a new <code>resource</code> parameter to be returned in OAuth 2.0 access token responses that is orthogonal to the token format issued by the authorization server. The parameter explicitly identifies the protected resource(s) for which the issued access token is valid, enabling clients to validate token applicability before use and reducing ambiguity across deployments.<a href="#section-1-14" class="pilcrow">¶</a></p>
 <div id="resource-mix-up-via-dynamic-discovery-example">
 <section id="section-1.1">
         <h3 id="name-resource-mix-up-via-dynamic">
@@ -1376,7 +1380,8 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         </h3>
 <p id="section-2.1-1">The terms "client", "authorization server", "resource server", "access token", "protected resource", "authorization request", "authorization response", "access token request", "access token response" are defined by the OAuth 2.0 Authorization Framework specification <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
 <p id="section-2.1-2">The term "resource" is defined by the Resource Indicators for OAuth 2.0 specification <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.<a href="#section-2.1-2" class="pilcrow">¶</a></p>
-<p id="section-2.1-3">The term "StringOrURI" is defined by the JWT specification <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>.<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">The term "server-assigned resource" denotes resource(s) assigned by the authorization server (e.g., defaults or additions based on policy, configuration, or requested scopes).<a href="#section-2.1-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-4">The term "StringOrURI" is defined by the JWT specification <span>[<a href="#RFC7519" class="cite xref">RFC7519</a>]</span>.<a href="#section-2.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="resource-vs-audience">
@@ -1400,8 +1405,8 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
         </ul>
 <p id="section-2.2-5">Audience assignment is a matter of authorization server policy. A client therefore cannot reliably predict which audience value will be used in an issued access token or which audience values a resource server will accept. This limitation is particularly relevant in dynamic environments, such as those using OAuth 2.0 Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>, where a client can discover the protected resource URL but cannot discover the authorization server’s audience assignment policy.<a href="#section-2.2-5" class="pilcrow">¶</a></p>
 <p id="section-2.2-6">Some deployments attempt to encode protected resource identifiers into scope values and rely on the <code>scope</code> parameter in the access token response <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span> to infer the applicability of an access token. This approach conflates two distinct concepts in OAuth. Scope expresses the permissions or actions that an access token authorizes, while the <code>resource</code> parameter <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> identifies the protected resource at which those permissions may be exercised. Encoding resource identifiers into scope values obscures this distinction, limits the independent evolution of authorization and resource targeting, and does not compose well in deployments where a single resource supports multiple scopes or where the same scope applies across multiple resources.<a href="#section-2.2-6" class="pilcrow">¶</a></p>
-<p id="section-2.2-7">Some deployments also rely on protected resource metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span> or authorization server metadata <span>[<a href="#RFC8414" class="cite xref">RFC8414</a>]</span> to discover which authorization server is authoritative for a given protected resource. While these mechanisms support discovery, they do not provide issuance-time confirmation of the resource or resources for which an access token is valid. Metadata describes static relationships and capabilities, not the authorization server’s resource selection decision for a specific token. As a result, metadata alone cannot be relied upon to determine whether an authorization server honored, restricted, or substituted a requested resource when issuing an access token.<a href="#section-2.2-7" class="pilcrow">¶</a></p>
-<p id="section-2.2-8">For these reasons, returning audience or scope information in the token response is less useful to a client than returning the resource or resources for which the access token was issued. By returning the <code>resource</code> parameter, this specification enables a client to confirm that an access token is valid for the specific resource it requested and to detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.<a href="#section-2.2-8" class="pilcrow">¶</a></p>
+<p id="section-2.2-7">Some deployments also rely on protected resource metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span> or authorization server metadata <span>[<a href="#RFC8414" class="cite xref">RFC8414</a>]</span> to discover which authorization server is authoritative for a given protected resource. While these mechanisms support discovery, they do not provide issuance-time confirmation of the resource(s) for which an access token is valid. Metadata describes static relationships and capabilities, not the authorization server’s resource selection decision for a specific token. As a result, metadata alone cannot be relied upon to determine whether an authorization server honored, restricted, or substituted a requested resource when issuing an access token.<a href="#section-2.2-7" class="pilcrow">¶</a></p>
+<p id="section-2.2-8">For these reasons, returning audience or scope information in the token response is less useful to a client than returning the resource(s) for which the access token was issued. By returning the <code>resource</code> parameter, this specification enables a client to confirm that an access token is valid for the specific resource it requested and to detect resource mix-up conditions in which an authorization server issues a token for a different resource than intended.<a href="#section-2.2-8" class="pilcrow">¶</a></p>
 <p id="section-2.2-9">This approach is consistent with Resource Indicators <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>, which define the <code>resource</code> parameter as the client-facing mechanism for identifying the target protected resource, independent of how a resource server enforces audience restrictions internally.<a href="#section-2.2-9" class="pilcrow">¶</a></p>
 <p id="section-2.2-10">This specification does not define, constrain, or replace the use of audience values in access tokens, nor does it require any particular token format. How authorization servers encode audience information and how resource servers enforce audience restrictions are explicitly out of scope.<a href="#section-2.2-10" class="pilcrow">¶</a></p>
 </section>
@@ -1413,7 +1418,7 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
       <h2 id="name-resource-parameter-in-token">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-resource-parameter-in-token" class="section-name selfRef">Resource Parameter in Token Response</a>
       </h2>
-<p id="section-3-1">Authorization servers that support this specification <span class="bcp14">MUST</span> include the <code>resource</code> parameter in successful access token responses, as defined in Section 5.1 of <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, to identify the protected resource or resources for which the access token is valid, according to the rules in <a href="#authorization-server-processing-rules" class="auto internal xref">Section 3.2</a>.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-1">Authorization servers that support this specification <span class="bcp14">MUST</span> include the <code>resource</code> parameter in successful access token responses, as defined in Section 5.1 of <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>, to identify the protected resource(s) for which the access token is valid, according to the rules in <a href="#authorization-server-processing-rules" class="auto internal xref">Section 3.2</a>.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <p id="section-3-2">The value of the <code>resource</code> parameter <span class="bcp14">MUST</span> be either:<a href="#section-3-2" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-3.1">
@@ -1455,12 +1460,14 @@ Pragma: no-cache
         <h3 id="name-authorization-server-proces">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-authorization-server-proces" class="section-name selfRef">Authorization Server Processing Rules</a>
         </h3>
-<p id="section-3.2-1">Authorization server processing is determined by the number of <code>resource</code> parameters included in the authorization request or token request, as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">The following rules describe how an authorization server evaluates requested resources and determines the effective resource or resources associated with an issued access token.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
+<p id="section-3.2-1">Authorization server processing is determined by the number of <code>resource</code> parameters included in the authorization request or token request, as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>. Server-assigned resources may also affect processing; the effective resource set can be influenced by requested scopes, authorization server policy, client configuration, and other factors.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-2">The following rules describe how an authorization server evaluates requested resources and determines the effective resource(s) associated with an issued access token. These rules apply equally to access tokens issued using the authorization code grant and the refresh token grant.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
 <p id="section-3.2-3">When issuing an access token, any <code>resource</code> parameters included in the token request represent an additional restriction on the resources permitted by the underlying authorization grant. The authorization server <span class="bcp14">MUST</span> ensure that each requested resource in the token request is within the set of resources authorized by the grant, or otherwise acceptable under local policy consistent with <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>. If this condition is not met, the authorization server <span class="bcp14">MUST</span> return an <code>invalid_target</code> error and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
-<p id="section-3.2-4">If the client includes <code>resource</code> parameters in both the authorization request and the token request, the values in the token request <span class="bcp14">MUST</span> be treated as a further restriction and <span class="bcp14">MUST</span> be a subset of the resources permitted by the underlying grant. If no <code>resource</code> parameter is included in the token request, the authorization server <span class="bcp14">MAY</span> issue an access token for the resource or resources previously authorized by the grant, subject to local policy.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">If the client includes <code>resource</code> parameters in both the authorization request and the token request, the values in the token request <span class="bcp14">MUST</span> be treated as a further restriction and <span class="bcp14">MUST</span> be a subset of the resources permitted by the underlying grant. If no <code>resource</code> parameter is included in the token request, the authorization server <span class="bcp14">MAY</span> issue an access token for the resource(s) previously authorized by the grant, subject to local policy.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
 <p id="section-3.2-5">When issuing an access token in response to a refresh token request, the authorization server <span class="bcp14">MUST NOT</span> expand the set of authorized resources beyond those previously bound to the underlying grant. If the client supplies one or more <code>resource</code> parameters in the refresh token request, each requested resource <span class="bcp14">MUST</span> be within the previously authorized set or otherwise acceptable under local policy consistent with <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>. If this condition is not met, the authorization server <span class="bcp14">MUST</span> return an <code>invalid_target</code> error and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
 <p id="section-3.2-6">An authorization server <span class="bcp14">MAY</span> require clients to include a <code>resource</code> parameter. If a <code>resource</code> parameter is required by local policy and the client does not include one, the authorization server <span class="bcp14">MUST</span> return an <code>invalid_target</code> error as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.2-6" class="pilcrow">¶</a></p>
+<p id="section-3.2-7">When including a <code>resource</code> parameter in the access token response, the authorization server <span class="bcp14">MUST</span> use a string when exactly one resource value is returned and <span class="bcp14">MUST</span> use an array of strings when more than one resource value is returned (whether from requested resources, server-assigned resources, or both).<a href="#section-3.2-7" class="pilcrow">¶</a></p>
+<p id="section-3.2-8">When the client included one or more <code>resource</code> parameters in the request, the authorization server <span class="bcp14">MUST NOT</span> issue an access token unless at least one requested resource is acceptable. The server <span class="bcp14">MUST</span> return an <code>invalid_target</code> error if none of the requested resources are acceptable, even if server-assigned resources could be returned. Server-assigned resources may only be included in addition to at least one accepted requested resource.<a href="#section-3.2-8" class="pilcrow">¶</a></p>
 <div id="summary-table">
 <section id="section-3.2.1">
           <h4 id="name-summary-table">
@@ -1478,43 +1485,23 @@ Pragma: no-cache
             <tbody>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <strong>Exactly one <code>resource</code> requested</strong>
+                  <strong>One or more <code>resource</code> values requested</strong>
 </td>
-                <td class="text-left" rowspan="1" colspan="1">No acceptable resource</td>
+                <td class="text-left" rowspan="1" colspan="1">No acceptable requested resource</td>
                 <td class="text-left" rowspan="1" colspan="1">
                   <span class="bcp14">MUST</span> return <code>invalid_target</code> and <span class="bcp14">MUST NOT</span> issue an access token.</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">One acceptable resource</td>
+                <td class="text-left" rowspan="1" colspan="1">One or more acceptable requested resources</td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <span class="bcp14">MUST</span> include <code>resource</code> as a string containing the accepted resource.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <strong>Multiple <code>resource</code> values requested</strong>
-</td>
-                <td class="text-left" rowspan="1" colspan="1">No acceptable resources</td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <span class="bcp14">MUST</span> return <code>invalid_target</code> and <span class="bcp14">MUST NOT</span> issue an access token.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">Subset of requested resources acceptable</td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <span class="bcp14">MUST</span> include <code>resource</code> as an array containing only the accepted subset.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">All requested resources acceptable</td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <span class="bcp14">MUST</span> include <code>resource</code> as an array containing all accepted resources.</td>
+                  <span class="bcp14">MUST</span> include <code>resource</code> with at least the accepted requested resource(s). <span class="bcp14">MAY</span> include server-assigned resource(s) in addition.</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
                   <strong>No <code>resource</code> requested</strong>
 </td>
-                <td class="text-left" rowspan="1" colspan="1">Default resource(s) assigned</td>
+                <td class="text-left" rowspan="1" colspan="1">server-assigned resource(s)</td>
                 <td class="text-left" rowspan="1" colspan="1">
                   <span class="bcp14">SHOULD</span> include the assigned resource(s) in the <code>resource</code> parameter.</td>
               </tr>
@@ -1529,66 +1516,36 @@ Pragma: no-cache
 <p id="section-3.2.1-2">When comparing resource identifiers, the authorization server <span class="bcp14">MUST</span> apply the rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.2.1-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="client-requested-exactly-one-resource">
+<div id="client-requested-one-or-more-resources">
 <section id="section-3.2.2">
-          <h4 id="name-client-requested-exactly-on">
-<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-client-requested-exactly-on" class="section-name selfRef">Client Requested Exactly One Resource</a>
+          <h4 id="name-client-requested-one-or-mor">
+<a href="#section-3.2.2" class="section-number selfRef">3.2.2. </a><a href="#name-client-requested-one-or-mor" class="section-name selfRef">Client Requested One or More Resources</a>
           </h4>
-<p id="section-3.2.2-1">If the client included exactly one <code>resource</code> parameter in the authorization request or token request:<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.2-1">If the client included one or more <code>resource</code> parameters in the authorization request or token request:<a href="#section-3.2.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2.2-2.1">
-              <p id="section-3.2.2-2.1.1">The authorization server <span class="bcp14">MUST</span> evaluate the requested <code>resource</code> value according to local policy.<a href="#section-3.2.2-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-3.2.2-2.1.1">The authorization server <span class="bcp14">MUST</span> evaluate the requested <code>resource</code> value(s) according to local policy and determine which requested values are acceptable.<a href="#section-3.2.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.2-2.2">
-              <p id="section-3.2.2-2.2.1">If the requested <code>resource</code> value is not acceptable, the authorization server <span class="bcp14">MUST</span> return an <code>invalid_target</code> error response as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.2.2-2.2.1" class="pilcrow">¶</a></p>
+              <p id="section-3.2.2-2.2.1">If none of the requested <code>resource</code> values are acceptable, the authorization server <span class="bcp14">MUST</span> return an <code>invalid_target</code> error response as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.2.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.2.2-2.3">
-              <p id="section-3.2.2-2.3.1">If the requested <code>resource</code> value is acceptable:<a href="#section-3.2.2-2.3.1" class="pilcrow">¶</a></p>
+              <p id="section-3.2.2-2.3.1">If one or more requested <code>resource</code> values are acceptable:<a href="#section-3.2.2-2.3.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2.2-2.3.2.1">
                   <p id="section-3.2.2-2.3.2.1.1">The authorization server <span class="bcp14">MUST</span> include the <code>resource</code> parameter in the access token response.<a href="#section-3.2.2-2.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
                 <li class="normal" id="section-3.2.2-2.3.2.2">
-                  <p id="section-3.2.2-2.3.2.2.1">The <code>resource</code> parameter value <span class="bcp14">MUST</span> be a string containing the accepted <code>resource</code> value.<a href="#section-3.2.2-2.3.2.2.1" class="pilcrow">¶</a></p>
+                  <p id="section-3.2.2-2.3.2.2.1">The returned value(s) <span class="bcp14">MUST</span> include at least one requested <code>resource</code> value according to the rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.2.2-2.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
                 <li class="normal" id="section-3.2.2-2.3.2.3">
-                  <p id="section-3.2.2-2.3.2.3.1">The returned <code>resource</code> value <span class="bcp14">MUST</span> match the requested <code>resource</code> value according to the rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.2.2-2.3.2.3.1" class="pilcrow">¶</a></p>
+                  <p id="section-3.2.2-2.3.2.3.1">The returned set <span class="bcp14">MAY</span> contain a strict subset of the requested <code>resource</code> values (when multiple were requested).<a href="#section-3.2.2-2.3.2.3.1" class="pilcrow">¶</a></p>
 </li>
-              </ul>
+                <li class="normal" id="section-3.2.2-2.3.2.4">
+                  <p id="section-3.2.2-2.3.2.4.1">The returned set <span class="bcp14">MAY</span> contain additional server-assigned resources. See <a href="#ex-scope-defined-resource" class="auto internal xref">Appendix A.2</a> for an example using scope-defined resources.<a href="#section-3.2.2-2.3.2.4.1" class="pilcrow">¶</a></p>
 </li>
-          </ul>
-</section>
-</div>
-<div id="client-requested-multiple-resources">
-<section id="section-3.2.3">
-          <h4 id="name-client-requested-multiple-r">
-<a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-client-requested-multiple-r" class="section-name selfRef">Client Requested Multiple Resources</a>
-          </h4>
-<p id="section-3.2.3-1">If the client included more than one <code>resource</code> parameter in the authorization request or token request:<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.2.3-2.1">
-              <p id="section-3.2.3-2.1.1">The authorization server <span class="bcp14">MUST</span> evaluate the requested <code>resource</code> values according to local policy and determine which requested values are acceptable.<a href="#section-3.2.3-2.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.2.3-2.2">
-              <p id="section-3.2.3-2.2.1">If none of the requested <code>resource</code> values are acceptable, the authorization server <span class="bcp14">MUST</span> return an <code>invalid_target</code> error response as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> and <span class="bcp14">MUST NOT</span> issue an access token.<a href="#section-3.2.3-2.2.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.2.3-2.3">
-              <p id="section-3.2.3-2.3.1">If one or more requested <code>resource</code> values are acceptable:<a href="#section-3.2.3-2.3.1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.2.3-2.3.2.1">
-                  <p id="section-3.2.3-2.3.2.1.1">The authorization server <span class="bcp14">MUST</span> include the <code>resource</code> parameter in the access token response.<a href="#section-3.2.3-2.3.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-3.2.3-2.3.2.2">
-                  <p id="section-3.2.3-2.3.2.2.1">The <code>resource</code> parameter value <span class="bcp14">MUST</span> be an array of strings if there is more than one accepted value.<a href="#section-3.2.3-2.3.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-3.2.3-2.3.2.3">
-                  <p id="section-3.2.3-2.3.2.3.1">Each returned <code>resource</code> value <span class="bcp14">MUST</span> match one of the requested <code>resource</code> values according to the rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.2.3-2.3.2.3.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-3.2.3-2.3.2.4">
-                  <p id="section-3.2.3-2.3.2.4.1">The returned array <span class="bcp14">MAY</span> contain a strict subset of the requested <code>resource</code> values.<a href="#section-3.2.3-2.3.2.4.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-3.2.3-2.3.2.5">
-                  <p id="section-3.2.3-2.3.2.5.1">The returned array <span class="bcp14">MUST NOT</span> contain duplicate <code>resource</code> values, including values that differ only by URI normalization using rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.2.3-2.3.2.5.1" class="pilcrow">¶</a></p>
+                <li class="normal" id="section-3.2.2-2.3.2.5">
+                  <p id="section-3.2.2-2.3.2.5.1">The returned set <span class="bcp14">MUST NOT</span> contain duplicate <code>resource</code> values, including values that differ only by URI normalization using rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.2.2-2.3.2.5.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
@@ -1596,36 +1553,30 @@ Pragma: no-cache
 </section>
 </div>
 <div id="client-did-not-request-a-resource">
-<section id="section-3.2.4">
+<section id="section-3.2.3">
           <h4 id="name-client-did-not-request-a-re">
-<a href="#section-3.2.4" class="section-number selfRef">3.2.4. </a><a href="#name-client-did-not-request-a-re" class="section-name selfRef">Client Did Not Request a Resource</a>
+<a href="#section-3.2.3" class="section-number selfRef">3.2.3. </a><a href="#name-client-did-not-request-a-re" class="section-name selfRef">Client Did Not Request a Resource</a>
           </h4>
-<p id="section-3.2.4-1">If the client did not include any <code>resource</code> parameters in the authorization request or token request:<a href="#section-3.2.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-1">If the client did not include any <code>resource</code> parameters in the authorization request or token request:<a href="#section-3.2.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.4-2.1">
-              <p id="section-3.2.4-2.1.1">If the authorization server assigns one or more default <code>resource</code> values based on policy or client configuration:<a href="#section-3.2.4-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.2.3-2.1">
+              <p id="section-3.2.3-2.1.1">If the authorization server assigns one or more server-assigned <code>resource</code> value(s) based on policy, client configuration, or requested scopes:<a href="#section-3.2.3-2.1.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.4-2.1.2.1">
-                  <p id="section-3.2.4-2.1.2.1.1">The authorization server <span class="bcp14">SHOULD</span> include the assigned <code>resource</code> value or values in the <code>resource</code> parameter of the response.<a href="#section-3.2.4-2.1.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-3.2.4-2.1.2.2">
-                  <p id="section-3.2.4-2.1.2.2.1">If exactly one <code>resource</code> value is assigned, the <code>resource</code> parameter value <span class="bcp14">SHOULD</span> be a string.<a href="#section-3.2.4-2.1.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                <li class="normal" id="section-3.2.4-2.1.2.3">
-                  <p id="section-3.2.4-2.1.2.3.1">If multiple <code>resource</code> values are assigned, the <code>resource</code> parameter value <span class="bcp14">SHOULD</span> be an array.<a href="#section-3.2.4-2.1.2.3.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.2.3-2.1.2.1">
+                  <p id="section-3.2.3-2.1.2.1.1">The authorization server <span class="bcp14">SHOULD</span> include the assigned <code>resource</code> value(s) in the <code>resource</code> parameter of the response.<a href="#section-3.2.3-2.1.2.1.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
-            <li class="normal" id="section-3.2.4-2.2">
-              <p id="section-3.2.4-2.2.1">If the authorization server does not apply any <code>resource</code>-specific restriction to the access token:<a href="#section-3.2.4-2.2.1" class="pilcrow">¶</a></p>
+            <li class="normal" id="section-3.2.3-2.2">
+              <p id="section-3.2.3-2.2.1">If the authorization server does not apply any <code>resource</code>-specific restriction to the access token:<a href="#section-3.2.3-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-3.2.4-2.2.2.1">
-                  <p id="section-3.2.4-2.2.2.1.1">The authorization server <span class="bcp14">SHOULD</span> omit the <code>resource</code> parameter from the response.<a href="#section-3.2.4-2.2.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-3.2.3-2.2.2.1">
+                  <p id="section-3.2.3-2.2.2.1.1">The authorization server <span class="bcp14">SHOULD</span> omit the <code>resource</code> parameter from the response.<a href="#section-3.2.3-2.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
               </ul>
 </li>
           </ul>
-<p id="section-3.2.4-3">If the <code>resource</code> parameter is omitted, the access token is not valid for any specific resource as defined by this specification.<a href="#section-3.2.4-3" class="pilcrow">¶</a></p>
+<p id="section-3.2.3-3">If the <code>resource</code> parameter is omitted, the access token is not valid for any specific resource as defined by this specification.<a href="#section-3.2.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1635,9 +1586,9 @@ Pragma: no-cache
         <h3 id="name-client-processing-rules">
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-client-processing-rules" class="section-name selfRef">Client Processing Rules</a>
         </h3>
-<p id="section-3.3-1">A client that supports this extension <span class="bcp14">MUST</span> process access token responses according to the rules in this section, which are determined by the number of <code>resource</code> parameters included in the authorization request or token request, as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-1">A client that supports this extension <span class="bcp14">MUST</span> process access token responses according to the rules in this section, which are determined by whether the client requested one or more resources or no resources, as defined in <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span>.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2">When a <code>resource</code> parameter is included in an access token response, the client <span class="bcp14">MUST</span> interpret and compare the returned resource identifiers using the rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>. If the client cannot determine that an access token is valid for the intended protected resource, the client <span class="bcp14">MUST NOT</span> use the access token.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
-<p id="section-3.3-3">If validation succeeds, the client <span class="bcp14">MAY</span> use the access token and <span class="bcp14">MUST</span> use it only with the resource or resources identified in the response. Any returned <code>scope</code> value <span class="bcp14">MUST</span> be interpreted in conjunction with the returned <code>resource</code> values, and the granted scopes <span class="bcp14">MUST</span> be appropriate for the returned resource or resources, consistent with <span><a href="https://rfc-editor.org/rfc/rfc6749#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<p id="section-3.3-3">If validation succeeds, the client <span class="bcp14">MAY</span> use the access token and <span class="bcp14">MUST</span> use it only with the resource(s) identified in the response. Any returned <code>scope</code> value <span class="bcp14">MUST</span> be interpreted in conjunction with the returned <code>resource</code> values, and the granted scopes <span class="bcp14">MUST</span> be appropriate for the returned resource(s), consistent with <span><a href="https://rfc-editor.org/rfc/rfc6749#section-3.3" class="relref">Section 3.3</a> of [<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
 <p id="section-3.3-4">If validation fails at any point, the client <span class="bcp14">MUST NOT</span> use the access token and <span class="bcp14">SHOULD</span> discard it.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
 <p id="section-3.3-5">These client processing rules apply equally to access tokens issued using the authorization code grant and to access tokens issued using the refresh token grant.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
 <div id="summary-table-1">
@@ -1657,7 +1608,7 @@ Pragma: no-cache
             <tbody>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <strong>Exactly one <code>resource</code> requested</strong>
+                  <strong>One or more <code>resource</code> values requested</strong>
 </td>
                 <td class="text-left" rowspan="1" colspan="1">
                   <code>resource</code> omitted</td>
@@ -1666,52 +1617,8 @@ Pragma: no-cache
               <tr>
                 <td class="text-left" rowspan="1" colspan="1"> </td>
                 <td class="text-left" rowspan="1" colspan="1">
-                  <code>resource</code> = string</td>
-                <td class="text-left" rowspan="1" colspan="1">Valid only if the value matches the requested resource.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <code>resource</code> = array (1 element)</td>
-                <td class="text-left" rowspan="1" colspan="1">Valid only if the element matches the requested resource.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <code>resource</code> = array (&gt;1 elements)</td>
-                <td class="text-left" rowspan="1" colspan="1">Invalid. Client <span class="bcp14">MUST NOT</span> use the access token and <span class="bcp14">SHOULD</span> discard it.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <strong>Multiple <code>resource</code> values requested</strong>
-</td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <code>resource</code> omitted</td>
-                <td class="text-left" rowspan="1" colspan="1">Invalid. Client <span class="bcp14">MUST NOT</span> use the access token and <span class="bcp14">SHOULD</span> discard it.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <code>resource</code> = string</td>
-                <td class="text-left" rowspan="1" colspan="1">Invalid. Client <span class="bcp14">MUST NOT</span> use the access token and <span class="bcp14">SHOULD</span> discard it.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <code>resource</code> = array (subset of requested)</td>
-                <td class="text-left" rowspan="1" colspan="1">Valid. Token is valid only for the returned subset.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <code>resource</code> = array (exact match)</td>
-                <td class="text-left" rowspan="1" colspan="1">Valid. Token is valid for all returned resources.</td>
-              </tr>
-              <tr>
-                <td class="text-left" rowspan="1" colspan="1"> </td>
-                <td class="text-left" rowspan="1" colspan="1">
-                  <code>resource</code> = array (includes unrequested value)</td>
-                <td class="text-left" rowspan="1" colspan="1">Invalid. Client <span class="bcp14">MUST NOT</span> use the access token and <span class="bcp14">SHOULD</span> discard it.</td>
+                  <code>resource</code> present</td>
+                <td class="text-left" rowspan="1" colspan="1">Valid only if at least one returned identifier matches a requested resource; additional elements <span class="bcp14">MAY</span> be server-assigned resources.</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -1725,7 +1632,7 @@ Pragma: no-cache
                 <td class="text-left" rowspan="1" colspan="1"> </td>
                 <td class="text-left" rowspan="1" colspan="1">
                   <code>resource</code> present</td>
-                <td class="text-left" rowspan="1" colspan="1">Valid. Client <span class="bcp14">SHOULD</span> treat the returned value as a default resource assignment.</td>
+                <td class="text-left" rowspan="1" colspan="1">Valid. Client <span class="bcp14">SHOULD</span> treat the returned value as a server-assigned resource assignment.</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -1757,24 +1664,21 @@ Pragma: no-cache
               <p id="section-3.3.2-2.3.1">Any other value is invalid; the client <span class="bcp14">MUST NOT</span> use the access token and <span class="bcp14">SHOULD</span> discard it.<a href="#section-3.3.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
-<p id="section-3.3.2-3">When comparing resource identifiers, the client <span class="bcp14">MUST</span> apply the rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.3.2-3">The client <span class="bcp14">MUST</span> normalize the parsed value to a set of resource identifiers (treating a string as a single-element set) before applying the validation rules below. When comparing resource identifiers, the client <span class="bcp14">MUST</span> apply the rules defined in <a href="#resource-identifier-comparison" class="auto internal xref">Section 3.1</a>.<a href="#section-3.3.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="client-requested-exactly-one-resource-1">
+<div id="client-requested-one-or-more-resources-1">
 <section id="section-3.3.3">
-          <h4 id="name-client-requested-exactly-one">
-<a href="#section-3.3.3" class="section-number selfRef">3.3.3. </a><a href="#name-client-requested-exactly-one" class="section-name selfRef">Client Requested Exactly One Resource</a>
+          <h4 id="name-client-requested-one-or-more">
+<a href="#section-3.3.3" class="section-number selfRef">3.3.3. </a><a href="#name-client-requested-one-or-more" class="section-name selfRef">Client Requested One or More Resources</a>
           </h4>
-<p id="section-3.3.3-1">If the client included exactly one <code>resource</code> parameter in the token request:<a href="#section-3.3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.3-1">If the client included one or more <code>resource</code> parameters in the token request:<a href="#section-3.3.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.3.3-2.1">
-              <p id="section-3.3.3-2.1.1">The response <span class="bcp14">MUST</span> contain exactly one matching resource identifier.<a href="#section-3.3.3-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-3.3.3-2.1.1">The response <span class="bcp14">MUST</span> include a <code>resource</code> parameter containing at least one identifier that matches a requested resource (additional identifiers <span class="bcp14">MAY</span> be server-assigned resources).<a href="#section-3.3.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.3.3-2.2">
-              <p id="section-3.3.3-2.2.1">The returned resource identifier <span class="bcp14">MUST</span> match the requested resource.<a href="#section-3.3.3-2.2.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.3.3-2.3">
-              <p id="section-3.3.3-2.3.1">If the response omits the <code>resource</code> parameter or contains zero or more than one resource identifier, validation fails.<a href="#section-3.3.3-2.3.1" class="pilcrow">¶</a></p>
+              <p id="section-3.3.3-2.2.1">Validation fails when the response omits the <code>resource</code> parameter, when the returned set does not contain any of the requested resources, or when duplicate resource identifiers are present.<a href="#section-3.3.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 <div id="ex-single-resource-authz">
@@ -1782,13 +1686,13 @@ Pragma: no-cache
             <h5 id="name-authorization-request-examp">
 <a href="#section-3.3.3.1" class="section-number selfRef">3.3.3.1. </a><a href="#name-authorization-request-examp" class="section-name selfRef">Authorization Request Example</a>
             </h5>
-<p id="section-3.3.3.1-1">Client obtains an access token for the Customers protected resource (<code>https://api.example.com/customers</code>) using the authorization code grant.<a href="#section-3.3.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.3.1-1">Client obtains an access token for the protected resource at <code>https://api.example.com/customers</code> using the authorization code grant.<a href="#section-3.3.3.1-1" class="pilcrow">¶</a></p>
 <div id="authorization-request">
 <section id="section-3.3.3.1.1">
               <h6 id="name-authorization-request">
 <a href="#section-3.3.3.1.1" class="section-number selfRef">3.3.3.1.1. </a><a href="#name-authorization-request" class="section-name selfRef">Authorization Request</a>
               </h6>
-<p id="section-3.3.3.1.1-1">Client makes an authorization request for the Customers protected resource (<code>https://api.example.com/customers</code>).<a href="#section-3.3.3.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.3.1.1-1">Client makes an authorization request for the protected resource at <code>https://api.example.com/customers</code>.<a href="#section-3.3.3.1.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.3.1.1-2">
 <pre>
 GET /authorize?response_type=code
@@ -1845,7 +1749,7 @@ code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
               <h6 id="name-token-response">
 <a href="#section-3.3.3.1.4" class="section-number selfRef">3.3.3.1.4. </a><a href="#name-token-response" class="section-name selfRef">Token Response</a>
               </h6>
-<p id="section-3.3.3.1.4-1">The authorization server issues an access token that is valid for the Customers protected resource (<code>https://api.example.com/customers</code>).<a href="#section-3.3.3.1.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.3.1.4-1">The authorization server issues an access token that is valid for the protected resource at <code>https://api.example.com/customers</code>.<a href="#section-3.3.3.1.4-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.3.1.4-2">
 <pre>
 HTTP/1.1 200 OK
@@ -1871,13 +1775,13 @@ Pragma: no-cache
             <h5 id="name-refresh-token-request-examp">
 <a href="#section-3.3.3.2" class="section-number selfRef">3.3.3.2. </a><a href="#name-refresh-token-request-examp" class="section-name selfRef">Refresh Token Request Example</a>
             </h5>
-<p id="section-3.3.3.2-1">Client refreshes an access token for the Customers protected resource (<code>https://api.example.com/customers</code>).<a href="#section-3.3.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.3.2-1">Client refreshes an access token for the protected resource at <code>https://api.example.com/customers</code>.<a href="#section-3.3.3.2-1" class="pilcrow">¶</a></p>
 <div id="refresh-token-request">
 <section id="section-3.3.3.2.1">
               <h6 id="name-refresh-token-request">
 <a href="#section-3.3.3.2.1" class="section-number selfRef">3.3.3.2.1. </a><a href="#name-refresh-token-request" class="section-name selfRef">Refresh Token Request</a>
               </h6>
-<p id="section-3.3.3.2.1-1">The client uses a refresh token to request a new access token that is valid for the Customers protected resource (<code>https://api.example.com/customers</code>).<a href="#section-3.3.3.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.3.2.1-1">The client uses a refresh token to request a new access token that is valid for the protected resource at <code>https://api.example.com/customers</code>.<a href="#section-3.3.3.2.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.3.2.1-2">
 <pre>
 POST /token HTTP/1.1
@@ -1898,7 +1802,7 @@ resource=https%3A%2F%2Fapi.example.com%2Fcustomers
               <h6 id="name-token-response-2">
 <a href="#section-3.3.3.2.2" class="section-number selfRef">3.3.3.2.2. </a><a href="#name-token-response-2" class="section-name selfRef">Token Response</a>
               </h6>
-<p id="section-3.3.3.2.2-1">The authorization server issues a new access token that is valid for the Customers protected resource (<code>https://api.example.com/customers</code>).<a href="#section-3.3.3.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.3.2.2-1">The authorization server issues a new access token that is valid for the protected resource at <code>https://api.example.com/customers</code>.<a href="#section-3.3.3.2.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.3.2.2-2">
 <pre>
 HTTP/1.1 200 OK
@@ -1919,44 +1823,19 @@ Pragma: no-cache
 </div>
 </section>
 </div>
-</section>
-</div>
-<div id="client-requested-multiple-resources-1">
-<section id="section-3.3.4">
-          <h4 id="name-client-requested-multiple-re">
-<a href="#section-3.3.4" class="section-number selfRef">3.3.4. </a><a href="#name-client-requested-multiple-re" class="section-name selfRef">Client Requested Multiple Resources</a>
-          </h4>
-<p id="section-3.3.4-1">If the client included more than one <code>resource</code> parameter in the token request:<a href="#section-3.3.4-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.3.4-2.1">
-              <p id="section-3.3.4-2.1.1">The response <span class="bcp14">MUST</span> include a <code>resource</code> parameter.<a href="#section-3.3.4-2.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.3.4-2.2">
-              <p id="section-3.3.4-2.2.1">The value <span class="bcp14">MUST</span> be an array.<a href="#section-3.3.4-2.2.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.3.4-2.3">
-              <p id="section-3.3.4-2.3.1">Each returned resource identifier <span class="bcp14">MUST</span> match one requested resource.<a href="#section-3.3.4-2.3.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.3.4-2.4">
-              <p id="section-3.3.4-2.4.1">The returned set <span class="bcp14">MAY</span> be a strict subset of the requested set.<a href="#section-3.3.4-2.4.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.3.4-2.5">
-              <p id="section-3.3.4-2.5.1">If any unrequested or duplicate resource identifier is present, validation fails.<a href="#section-3.3.4-2.5.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
 <div id="ex-multi-resource-authz">
-<section id="section-3.3.4.1">
+<section id="section-3.3.3.3">
             <h5 id="name-authorization-request-exampl">
-<a href="#section-3.3.4.1" class="section-number selfRef">3.3.4.1. </a><a href="#name-authorization-request-exampl" class="section-name selfRef">Authorization Request Example</a>
+<a href="#section-3.3.3.3" class="section-number selfRef">3.3.3.3. </a><a href="#name-authorization-request-exampl" class="section-name selfRef">Authorization Request Example</a>
             </h5>
-<p id="section-3.3.4.1-1">Client obtains an access token for the Customers (<code>https://api.example.com/customers</code>) and Orders (<code>https://api.example.com/orders</code>) protected resources.<a href="#section-3.3.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.3.3-1">Client obtains an access token for the protected resources at <code>https://api.example.com/customers</code> and <code>https://api.example.com/orders</code>.<a href="#section-3.3.3.3-1" class="pilcrow">¶</a></p>
 <div id="authorization-request-1">
-<section id="section-3.3.4.1.1">
+<section id="section-3.3.3.3.1">
               <h6 id="name-authorization-request-2">
-<a href="#section-3.3.4.1.1" class="section-number selfRef">3.3.4.1.1. </a><a href="#name-authorization-request-2" class="section-name selfRef">Authorization Request</a>
+<a href="#section-3.3.3.3.1" class="section-number selfRef">3.3.3.3.1. </a><a href="#name-authorization-request-2" class="section-name selfRef">Authorization Request</a>
               </h6>
-<p id="section-3.3.4.1.1-1">Client makes an authorization request for both protected resources.<a href="#section-3.3.4.1.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.4.1.1-2">
+<p id="section-3.3.3.3.1-1">Client makes an authorization request for both protected resources.<a href="#section-3.3.3.3.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.3.3.1-2">
 <pre>
 GET /authorize?response_type=code
   &amp;client_id=client123
@@ -1969,14 +1848,178 @@ GET /authorize?response_type=code
   &amp;code_challenge_method=S256
 HTTP/1.1
 Host: authorization-server.example.com
-</pre><a href="#section-3.3.4.1.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.3.3.3.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="redirect-1">
-<section id="section-3.3.4.1.2">
+<section id="section-3.3.3.3.2">
               <h6 id="name-redirect-2">
-<a href="#section-3.3.4.1.2" class="section-number selfRef">3.3.4.1.2. </a><a href="#name-redirect-2" class="section-name selfRef">Redirect</a>
+<a href="#section-3.3.3.3.2" class="section-number selfRef">3.3.3.3.2. </a><a href="#name-redirect-2" class="section-name selfRef">Redirect</a>
+              </h6>
+<p id="section-3.3.3.3.2-1">The authorization server redirects the user-agent back to the client with an authorization code.<a href="#section-3.3.3.3.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.3.3.2-2">
+<pre>
+HTTP/1.1 302 Found
+Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&amp;state=abc123
+</pre><a href="#section-3.3.3.3.2-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="token-request-1">
+<section id="section-3.3.3.3.3">
+              <h6 id="name-token-request-2">
+<a href="#section-3.3.3.3.3" class="section-number selfRef">3.3.3.3.3. </a><a href="#name-token-request-2" class="section-name selfRef">Token Request</a>
+              </h6>
+<p id="section-3.3.3.3.3-1">The client exchanges the authorization code for an access token.<a href="#section-3.3.3.3.3-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.3.3.3-2">
+<pre>
+POST /token HTTP/1.1
+Host: authorization-server.example.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&amp;
+code=SplxlOBeZQQYbYS6WxSbIA&amp;
+redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&amp;
+client_id=client123&amp;
+code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+</pre><a href="#section-3.3.3.3.3-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="token-response-2">
+<section id="section-3.3.3.3.4">
+              <h6 id="name-token-response-3">
+<a href="#section-3.3.3.3.4" class="section-number selfRef">3.3.3.3.4. </a><a href="#name-token-response-3" class="section-name selfRef">Token Response</a>
+              </h6>
+<p id="section-3.3.3.3.4-1">The authorization server issues an access token that is valid for both protected resources.<a href="#section-3.3.3.3.4-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.3.3.4-2">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "access_token": "ACCESS_TOKEN",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "customers:read orders:read",
+  "resource": [
+    "https://api.example.com/customers",
+    "https://api.example.com/orders"
+  ]
+}
+</pre><a href="#section-3.3.3.3.4-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="ex-multi-resource-refresh">
+<section id="section-3.3.3.4">
+            <h5 id="name-refresh-token-request-exampl">
+<a href="#section-3.3.3.4" class="section-number selfRef">3.3.3.4. </a><a href="#name-refresh-token-request-exampl" class="section-name selfRef">Refresh Token Request Example</a>
+            </h5>
+<p id="section-3.3.3.4-1">Client refreshes an access token for the protected resources at <code>https://api.example.com/customers</code> and <code>https://api.example.com/orders</code>.<a href="#section-3.3.3.4-1" class="pilcrow">¶</a></p>
+<div id="refresh-token-request-1">
+<section id="section-3.3.3.4.1">
+              <h6 id="name-refresh-token-request-2">
+<a href="#section-3.3.3.4.1" class="section-number selfRef">3.3.3.4.1. </a><a href="#name-refresh-token-request-2" class="section-name selfRef">Refresh Token Request</a>
+              </h6>
+<p id="section-3.3.3.4.1-1">The client uses a refresh token to request a new access token that is valid for both protected resources.<a href="#section-3.3.3.4.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.3.4.1-2">
+<pre>
+POST /token HTTP/1.1
+Host: authorization-server.example.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&amp;
+refresh_token=REFRESH_TOKEN&amp;
+client_id=client123&amp;
+scope=customers%3Aread%20orders%3Aread&amp;
+resource=https%3A%2F%2Fapi.example.com%2Fcustomers&amp;
+resource=https%3A%2F%2Fapi.example.com%2Forders
+</pre><a href="#section-3.3.3.4.1-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="token-response-3">
+<section id="section-3.3.3.4.2">
+              <h6 id="name-token-response-4">
+<a href="#section-3.3.3.4.2" class="section-number selfRef">3.3.3.4.2. </a><a href="#name-token-response-4" class="section-name selfRef">Token Response</a>
+              </h6>
+<p id="section-3.3.3.4.2-1">The authorization server issues a new access token that is valid for both protected resources.<a href="#section-3.3.3.4.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.3.4.2-2">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "access_token": "ACCESS_TOKEN",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "customers:read orders:read",
+  "resource": [
+    "https://api.example.com/customers",
+    "https://api.example.com/orders"
+  ]
+}
+</pre><a href="#section-3.3.3.4.2-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div id="client-did-not-request-a-resource-1">
+<section id="section-3.3.4">
+          <h4 id="name-client-did-not-request-a-res">
+<a href="#section-3.3.4" class="section-number selfRef">3.3.4. </a><a href="#name-client-did-not-request-a-res" class="section-name selfRef">Client Did Not Request a Resource</a>
+          </h4>
+<p id="section-3.3.4-1">If the client did not include any <code>resource</code> parameters in the token request:<a href="#section-3.3.4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3.3.4-2.1">
+              <p id="section-3.3.4-2.1.1">If the response includes a <code>resource</code> parameter, the client <span class="bcp14">MAY</span> treat it as a server-assigned resource assignment.<a href="#section-3.3.4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+            <li class="normal" id="section-3.3.4-2.2">
+              <p id="section-3.3.4-2.2.1">If the response omits the <code>resource</code> parameter, the token <span class="bcp14">SHOULD</span> be treated as unbounded.<a href="#section-3.3.4-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<div id="ex-default-resource-authz">
+<section id="section-3.3.4.1">
+            <h5 id="name-authorization-request-example">
+<a href="#section-3.3.4.1" class="section-number selfRef">3.3.4.1. </a><a href="#name-authorization-request-example" class="section-name selfRef">Authorization Request Example</a>
+            </h5>
+<p id="section-3.3.4.1-1">Client obtains an access token without requesting a specific resource.<a href="#section-3.3.4.1-1" class="pilcrow">¶</a></p>
+<div id="authorization-request-2">
+<section id="section-3.3.4.1.1">
+              <h6 id="name-authorization-request-3">
+<a href="#section-3.3.4.1.1" class="section-number selfRef">3.3.4.1.1. </a><a href="#name-authorization-request-3" class="section-name selfRef">Authorization Request</a>
+              </h6>
+<p id="section-3.3.4.1.1-1">Client makes an authorization request without including a resource indicator.<a href="#section-3.3.4.1.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.4.1.1-2">
+<pre>
+GET /authorize?response_type=code
+  &amp;client_id=client123
+  &amp;redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+  &amp;scope=orders%3Aread
+  &amp;state=abc123
+  &amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+  &amp;code_challenge_method=S256
+HTTP/1.1
+Host: authorization-server.example.com
+</pre><a href="#section-3.3.4.1.1-2" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="redirect-2">
+<section id="section-3.3.4.1.2">
+              <h6 id="name-redirect-3">
+<a href="#section-3.3.4.1.2" class="section-number selfRef">3.3.4.1.2. </a><a href="#name-redirect-3" class="section-name selfRef">Redirect</a>
               </h6>
 <p id="section-3.3.4.1.2-1">The authorization server redirects the user-agent back to the client with an authorization code.<a href="#section-3.3.4.1.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.4.1.2-2">
@@ -1987,10 +2030,10 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&amp;state=ab
 </div>
 </section>
 </div>
-<div id="token-request-1">
+<div id="token-request-2">
 <section id="section-3.3.4.1.3">
-              <h6 id="name-token-request-2">
-<a href="#section-3.3.4.1.3" class="section-number selfRef">3.3.4.1.3. </a><a href="#name-token-request-2" class="section-name selfRef">Token Request</a>
+              <h6 id="name-token-request-3">
+<a href="#section-3.3.4.1.3" class="section-number selfRef">3.3.4.1.3. </a><a href="#name-token-request-3" class="section-name selfRef">Token Request</a>
               </h6>
 <p id="section-3.3.4.1.3-1">The client exchanges the authorization code for an access token.<a href="#section-3.3.4.1.3-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.4.1.3-2">
@@ -2008,12 +2051,12 @@ code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
 </div>
 </section>
 </div>
-<div id="token-response-2">
+<div id="token-response-4">
 <section id="section-3.3.4.1.4">
-              <h6 id="name-token-response-3">
-<a href="#section-3.3.4.1.4" class="section-number selfRef">3.3.4.1.4. </a><a href="#name-token-response-3" class="section-name selfRef">Token Response</a>
+              <h6 id="name-token-response-5">
+<a href="#section-3.3.4.1.4" class="section-number selfRef">3.3.4.1.4. </a><a href="#name-token-response-5" class="section-name selfRef">Token Response</a>
               </h6>
-<p id="section-3.3.4.1.4-1">The authorization server issues an access token that is valid for both protected resources.<a href="#section-3.3.4.1.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.4.1.4-1">The authorization server issues an access token that is valid for the server-assigned protected resource (<code>https://api.example.com/orders</code>).<a href="#section-3.3.4.1.4-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.4.1.4-2">
 <pre>
 HTTP/1.1 200 OK
@@ -2025,11 +2068,8 @@ Pragma: no-cache
   "access_token": "ACCESS_TOKEN",
   "token_type": "Bearer",
   "expires_in": 3600,
-  "scope": "customers:read orders:read",
-  "resource": [
-    "https://api.example.com/customers",
-    "https://api.example.com/orders"
-  ]
+  "scope": "orders:read",
+  "resource": "https://api.example.com/orders"
 }
 </pre><a href="#section-3.3.4.1.4-2" class="pilcrow">¶</a>
 </div>
@@ -2037,18 +2077,18 @@ Pragma: no-cache
 </div>
 </section>
 </div>
-<div id="ex-multi-resource-refresh">
+<div id="ex-default-resource-refresh">
 <section id="section-3.3.4.2">
-            <h5 id="name-refresh-token-request-exampl">
-<a href="#section-3.3.4.2" class="section-number selfRef">3.3.4.2. </a><a href="#name-refresh-token-request-exampl" class="section-name selfRef">Refresh Token Request Example</a>
+            <h5 id="name-refresh-token-request-example">
+<a href="#section-3.3.4.2" class="section-number selfRef">3.3.4.2. </a><a href="#name-refresh-token-request-example" class="section-name selfRef">Refresh Token Request Example</a>
             </h5>
-<p id="section-3.3.4.2-1">Client refreshes an access token for the Customers and Orders protected resources.<a href="#section-3.3.4.2-1" class="pilcrow">¶</a></p>
-<div id="refresh-token-request-1">
+<p id="section-3.3.4.2-1">Client refreshes an access token without explicitly requesting a resource.<a href="#section-3.3.4.2-1" class="pilcrow">¶</a></p>
+<div id="refresh-token-request-2">
 <section id="section-3.3.4.2.1">
-              <h6 id="name-refresh-token-request-2">
-<a href="#section-3.3.4.2.1" class="section-number selfRef">3.3.4.2.1. </a><a href="#name-refresh-token-request-2" class="section-name selfRef">Refresh Token Request</a>
+              <h6 id="name-refresh-token-request-3">
+<a href="#section-3.3.4.2.1" class="section-number selfRef">3.3.4.2.1. </a><a href="#name-refresh-token-request-3" class="section-name selfRef">Refresh Token Request</a>
               </h6>
-<p id="section-3.3.4.2.1-1">The client uses a refresh token to request a new access token that is valid for both protected resources.<a href="#section-3.3.4.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.4.2.1-1">The client uses a refresh token to request a new access token without explicitly requesting a resource.<a href="#section-3.3.4.2.1-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.4.2.1-2">
 <pre>
 POST /token HTTP/1.1
@@ -2058,19 +2098,17 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=refresh_token&amp;
 refresh_token=REFRESH_TOKEN&amp;
 client_id=client123&amp;
-scope=customers%3Aread%20orders%3Aread&amp;
-resource=https%3A%2F%2Fapi.example.com%2Fcustomers&amp;
-resource=https%3A%2F%2Fapi.example.com%2Forders
+scope=orders%3Aread
 </pre><a href="#section-3.3.4.2.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
-<div id="token-response-3">
+<div id="token-response-5">
 <section id="section-3.3.4.2.2">
-              <h6 id="name-token-response-4">
-<a href="#section-3.3.4.2.2" class="section-number selfRef">3.3.4.2.2. </a><a href="#name-token-response-4" class="section-name selfRef">Token Response</a>
+              <h6 id="name-token-response-6">
+<a href="#section-3.3.4.2.2" class="section-number selfRef">3.3.4.2.2. </a><a href="#name-token-response-6" class="section-name selfRef">Token Response</a>
               </h6>
-<p id="section-3.3.4.2.2-1">The authorization server issues a new access token that is valid for both protected resources.<a href="#section-3.3.4.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.4.2.2-1">The authorization server issues a new access token that is valid for the server-assigned protected resource (<code>https://api.example.com/orders</code>).<a href="#section-3.3.4.2.2-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.3.4.2.2-2">
 <pre>
 HTTP/1.1 200 OK
@@ -2082,11 +2120,8 @@ Pragma: no-cache
   "access_token": "ACCESS_TOKEN",
   "token_type": "Bearer",
   "expires_in": 3600,
-  "scope": "customers:read orders:read",
-  "resource": [
-    "https://api.example.com/customers",
-    "https://api.example.com/orders"
-  ]
+  "scope": "orders:read",
+  "resource": "https://api.example.com/orders"
 }
 </pre><a href="#section-3.3.4.2.2-2" class="pilcrow">¶</a>
 </div>
@@ -2096,182 +2131,26 @@ Pragma: no-cache
 </div>
 </section>
 </div>
-<div id="client-did-not-request-a-resource-1">
-<section id="section-3.3.5">
-          <h4 id="name-client-did-not-request-a-res">
-<a href="#section-3.3.5" class="section-number selfRef">3.3.5. </a><a href="#name-client-did-not-request-a-res" class="section-name selfRef">Client Did Not Request a Resource</a>
-          </h4>
-<p id="section-3.3.5-1">If the client did not include any <code>resource</code> parameters in the token request:<a href="#section-3.3.5-1" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-3.3.5-2.1">
-              <p id="section-3.3.5-2.1.1">If the response includes a <code>resource</code> parameter, the client <span class="bcp14">MAY</span> treat it as a default resource assignment.<a href="#section-3.3.5-2.1.1" class="pilcrow">¶</a></p>
-</li>
-            <li class="normal" id="section-3.3.5-2.2">
-              <p id="section-3.3.5-2.2.1">If the response omits the <code>resource</code> parameter, the token <span class="bcp14">SHOULD</span> be treated as unbounded.<a href="#section-3.3.5-2.2.1" class="pilcrow">¶</a></p>
-</li>
-          </ul>
-<div id="ex-default-resource-authz">
-<section id="section-3.3.5.1">
-            <h5 id="name-authorization-request-example">
-<a href="#section-3.3.5.1" class="section-number selfRef">3.3.5.1. </a><a href="#name-authorization-request-example" class="section-name selfRef">Authorization Request Example</a>
-            </h5>
-<p id="section-3.3.5.1-1">Client obtains an access token without requesting a specific resource.<a href="#section-3.3.5.1-1" class="pilcrow">¶</a></p>
-<div id="authorization-request-2">
-<section id="section-3.3.5.1.1">
-              <h6 id="name-authorization-request-3">
-<a href="#section-3.3.5.1.1" class="section-number selfRef">3.3.5.1.1. </a><a href="#name-authorization-request-3" class="section-name selfRef">Authorization Request</a>
-              </h6>
-<p id="section-3.3.5.1.1-1">Client makes an authorization request without including a resource indicator.<a href="#section-3.3.5.1.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.5.1.1-2">
-<pre>
-GET /authorize?response_type=code
-  &amp;client_id=client123
-  &amp;redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
-  &amp;scope=orders%3Aread
-  &amp;state=abc123
-  &amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
-  &amp;code_challenge_method=S256
-HTTP/1.1
-Host: authorization-server.example.com
-</pre><a href="#section-3.3.5.1.1-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="redirect-2">
-<section id="section-3.3.5.1.2">
-              <h6 id="name-redirect-3">
-<a href="#section-3.3.5.1.2" class="section-number selfRef">3.3.5.1.2. </a><a href="#name-redirect-3" class="section-name selfRef">Redirect</a>
-              </h6>
-<p id="section-3.3.5.1.2-1">The authorization server redirects the user-agent back to the client with an authorization code.<a href="#section-3.3.5.1.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.5.1.2-2">
-<pre>
-HTTP/1.1 302 Found
-Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&amp;state=abc123
-</pre><a href="#section-3.3.5.1.2-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="token-request-2">
-<section id="section-3.3.5.1.3">
-              <h6 id="name-token-request-3">
-<a href="#section-3.3.5.1.3" class="section-number selfRef">3.3.5.1.3. </a><a href="#name-token-request-3" class="section-name selfRef">Token Request</a>
-              </h6>
-<p id="section-3.3.5.1.3-1">The client exchanges the authorization code for an access token.<a href="#section-3.3.5.1.3-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.5.1.3-2">
-<pre>
-POST /token HTTP/1.1
-Host: authorization-server.example.com
-Content-Type: application/x-www-form-urlencoded
-
-grant_type=authorization_code&amp;
-code=SplxlOBeZQQYbYS6WxSbIA&amp;
-redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&amp;
-client_id=client123&amp;
-code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
-</pre><a href="#section-3.3.5.1.3-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="token-response-4">
-<section id="section-3.3.5.1.4">
-              <h6 id="name-token-response-5">
-<a href="#section-3.3.5.1.4" class="section-number selfRef">3.3.5.1.4. </a><a href="#name-token-response-5" class="section-name selfRef">Token Response</a>
-              </h6>
-<p id="section-3.3.5.1.4-1">The authorization server issues an access token that is valid for the default protected resource (<code>https://api.example.com/orders</code>).<a href="#section-3.3.5.1.4-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.5.1.4-2">
-<pre>
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: no-store
-Pragma: no-cache
-
-{
-  "access_token": "ACCESS_TOKEN",
-  "token_type": "Bearer",
-  "expires_in": 3600,
-  "scope": "orders:read",
-  "resource": "https://api.example.com/orders"
-}
-</pre><a href="#section-3.3.5.1.4-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-</section>
-</div>
-<div id="ex-default-resource-refresh">
-<section id="section-3.3.5.2">
-            <h5 id="name-refresh-token-request-example">
-<a href="#section-3.3.5.2" class="section-number selfRef">3.3.5.2. </a><a href="#name-refresh-token-request-example" class="section-name selfRef">Refresh Token Request Example</a>
-            </h5>
-<p id="section-3.3.5.2-1">Client refreshes an access token without explicitly requesting a resource.<a href="#section-3.3.5.2-1" class="pilcrow">¶</a></p>
-<div id="refresh-token-request-2">
-<section id="section-3.3.5.2.1">
-              <h6 id="name-refresh-token-request-3">
-<a href="#section-3.3.5.2.1" class="section-number selfRef">3.3.5.2.1. </a><a href="#name-refresh-token-request-3" class="section-name selfRef">Refresh Token Request</a>
-              </h6>
-<p id="section-3.3.5.2.1-1">The client uses a refresh token to request a new access token without explicitly requesting a resource.<a href="#section-3.3.5.2.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.5.2.1-2">
-<pre>
-POST /token HTTP/1.1
-Host: authorization-server.example.com
-Content-Type: application/x-www-form-urlencoded
-
-grant_type=refresh_token&amp;
-refresh_token=REFRESH_TOKEN&amp;
-client_id=client123&amp;
-scope=orders%3Aread
-</pre><a href="#section-3.3.5.2.1-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-<div id="token-response-5">
-<section id="section-3.3.5.2.2">
-              <h6 id="name-token-response-6">
-<a href="#section-3.3.5.2.2" class="section-number selfRef">3.3.5.2.2. </a><a href="#name-token-response-6" class="section-name selfRef">Token Response</a>
-              </h6>
-<p id="section-3.3.5.2.2-1">The authorization server issues a new access token that is valid for the default protected resource (<code>https://api.example.com/orders</code>).<a href="#section-3.3.5.2.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.5.2.2-2">
-<pre>
-HTTP/1.1 200 OK
-Content-Type: application/json
-Cache-Control: no-store
-Pragma: no-cache
-
-{
-  "access_token": "ACCESS_TOKEN",
-  "token_type": "Bearer",
-  "expires_in": 3600,
-  "scope": "orders:read",
-  "resource": "https://api.example.com/orders"
-}
-</pre><a href="#section-3.3.5.2.2-2" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
-</section>
-</div>
-</section>
-</div>
 <div id="invalid-resource">
-<section id="section-3.3.6">
+<section id="section-3.3.5">
           <h4 id="name-invalid-resource">
-<a href="#section-3.3.6" class="section-number selfRef">3.3.6. </a><a href="#name-invalid-resource" class="section-name selfRef">Invalid Resource</a>
+<a href="#section-3.3.5" class="section-number selfRef">3.3.5. </a><a href="#name-invalid-resource" class="section-name selfRef">Invalid Resource</a>
           </h4>
-<p id="section-3.3.6-1">An <code>invalid_target</code> error indicates that none of the requested resource values were acceptable to the authorization server. This outcome may result from authorization server policy or client configuration.<a href="#section-3.3.6-1" class="pilcrow">¶</a></p>
-<p id="section-3.3.6-2">Upon receiving an <code>invalid_target</code> error, the client <span class="bcp14">MAY</span> retry the authorization request with a different <code>resource</code> value.<a href="#section-3.3.6-2" class="pilcrow">¶</a></p>
+<p id="section-3.3.5-1">An <code>invalid_target</code> error indicates that none of the requested resource values were acceptable to the authorization server. This outcome may result from authorization server policy or client configuration.<a href="#section-3.3.5-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.5-2">Upon receiving an <code>invalid_target</code> error, the client <span class="bcp14">MAY</span> retry the authorization request with a different <code>resource</code> value.<a href="#section-3.3.5-2" class="pilcrow">¶</a></p>
 <div id="ex-invalid-resource-authz">
-<section id="section-3.3.6.1">
+<section id="section-3.3.5.1">
             <h5 id="name-authorization-request-example-2">
-<a href="#section-3.3.6.1" class="section-number selfRef">3.3.6.1. </a><a href="#name-authorization-request-example-2" class="section-name selfRef">Authorization Request Example</a>
+<a href="#section-3.3.5.1" class="section-number selfRef">3.3.5.1. </a><a href="#name-authorization-request-example-2" class="section-name selfRef">Authorization Request Example</a>
             </h5>
-<p id="section-3.3.6.1-1">Client attempts to obtain an access token for a protected resource (<code>https://unknown.example.com</code>) that is not permitted.<a href="#section-3.3.6.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.5.1-1">Client attempts to obtain an access token for a protected resource (<code>https://unknown.example.com</code>) that is not permitted.<a href="#section-3.3.5.1-1" class="pilcrow">¶</a></p>
 <div id="authorization-request-3">
-<section id="section-3.3.6.1.1">
+<section id="section-3.3.5.1.1">
               <h6 id="name-authorization-request-4">
-<a href="#section-3.3.6.1.1" class="section-number selfRef">3.3.6.1.1. </a><a href="#name-authorization-request-4" class="section-name selfRef">Authorization Request</a>
+<a href="#section-3.3.5.1.1" class="section-number selfRef">3.3.5.1.1. </a><a href="#name-authorization-request-4" class="section-name selfRef">Authorization Request</a>
               </h6>
-<p id="section-3.3.6.1.1-1">Client makes an authorization request for a protected resource that is not permitted.<a href="#section-3.3.6.1.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.6.1.1-2">
+<p id="section-3.3.5.1.1-1">Client makes an authorization request for a protected resource that is not permitted.<a href="#section-3.3.5.1.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.5.1.1-2">
 <pre>
 GET /authorize?response_type=code
   &amp;client_id=client123
@@ -2283,39 +2162,39 @@ GET /authorize?response_type=code
   &amp;code_challenge_method=S256
 HTTP/1.1
 Host: authorization-server.example.com
-</pre><a href="#section-3.3.6.1.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.3.5.1.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="error-redirect">
-<section id="section-3.3.6.1.2">
+<section id="section-3.3.5.1.2">
               <h6 id="name-error-redirect">
-<a href="#section-3.3.6.1.2" class="section-number selfRef">3.3.6.1.2. </a><a href="#name-error-redirect" class="section-name selfRef">Error Redirect</a>
+<a href="#section-3.3.5.1.2" class="section-number selfRef">3.3.5.1.2. </a><a href="#name-error-redirect" class="section-name selfRef">Error Redirect</a>
               </h6>
-<p id="section-3.3.6.1.2-1">The authorization server rejects the requested resource and does not issue an authorization code.<a href="#section-3.3.6.1.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.6.1.2-2">
+<p id="section-3.3.5.1.2-1">The authorization server rejects the requested resource and does not issue an authorization code.<a href="#section-3.3.5.1.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.5.1.2-2">
 <pre>
 HTTP/1.1 302 Found
 Location: https://client.example.com/cb?error=invalid_target&amp;error_description=Resource%20not%20allowed&amp;state=invalid123
-</pre><a href="#section-3.3.6.1.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.3.5.1.2-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 </section>
 </div>
 <div id="ex-invalid-resource-refresh">
-<section id="section-3.3.6.2">
+<section id="section-3.3.5.2">
             <h5 id="name-refresh-token-request-example-2">
-<a href="#section-3.3.6.2" class="section-number selfRef">3.3.6.2. </a><a href="#name-refresh-token-request-example-2" class="section-name selfRef">Refresh Token Request Example</a>
+<a href="#section-3.3.5.2" class="section-number selfRef">3.3.5.2. </a><a href="#name-refresh-token-request-example-2" class="section-name selfRef">Refresh Token Request Example</a>
             </h5>
-<p id="section-3.3.6.2-1">Client attempts to refresh an access token for a protected resource (<code>https://unknown.example.com</code>) that is not permitted.<a href="#section-3.3.6.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.3.5.2-1">Client attempts to refresh an access token for a protected resource (<code>https://unknown.example.com</code>) that is not permitted.<a href="#section-3.3.5.2-1" class="pilcrow">¶</a></p>
 <div id="refresh-token-request-3">
-<section id="section-3.3.6.2.1">
+<section id="section-3.3.5.2.1">
               <h6 id="name-refresh-token-request-4">
-<a href="#section-3.3.6.2.1" class="section-number selfRef">3.3.6.2.1. </a><a href="#name-refresh-token-request-4" class="section-name selfRef">Refresh Token Request</a>
+<a href="#section-3.3.5.2.1" class="section-number selfRef">3.3.5.2.1. </a><a href="#name-refresh-token-request-4" class="section-name selfRef">Refresh Token Request</a>
               </h6>
-<p id="section-3.3.6.2.1-1">The client uses a refresh token to request a new access token for a protected resource that is not permitted.<a href="#section-3.3.6.2.1-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.6.2.1-2">
+<p id="section-3.3.5.2.1-1">The client uses a refresh token to request a new access token for a protected resource that is not permitted.<a href="#section-3.3.5.2.1-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.5.2.1-2">
 <pre>
 POST /token HTTP/1.1
 Host: authorization-server.example.com
@@ -2326,17 +2205,17 @@ refresh_token=REFRESH_TOKEN&amp;
 client_id=client123&amp;
 scope=customers%3Aread&amp;
 resource=https%3A%2F%2Funknown.example.com%2F
-</pre><a href="#section-3.3.6.2.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.3.5.2.1-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="error-response">
-<section id="section-3.3.6.2.2">
+<section id="section-3.3.5.2.2">
               <h6 id="name-error-response">
-<a href="#section-3.3.6.2.2" class="section-number selfRef">3.3.6.2.2. </a><a href="#name-error-response" class="section-name selfRef">Error Response</a>
+<a href="#section-3.3.5.2.2" class="section-number selfRef">3.3.5.2.2. </a><a href="#name-error-response" class="section-name selfRef">Error Response</a>
               </h6>
-<p id="section-3.3.6.2.2-1">The authorization server rejects the requested resource.<a href="#section-3.3.6.2.2-1" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-3.3.6.2.2-2">
+<p id="section-3.3.5.2.2-1">The authorization server rejects the requested resource.<a href="#section-3.3.5.2.2-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-3.3.5.2.2-2">
 <pre>
 HTTP/1.1 400 Bad Request
 Content-Type: application/json
@@ -2347,7 +2226,7 @@ Pragma: no-cache
   "error": "invalid_target",
   "error_description": "Resource not allowed"
 }
-</pre><a href="#section-3.3.6.2.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-3.3.5.2.2-2" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2369,11 +2248,11 @@ Pragma: no-cache
 <a href="#section-3.4.1" class="section-number selfRef">3.4.1. </a><a href="#name-resource-selection-ambiguit" class="section-name selfRef">Resource Selection Ambiguity and Mix-Up Attacks</a>
           </h4>
 <p id="section-3.4.1-1"><strong>Threat:</strong>
-An authorization server issues a successful access token response without clearly indicating the protected resource or resources for which the token is valid. This can occur when the server applies default resource selection, narrows a requested resource set, or substitutes a different resource according to local policy without communicating that decision to the client. Such conditions are more likely in deployments where a client interacts with multiple authorization servers and protected resources, or dynamically discovers authorization servers at runtime, including via HTTP authorization challenges using OAuth 2.0 Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>.<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
+An authorization server issues a successful access token response without clearly indicating the protected resource(s) for which the token is valid. This can occur when the server applies server-assigned resource selection, narrows a requested resource set, or substitutes a different resource according to local policy without communicating that decision to the client. Such conditions are more likely in deployments where a client interacts with multiple authorization servers and protected resources, or dynamically discovers authorization servers at runtime, including via HTTP authorization challenges using OAuth 2.0 Protected Resource Metadata <span>[<a href="#RFC9728" class="cite xref">RFC9728</a>]</span>.<a href="#section-3.4.1-1" class="pilcrow">¶</a></p>
 <p id="section-3.4.1-2"><strong>Impact:</strong>
 A client may incorrectly assume that an access token is valid for a different protected resource than the one actually authorized. This can result in access token misuse, unintended token disclosure to an incorrect protected resource, or resource mix-up attacks in which a token intended for one resource is presented to another. These risks are amplified in dynamic environments where the client cannot fully validate the trust relationship between a protected resource and the authorization server.<a href="#section-3.4.1-2" class="pilcrow">¶</a></p>
 <p id="section-3.4.1-3"><strong>Mitigation:</strong>
-This specification mitigates resource selection ambiguity and OAuth mix-up attacks by requiring authorization servers to explicitly return the resource or resources for which an access token is valid in the access token response. By providing issuance-time confirmation of the effective resource selection, clients can detect cases where a requested resource was narrowed, substituted, or overridden, and can avoid using access tokens with unintended protected resources.<a href="#section-3.4.1-3" class="pilcrow">¶</a></p>
+This specification mitigates resource selection ambiguity and OAuth mix-up attacks by requiring authorization servers to explicitly return the resource(s) for which an access token is valid in the access token response. By providing issuance-time confirmation of the effective resource selection, clients can detect cases where a requested resource was narrowed, substituted, or overridden, and can avoid using access tokens with unintended protected resources.<a href="#section-3.4.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="limitations-of-discovery-time-mechanisms">
@@ -2408,7 +2287,7 @@ To prevent token reuse attacks, access tokens <span class="bcp14">SHOULD</span> 
 <a href="#section-3.4.4" class="section-number selfRef">3.4.4. </a><a href="#name-client-validation-and-defen" class="section-name selfRef">Client Validation and Defense in Depth</a>
           </h4>
 <p id="section-3.4.4-1"><strong>Threat:</strong>
-A client fails to validate the resource or resources returned in the access token response and proceeds to use an access token for a protected resource other than the one for which it was issued.<a href="#section-3.4.4-1" class="pilcrow">¶</a></p>
+A client fails to validate the resource(s) returned in the access token response and proceeds to use an access token for a protected resource other than the one for which it was issued.<a href="#section-3.4.4-1" class="pilcrow">¶</a></p>
 <p id="section-3.4.4-2"><strong>Impact:</strong>
 Failure to validate the returned <code>resource</code> parameter can result in token misuse or unintended interactions with protected resources, even when the authorization server correctly indicates the effective resource selection.<a href="#section-3.4.4-2" class="pilcrow">¶</a></p>
 <p id="section-3.4.4-3"><strong>Mitigation:</strong>
@@ -2432,17 +2311,18 @@ Clients are advised to validate the <code>resource</code> parameter in the token
       <h2 id="name-iana-considerations">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-5-1">This document registers the following value in the OAuth Parameters registry established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<div id="oauth-access-token-response-parameters-registry">
+<p id="section-5-1">This document updates the "resource" parameter in the OAuth Parameters registry established by <span>[<a href="#RFC6749" class="cite xref">RFC6749</a>]</span>. The "resource" parameter is defined by <span>[<a href="#RFC8707" class="cite xref">RFC8707</a>]</span> for use in authorization requests and token requests. This specification adds the following usage location:<a href="#section-5-1" class="pilcrow">¶</a></p>
+<div id="oauth-parameters-registry">
 <section id="section-5.1">
-        <h3 id="name-oauth-access-token-response">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-oauth-access-token-response" class="section-name selfRef">OAuth Access Token Response Parameters Registry</a>
+        <h3 id="name-oauth-parameters-registry">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-oauth-parameters-registry" class="section-name selfRef">OAuth Parameters Registry</a>
         </h3>
 <table class="center" id="table-3">
           <caption><a href="#table-3" class="selfRef">Table 3</a></caption>
 <thead>
             <tr>
               <th class="text-left" rowspan="1" colspan="1">Name</th>
+              <th class="text-left" rowspan="1" colspan="1">Parameter Usage Location</th>
               <th class="text-left" rowspan="1" colspan="1">Description</th>
               <th class="text-left" rowspan="1" colspan="1">Specification</th>
             </tr>
@@ -2450,6 +2330,7 @@ Clients are advised to validate the <code>resource</code> parameter in the token
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">resource</td>
+              <td class="text-left" rowspan="1" colspan="1">token response</td>
               <td class="text-left" rowspan="1" colspan="1">Resource to which the access token applies</td>
               <td class="text-left" rowspan="1" colspan="1">This document</td>
             </tr>
@@ -2554,7 +2435,7 @@ GET /.well-known/oauth-protected-resource
 Host: api.example.com
 Accept: application/json
 
-HTTP/1.1 200 Ok
+HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
@@ -2578,7 +2459,7 @@ GET /.well-known/oauth-authorization-server
 Host: authorization-server.example.com
 Accept: application/json
 
-HTTP/1.1 200 Ok
+HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
@@ -2605,7 +2486,7 @@ Content-Type: application/json
 GET /oauth2/authorize?response_type=code
   &amp;client_id=client123
   &amp;redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
-  &amp;scope=resource%3Aread
+  &amp;scope=resource.read
   &amp;state=abc123
   &amp;resource=https%3A%2F%2Fapi.example.com%2Fresource
   &amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
@@ -2647,12 +2528,110 @@ Pragma: no-cache
   "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "Bearer",
   "expires_in": 3600,
-  "scope": "resource:read",
+  "scope": "resource.read",
   "resource": "https://api.example.com/resource"
 }
 </pre><a href="#appendix-A.1-17" class="pilcrow">¶</a>
 </div>
 <p id="appendix-A.1-18">Client verifies that it obtained an access token that is valid for the discovered resource.<a href="#appendix-A.1-18" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="ex-scope-defined-resource">
+<section id="appendix-A.2">
+        <h3 id="name-scope-defined-resource-with">
+<a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-scope-defined-resource-with" class="section-name selfRef">Scope-defined resource with a resource request</a>
+        </h3>
+<p id="appendix-A.2-1">An authorization server may determine resources from requested scopes in addition to explicit <code>resource</code> parameters. For example, a scope might imply a protected resource URL that the authorization server returns as a server-assigned resource alongside any client-requested resources.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-2">The following example uses OpenID Connect: the <code>openid</code> scope implies access to the UserInfo endpoint. When a client requests both a protected resource and the <code>openid</code> scope, the authorization server may determine the UserInfo endpoint URL from its configuration (e.g., <code>{issuer}/userinfo</code>) and return it as a server-assigned resource alongside the client-requested resource.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
+<div id="authorization-request-example">
+<section id="appendix-A.2.1">
+          <h4 id="name-authorization-request-example-3">
+<a href="#appendix-A.2.1" class="section-number selfRef">A.2.1. </a><a href="#name-authorization-request-example-3" class="section-name selfRef">Authorization request example</a>
+          </h4>
+<div id="authorization-request-4">
+<section id="appendix-A.2.1.1">
+            <h5 id="name-authorization-request-5">
+<a href="#appendix-A.2.1.1" class="section-number selfRef">A.2.1.1. </a><a href="#name-authorization-request-5" class="section-name selfRef">Authorization Request</a>
+            </h5>
+<div class="alignLeft art-text artwork" id="appendix-A.2.1.1-1">
+<pre>
+GET /authorize?response_type=code
+  &amp;client_id=client123
+  &amp;redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb
+  &amp;scope=openid%20profile%20data%3Aread
+  &amp;state=oidc123
+  &amp;resource=https%3A%2F%2Fapi.example.com%2Fdata
+  &amp;code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
+  &amp;code_challenge_method=S256
+HTTP/1.1
+Host: idp.example.com
+</pre><a href="#appendix-A.2.1.1-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="redirect-3">
+<section id="appendix-A.2.1.2">
+            <h5 id="name-redirect-4">
+<a href="#appendix-A.2.1.2" class="section-number selfRef">A.2.1.2. </a><a href="#name-redirect-4" class="section-name selfRef">Redirect</a>
+            </h5>
+<div class="alignLeft art-text artwork" id="appendix-A.2.1.2-1">
+<pre>
+HTTP/1.1 302 Found
+Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&amp;state=oidc123
+</pre><a href="#appendix-A.2.1.2-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="token-request-3">
+<section id="appendix-A.2.1.3">
+            <h5 id="name-token-request-4">
+<a href="#appendix-A.2.1.3" class="section-number selfRef">A.2.1.3. </a><a href="#name-token-request-4" class="section-name selfRef">Token Request</a>
+            </h5>
+<div class="alignLeft art-text artwork" id="appendix-A.2.1.3-1">
+<pre>
+POST /token HTTP/1.1
+Host: idp.example.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&amp;
+code=SplxlOBeZQQYbYS6WxSbIA&amp;
+redirect_uri=https%3A%2F%2Fclient.example.com%2Fcb&amp;
+client_id=client123&amp;
+code_verifier=dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk
+</pre><a href="#appendix-A.2.1.3-1" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="token-response-6">
+<section id="appendix-A.2.1.4">
+            <h5 id="name-token-response-7">
+<a href="#appendix-A.2.1.4" class="section-number selfRef">A.2.1.4. </a><a href="#name-token-response-7" class="section-name selfRef">Token Response</a>
+            </h5>
+<p id="appendix-A.2.1.4-1">The authorization server issues an access token valid for both the requested resource (<code>https://api.example.com/data</code>) and the UserInfo endpoint (<code>https://idp.example.com/userinfo</code>), which it determined from the <code>openid</code> scope.<a href="#appendix-A.2.1.4-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="appendix-A.2.1.4-2">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+Pragma: no-cache
+
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope": "openid profile data:read",
+  "resource": [
+    "https://api.example.com/data",
+    "https://idp.example.com/userinfo"
+  ]
+}
+</pre><a href="#appendix-A.2.1.4-2" class="pilcrow">¶</a>
+</div>
+<p id="appendix-A.2.1.4-3">The client validates that the requested resource (<code>https://api.example.com/data</code>) is present in the response. The additional resource (<code>https://idp.example.com/userinfo</code>) is a server-assigned resource determined by the authorization server based on the <code>openid</code> scope, enabling the client to use the same access token for both the API and the UserInfo endpoint.<a href="#appendix-A.2.1.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
 </section>
 </div>
 </section>
