@@ -97,7 +97,7 @@ Table of Contents
        3.4.4.  Client Validation and Defense in Depth
    4.  Privacy Considerations
    5.  IANA Considerations
-     5.1.  OAuth Access Token Response Parameters Registry
+     5.1.  OAuth Parameters Registry
    6.  Normative References
    Appendix A.  Additional Examples
      A.1.  Requesting a token for a dynamically discovered protected
@@ -1201,19 +1201,24 @@ Location: https://client.example.com/cb?error=invalid_target&error_description=R
 
 5.  IANA Considerations
 
-   This document registers the following value in the OAuth Parameters
-   registry established by [RFC6749].
+   This document updates the "resource" parameter in the OAuth
+   Parameters registry established by [RFC6749].  The "resource"
+   parameter is defined by [RFC8707] for use in authorization requests
+   and token requests.  This specification adds the following usage
+   location:
 
-5.1.  OAuth Access Token Response Parameters Registry
+5.1.  OAuth Parameters Registry
 
-           +==========+=======================+===============+
-           | Name     | Description           | Specification |
-           +==========+=======================+===============+
-           | resource | Resource to which the | This document |
-           |          | access token applies  |               |
-           +----------+-----------------------+---------------+
+   +==========+================+=======================+===============+
+   | Name     | Parameter      | Description           | Specification |
+   |          | Usage Location |                       |               |
+   +==========+================+=======================+===============+
+   | resource | token response | Resource to           | This document |
+   |          |                | which the access      |               |
+   |          |                | token applies         |               |
+   +----------+----------------+-----------------------+---------------+
 
-                                 Table 3
+                                  Table 3
 
 6.  Normative References
 
@@ -1306,7 +1311,7 @@ A.1.  Requesting a token for a dynamically discovered protected resource
    Host: api.example.com
    Accept: application/json
 
-   HTTP/1.1 200 Ok
+   HTTP/1.1 200 OK
    Content-Type: application/json
 
    {
@@ -1328,7 +1333,7 @@ GET /.well-known/oauth-authorization-server
 Host: authorization-server.example.com
 Accept: application/json
 
-HTTP/1.1 200 Ok
+HTTP/1.1 200 OK
 Content-Type: application/json
 
 {
@@ -1353,7 +1358,7 @@ Content-Type: application/json
    GET /oauth2/authorize?response_type=code
      &client_id=client123
      &redirect_uri=https%3A%2F%2Fclient.example%2Fcallback
-     &scope=resource%3Aread
+     &scope=resource.read
      &state=abc123
      &resource=https%3A%2F%2Fapi.example.com%2Fresource
      &code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM
@@ -1390,7 +1395,7 @@ Location: https://client.example/callback?code=SplxlOBeZQQYbYS6WxSbIA&state=abc1
      "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
      "token_type": "Bearer",
      "expires_in": 3600,
-     "scope": "resource:read",
+     "scope": "resource.read",
      "resource": "https://api.example.com/resource"
    }
 
