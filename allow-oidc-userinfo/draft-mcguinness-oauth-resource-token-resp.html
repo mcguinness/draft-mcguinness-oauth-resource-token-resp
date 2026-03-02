@@ -1296,7 +1296,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
           <p id="section-1-5.1.1">Ignore the <code>resource</code> parameter and issue an access token that is not restricted to any specific resource.<a href="#section-1-5.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-5.2">
-          <p id="section-1-5.2.1">Ignore the <code>resource</code> parameter and issue an access token that is valid for an server-assigned resource or set of resources.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
+          <p id="section-1-5.2.1">Ignore the <code>resource</code> parameter and issue an access token that is valid for a server-assigned resource or set of resources.<a href="#section-1-5.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-1-5.3">
           <p id="section-1-5.3.1">Accept all requested <code>resource</code> values and issue an access token that is valid for the complete requested set.<a href="#section-1-5.3.1" class="pilcrow">¶</a></p>
@@ -1754,7 +1754,7 @@ Pragma: no-cache
                 <td class="text-left" rowspan="1" colspan="1"> </td>
                 <td class="text-left" rowspan="1" colspan="1">
                   <code>resource</code> present</td>
-                <td class="text-left" rowspan="1" colspan="1">Valid. Client <span class="bcp14">SHOULD</span> treat the returned value as an server-assigned resource assignment.</td>
+                <td class="text-left" rowspan="1" colspan="1">Valid. Client <span class="bcp14">SHOULD</span> treat the returned value as a server-assigned resource assignment.</td>
               </tr>
               <tr>
                 <td class="text-left" rowspan="1" colspan="1">
@@ -2139,7 +2139,7 @@ Pragma: no-cache
 <p id="section-3.3.5-1">If the client did not include any <code>resource</code> parameters in the token request:<a href="#section-3.3.5-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.3.5-2.1">
-              <p id="section-3.3.5-2.1.1">If the response includes a <code>resource</code> parameter, the client <span class="bcp14">MAY</span> treat it as an server-assigned resource assignment.<a href="#section-3.3.5-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-3.3.5-2.1.1">If the response includes a <code>resource</code> parameter, the client <span class="bcp14">MAY</span> treat it as a server-assigned resource assignment.<a href="#section-3.3.5-2.1.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.3.5-2.2">
               <p id="section-3.3.5-2.2.1">If the response omits the <code>resource</code> parameter, the token <span class="bcp14">SHOULD</span> be treated as unbounded.<a href="#section-3.3.5-2.2.1" class="pilcrow">¶</a></p>
@@ -2695,8 +2695,8 @@ Pragma: no-cache
         <h3 id="name-scope-defined-resource-with">
 <a href="#appendix-A.2" class="section-number selfRef">A.2. </a><a href="#name-scope-defined-resource-with" class="section-name selfRef">Scope-defined resource with a resource request</a>
         </h3>
-<p id="appendix-A.2-1">An authorization server may determine resources from requested scopes in addition to explicit <code>resource</code> parameters. For example, a scope might imply a protected resource URL that the authorization server returns as an server-assigned resource alongside any client-requested resources.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
-<p id="appendix-A.2-2">The following example uses OpenID Connect: the <code>openid</code> scope implies access to the UserInfo endpoint. When a client requests both a protected resource and the <code>openid</code> scope, the authorization server may determine the UserInfo endpoint URL from its configuration (e.g., <code>{issuer}/userinfo</code>) and return it as an server-assigned resource alongside the client-requested resource.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-1">An authorization server may determine resources from requested scopes in addition to explicit <code>resource</code> parameters. For example, a scope might imply a protected resource URL that the authorization server returns as a server-assigned resource alongside any client-requested resources.<a href="#appendix-A.2-1" class="pilcrow">¶</a></p>
+<p id="appendix-A.2-2">The following example uses OpenID Connect: the <code>openid</code> scope implies access to the UserInfo endpoint. When a client requests both a protected resource and the <code>openid</code> scope, the authorization server may determine the UserInfo endpoint URL from its configuration (e.g., <code>{issuer}/userinfo</code>) and return it as a server-assigned resource alongside the client-requested resource.<a href="#appendix-A.2-2" class="pilcrow">¶</a></p>
 <div id="authorization-request-example">
 <section id="appendix-A.2.1">
           <h4 id="name-authorization-request-example-3">
@@ -2781,7 +2781,7 @@ Pragma: no-cache
 }
 </pre><a href="#appendix-A.2.1.4-2" class="pilcrow">¶</a>
 </div>
-<p id="appendix-A.2.1.4-3">The client validates that the requested resource (<code>https://api.example.com/data</code>) is present in the response. The additional resource (<code>https://idp.example.com/userinfo</code>) is an server-assigned resource determined by the authorization server based on the <code>openid</code> scope, enabling the client to use the same access token for both the API and the UserInfo endpoint.<a href="#appendix-A.2.1.4-3" class="pilcrow">¶</a></p>
+<p id="appendix-A.2.1.4-3">The client validates that the requested resource (<code>https://api.example.com/data</code>) is present in the response. The additional resource (<code>https://idp.example.com/userinfo</code>) is a server-assigned resource determined by the authorization server based on the <code>openid</code> scope, enabling the client to use the same access token for both the API and the UserInfo endpoint.<a href="#appendix-A.2.1.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

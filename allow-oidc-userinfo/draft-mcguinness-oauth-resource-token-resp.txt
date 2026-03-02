@@ -140,7 +140,7 @@ Table of Contents
       not restricted to any specific resource.
 
    *  Ignore the resource parameter and issue an access token that is
-      valid for an server-assigned resource or set of resources.
+      valid for a server-assigned resource or set of resources.
 
    *  Accept all requested resource values and issue an access token
       that is valid for the complete requested set.
@@ -730,7 +730,7 @@ Table of Contents
      +------------+----------------------+---------------------------+
      |            | resource present     | Valid.  Client SHOULD     |
      |            |                      | treat the returned value  |
-     |            |                      | as an server-assigned     |
+     |            |                      | as a server-assigned      |
      |            |                      | resource assignment.      |
      +------------+----------------------+---------------------------+
      | *Any       | error=invalid_target | Client MUST treat this as |
@@ -1008,7 +1008,7 @@ Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=abc123
    request:
 
    *  If the response includes a resource parameter, the client MAY
-      treat it as an server-assigned resource assignment.
+      treat it as a server-assigned resource assignment.
 
    *  If the response omits the resource parameter, the token SHOULD be
       treated as unbounded.
@@ -1499,14 +1499,14 @@ A.2.  Scope-defined resource with a resource request
    An authorization server may determine resources from requested scopes
    in addition to explicit resource parameters.  For example, a scope
    might imply a protected resource URL that the authorization server
-   returns as an server-assigned resource alongside any client-requested
+   returns as a server-assigned resource alongside any client-requested
    resources.
 
    The following example uses OpenID Connect: the openid scope implies
    access to the UserInfo endpoint.  When a client requests both a
    protected resource and the openid scope, the authorization server may
    determine the UserInfo endpoint URL from its configuration (e.g.,
-   {issuer}/userinfo) and return it as an server-assigned resource
+   {issuer}/userinfo) and return it as a server-assigned resource
    alongside the client-requested resource.
 
 A.2.1.  Authorization request example
@@ -1566,7 +1566,7 @@ A.2.1.4.  Token Response
 
    The client validates that the requested resource
    (https://api.example.com/data) is present in the response.  The
-   additional resource (https://idp.example.com/userinfo) is an server-
+   additional resource (https://idp.example.com/userinfo) is a server-
    assigned resource determined by the authorization server based on the
    openid scope, enabling the client to use the same access token for
    both the API and the UserInfo endpoint.
