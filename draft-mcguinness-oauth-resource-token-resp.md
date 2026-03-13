@@ -30,6 +30,10 @@ author:
     organization: Keycard Labs
     email: jared@keycard.ai
     uri: https://keycard.ai
+ -
+    fullname: Filip Skokan
+    organization: Okta
+    email: panva.ip@gmail.com
 
 normative:
   RFC6749:
@@ -236,7 +240,11 @@ If the `resource` parameter is omitted, the access token is not valid for any sp
 
 ## Client Processing Rules {#client-processing-rules}
 
-A client that supports this extension MUST process access token responses according to the rules in this section, which are determined by whether the client requested one or more resources or no resources, as defined in {{RFC8707}}.
+The client processing requirements in this section depend on (a) whether the client requested one or more `resource` values, as defined in {{RFC8707}}, and (b) whether the client was pre-configured with knowledge of both the authorization server and the protected resource prior to any interaction.
+
+A client is considered to have **pre-configured knowledge** when it was statically configured, prior to runtime, with both the identity of the authorization server (e.g., the issuer URI or token endpoint) and the identity of the protected resource(s) for which it will use access tokens. Such a client has an established trust relationship with these endpoints and can assume it is not exposed to resource mix-up attacks.
+
+A client that does not have pre-configured knowledge of both the authorization server and the protected resource (for example, because it discovered either endpoint at runtime using mechanisms such as OAuth 2.0 Protected Resource Metadata {{RFC9728}}) is exposed to resource mix-up attacks as described in {{resource-mix-up-via-dynamic-discovery-example}}. Such clients MUST apply all of the validation rules in this section. A client with pre-configured knowledge of both the authorization server and the protected resource SHOULD apply the validation rules, but is not required to reject responses that omit the `resource` parameter.
 
 When a `resource` parameter is included in an access token response, the client MUST interpret and compare the returned resource identifiers using the rules defined in {{resource-identifier-comparison}}. If the client cannot determine that an access token is valid for the intended protected resource, the client MUST NOT use the access token.
 
@@ -250,7 +258,7 @@ These client processing rules apply equally to access tokens issued using the au
 
 | Client Request Shape | Token Response | Client Processing Rules |
 |----------------------|----------------|--------------------------|
-| **One or more `resource` values requested** | `resource` omitted | Invalid. Client MUST NOT use the access token and SHOULD discard it. |
+| **One or more `resource` values requested** | `resource` omitted | Client without pre-configured knowledge of both the AS and resource: MUST NOT use the access token and SHOULD discard it. Client with pre-configured knowledge of both the AS and resource: MAY use the access token consistent with prior behavior. |
 |                      | `resource` present | Valid only if at least one returned identifier matches a requested resource; additional elements MAY be server-assigned resources. |
 | **No `resource` requested** | `resource` omitted | Valid. Token is not resource-specific. |
 |                      | `resource` present | Valid. Client SHOULD treat the returned value as a server-assigned resource assignment. |
@@ -270,8 +278,9 @@ The client MUST normalize the parsed value to a set of resource identifiers (tre
 
 If the client included one or more `resource` parameters in the token request:
 
-- The response MUST include a `resource` parameter containing at least one identifier that matches a requested resource (additional identifiers MAY be server-assigned resources).
-- Validation fails when the response omits the `resource` parameter, when the returned set does not contain any of the requested resources, or when duplicate resource identifiers are present.
+- If a `resource` parameter is present in the response, it MUST contain at least one identifier that matches a requested resource (additional identifiers MAY be server-assigned resources). Validation fails if the returned set contains none of the requested resources, or contains duplicate resource identifiers.
+- A client without pre-configured knowledge of both the authorization server and the protected resource MUST require the `resource` parameter to be present in the response. If it is absent, the client MUST NOT use the access token and SHOULD discard it.
+- A client with pre-configured knowledge of both the authorization server and the protected resource that receives a response without a `resource` parameter SHOULD treat the token as not resource-confirmed. The client MAY use the access token consistent with its prior behavior before adopting this specification.
 
 #### Authorization Request Example {#ex-single-resource-authz}
 
