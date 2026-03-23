@@ -884,6 +884,11 @@ The authors would like to thank the following individuals who contributed ideas,
 # Document History
 {:numbered="false"}
 
+-03
+
+* Existing clients that are deployed in environments that trust AS and RS don't need to process response parameter (draft-skokan-oauth-resource-response gap behavior)
+* Made Filip co-author
+
 -02
 
 * Modified processing rules to allow server-assigned resources to be combined with requested resources
