@@ -5,10 +5,10 @@
 Web Authorization Protocol                                 K. McGuinness
 Internet-Draft                                               Independent
 Intended status: Standards Track                               J. Hanson
-Expires: 21 September 2026                                  Keycard Labs
+Expires: 24 September 2026                                  Keycard Labs
                                                                F. Skokan
                                                                     Okta
-                                                           20 March 2026
+                                                           23 March 2026
 
 
          OAuth 2.0 Resource Parameter in Access Token Response
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 September 2026.
+   This Internet-Draft will expire on 24 September 2026.
 
 Copyright Notice
 
@@ -1525,6 +1525,14 @@ Acknowledgments
    specification: Filip Skokan
 
 Document History
+
+   -03
+
+   *  Existing clients that are deployed in environments that trust AS
+      and RS don't need to process response parameter (draft-skokan-
+      oauth-resource-response gap behavior)
+
+   *  Made Filip co-author
 
    -02
 
